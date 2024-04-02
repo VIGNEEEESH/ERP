@@ -69,7 +69,7 @@ const getAttendanceByDateAndUserId = async (req, res, next) => {
   const userId = req.params.userId;
   let attendance;
   try {
-    attendance = await Attendance.find({ date: date, userId: userId });
+    attendance = await Attendance.findOne({ date: date, userId: userId });
 
     if (!attendance || attendance.length === 0) {
       return res.status(404).json({
@@ -88,7 +88,37 @@ const getAttendanceByDateAndUserId = async (req, res, next) => {
   }
 };
 
+const updateWorkStatus = async (req, res, next) => {
+  const { date, userId, workStatus } = req.body;
+  let attendance;
+  try {
+    attendance = await Attendance.findOne({ date: date, userId: userId });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!attendance) {
+    const error = new HttpError("Attendance not found, please try again", 500);
+    return next(error);
+  }
+  attendance.workStatus = workStatus;
+  try {
+    await attendance.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({ attendance: attendance });
+};
+
 exports.createAttendance = createAttendance;
 exports.getAllAttendance = getAllAttendance;
 exports.getAttendanceByDate = getAttendanceByDate;
 exports.getAttendanceByDateAndUserId = getAttendanceByDateAndUserId;
+exports.updateWorkStatus = updateWorkStatus;
