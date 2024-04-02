@@ -279,9 +279,41 @@ const updateUserById = async (req, res, next) => {
     .status(201)
     .json({ userId: user.id, email: user.email, role: user.role, token });
 };
+const deleteUserById = async (req, res, next) => {
+  const id = req.params.id;
+  let user;
+  try {
+    user = await User.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!user) {
+    const error = new HttpError("User not found, please try again", 500);
+    return next(error);
+  }
+  const imagePath = user.image;
+  try {
+    await user.deleteOne();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while deleting the user, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ message: "User deleted successfully" });
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
+};
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
 exports.getAllUsers = getAllUsers;
 exports.getUserById = getUserById;
 exports.login = login;
 exports.updateUserById = updateUserById;
+exports.deleteUserById = deleteUserById;
