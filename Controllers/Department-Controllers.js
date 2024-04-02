@@ -44,5 +44,32 @@ const createDepartment = async (req, res, next) => {
   }
   res.status(201).json({ createdDepartment: createdDepartment });
 };
-
+const getAllDepartments = async (req, res, next) => {
+  let departments;
+  try {
+    departments = await Department.find({});
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ departments: departments });
+};
+const getDepartmentById = async (req, res, next) => {
+  const id = req.params.id;
+  let department;
+  try {
+    department = await Department.find({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ department: department });
+};
 exports.createDepartment = createDepartment;
+exports.getAllDepartments = getAllDepartments;
