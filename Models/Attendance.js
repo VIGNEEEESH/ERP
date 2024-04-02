@@ -9,6 +9,7 @@ const attendanceSchema = new Schema({
   loggedOutTime: { type: String, required: true },
   workStatus: { type: String, required: true },
   userId: { type: String, required: true },
+  email: { type: String, required: true },
 });
 attendanceSchema.plugin(uniqueValidator);
 module.exports = mongoose.model("Attendance", attendanceSchema);
