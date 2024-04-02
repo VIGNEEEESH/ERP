@@ -44,5 +44,86 @@ const inviteUser = async (req, res, next) => {
   }
   res.status(201).json({ userId: createdUser.id });
 };
-
+const createUser = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Invalid inputs passed, please try again",
+      errors: errors.array(),
+    });
+  }
+  const {
+    id,
+    firstName,
+    lastName,
+    password,
+    mobile,
+    address,
+    pincode,
+    state,
+    country,
+  } = req.body;
+  let user;
+  try {
+    user = await findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!user) {
+    const error = new HttpError("No user found, please try again", 500);
+    return next(error);
+  }
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while encrypting the password, please try again",
+      500
+    );
+    return next(error);
+  }
+  user.firstName = firstName;
+  user.lastName = lastName;
+  user.password = hashedPassword;
+  user.mobile = mobile;
+  user.address = address;
+  user.pincode = pincode;
+  user.state = state;
+  user.country = country;
+  user.image = req.file.path;
+  try {
+    await user.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the user, please try again",
+      500
+    );
+    return next(error);
+  }
+  try {
+    token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      process.env.JWT_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while generating the JWT token, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    token: token,
+  });
+};
 exports.inviteUser = inviteUser;
+exports.createUser = createUser;
