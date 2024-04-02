@@ -71,7 +71,40 @@ const getDepartmentById = async (req, res, next) => {
   }
   res.status(200).json({ department: department });
 };
+const updateDepartmentById = async (req, res, next) => {
+  const id = req.params.id;
+  let department;
+  const { departmentName, userId } = req.body;
+  try {
+    department = await Department.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!department) {
+    const error = new HttpError("Department not found, please try again", 500);
+    return next(error);
+  }
+  department.departmentName = departmentName
+    ? departmentName
+    : department.departmentName;
+  department.userId = userId ? userId : department.userId;
+  try {
+    department.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({ department: department });
+};
 
 exports.createDepartment = createDepartment;
 exports.getAllDepartments = getAllDepartments;
 exports.getDepartmentById = getDepartmentById;
+exports.updateDepartmentById = updateDepartmentById;
