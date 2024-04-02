@@ -125,5 +125,19 @@ const createUser = async (req, res, next) => {
     token: token,
   });
 };
+const getAllUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ users: users });
+};
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
+exports.getAllUsers = getAllUsers;
