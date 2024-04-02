@@ -8,11 +8,11 @@ const createDepartment = async (req, res, next) => {
     const error = new HttpError("Invalid inputs, please try again", 422);
     return next(error);
   }
-  const { DepartmentName, userId } = req.body;
+  const { departmentName, userId } = req.body;
   let existingDepartment;
   try {
     existingDepartment = await Department.findOne({
-      DepartmentName: DepartmentName,
+      departmentName: departmentName,
     });
   } catch (err) {
     const error = new HttpError(
@@ -30,7 +30,7 @@ const createDepartment = async (req, res, next) => {
   }
 
   const createdDepartment = new Department({
-    DepartmentName,
+    departmentName,
     userId,
   });
   try {

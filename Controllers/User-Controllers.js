@@ -252,7 +252,7 @@ const updateUserById = async (req, res, next) => {
   user.pincode = pincode ? pincode : user.pincode;
   user.state = state ? state : user.state;
   user.country = country ? country : user.country;
-  user.image = image;
+  user.image = image ? image : user.image;
   try {
     await user.save();
   } catch (err) {
