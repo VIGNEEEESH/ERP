@@ -101,7 +101,35 @@ const updateClientById = async (req, res, next) => {
   }
   res.status(201).json({ client: client });
 };
+const deleteClientById = async (req, res, next) => {
+  const id = req.params.id;
+  let client;
+  try {
+    client = await Client.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!client) {
+    const error = new HttpError("Client not found, please try again", 500);
+    return next(error);
+  }
+  try {
+    await client.deleteOne();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while deleting the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ message: "Client deleted successfully" });
+};
 exports.createClient = createClient;
 exports.getAllClients = getAllClients;
 exports.getClientById = getClientById;
 exports.updateClientById = updateClientById;
+exports.deleteClientById = deleteClientById;
