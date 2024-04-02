@@ -58,6 +58,37 @@ const getLeaveById = async (req, res, next) => {
   }
   res.status(200).json({ leave: leave });
 };
+const updateLeaveStatus = async (req, res, next) => {
+  const id = req.params.id;
+  let leave;
+  const { status } = req.body;
+  try {
+    leave = await Leave.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!leave) {
+    const error = new HttpError("Leave not found, please try again", 500);
+    return next(error);
+  }
+  leave.status = status ? status : leave.status;
+
+  try {
+    leave.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({ leave: leave });
+};
 exports.createLeave = createLeave;
 exports.getAllLeaves = getAllLeaves;
 exports.getLeaveById = getLeaveById;
+exports.updateLeaveStatus = updateLeaveStatus;
