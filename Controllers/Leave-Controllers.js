@@ -95,7 +95,7 @@ const updateLeaveStatus = async (req, res, next) => {
     leave.save();
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong while saving the data, please try again",
+      "Something went wrong while saving the data , please try again",
       500
     );
     return next(error);
