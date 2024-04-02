@@ -6,7 +6,7 @@ const attendanceSchema = new Schema({
   attendanceStatus: { type: String, required: true },
   date: { type: String, required: true, unique: true },
   loggedInTime: { type: String, required: true },
-  loggedOutTime: { type: String, required: true },
+  loggedOutTime: { type: String },
   workStatus: { type: String, required: true },
   userId: { type: String, required: true },
   email: { type: String, required: true },

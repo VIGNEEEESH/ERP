@@ -64,7 +64,31 @@ const getAttendanceByDate = async (req, res, next) => {
   }
   res.status(200).json({ attendance: attendance });
 };
+const getAttendanceByDateAndUserId = async (req, res, next) => {
+  const date = req.params.date;
+  const userId = req.params.userId;
+  let attendance;
+  try {
+    attendance = await Attendance.find({ date: date, userId: userId });
+
+    if (!attendance || attendance.length === 0) {
+      return res.status(404).json({
+        message: "Attendance data not found for the provided date and user ID",
+      });
+    }
+
+    res.status(200).json({ attendance: attendance });
+  } catch (err) {
+    console.error(err);
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+};
 
 exports.createAttendance = createAttendance;
 exports.getAllAttendance = getAllAttendance;
 exports.getAttendanceByDate = getAttendanceByDate;
+exports.getAttendanceByDateAndUserId = getAttendanceByDateAndUserId;
