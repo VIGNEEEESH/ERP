@@ -5,7 +5,7 @@ const Attendance = require("../Models/Attendance");
 const createAttendance = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = new HttpError("Invalid inputs, please try again", 500);
+    const error = new HttpError("Invalid inputs, please try again", 422);
     return next(error);
   }
   const {
