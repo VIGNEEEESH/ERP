@@ -69,6 +69,39 @@ const getClientById = async (req, res, next) => {
   }
   res.status(200).json({ client: client });
 };
+const updateClientById = async (req, res, next) => {
+  const id = req.params.id;
+  let client;
+  const { clientName, companyName, mobile, projects } = req.body;
+  try {
+    client = await Client.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!client) {
+    const error = new HttpError("Client not found, please try again", 500);
+    return next(error);
+  }
+  client.clientName = clientName ? clientName : client.clientName;
+  client.companyName = companyName ? companyName : client.companyName;
+  client.mobile = mobile ? mobile : client.mobile;
+  client.projects = projects ? projects : client.projects;
+  try {
+    client.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({ client: client });
+};
 exports.createClient = createClient;
 exports.getAllClients = getAllClients;
 exports.getClientById = getClientById;
+exports.updateClientById = updateClientById;
