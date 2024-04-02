@@ -48,7 +48,7 @@ const getLeaveById = async (req, res, next) => {
   const id = req.params.id;
   let leave;
   try {
-    leave = await Leave.find({ _id: id });
+    leave = await Leave.findOne({ _id: id });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
@@ -57,6 +57,20 @@ const getLeaveById = async (req, res, next) => {
     return next(error);
   }
   res.status(200).json({ leave: leave });
+};
+const getLeaveByEmail = async (req, res, next) => {
+  const email = req.params.email;
+  let leaves;
+  try {
+    leaves = await Leave.find({ email: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ leaves: leaves });
 };
 const updateLeaveStatus = async (req, res, next) => {
   const id = req.params.id;
@@ -91,4 +105,5 @@ const updateLeaveStatus = async (req, res, next) => {
 exports.createLeave = createLeave;
 exports.getAllLeaves = getAllLeaves;
 exports.getLeaveById = getLeaveById;
+exports.getLeaveByEmail = getLeaveByEmail;
 exports.updateLeaveStatus = updateLeaveStatus;
