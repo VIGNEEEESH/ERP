@@ -42,4 +42,18 @@ const createClient = async (req, res, next) => {
   }
   res.status(201).json({ createdClient: createdClient });
 };
+const getAllClients = async (req, res, next) => {
+  let clients;
+  try {
+    clients = await Client.find({});
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ clients: clients });
+};
 exports.createClient = createClient;
+exports.getAllClients = getAllClients;
