@@ -138,6 +138,21 @@ const getAllUsers = async (req, res, next) => {
   }
   res.status(200).json({ users: users });
 };
+const getUserById = async (req, res, next) => {
+  const id = req.params.id;
+  let user;
+  try {
+    user = await User.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ user: user });
+};
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
 exports.getAllUsers = getAllUsers;
+exports.getUserById = getUserById;
