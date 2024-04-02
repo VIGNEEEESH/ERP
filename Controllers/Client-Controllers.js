@@ -55,5 +55,20 @@ const getAllClients = async (req, res, next) => {
   }
   res.status(200).json({ clients: clients });
 };
+const getClientById = async (req, res, next) => {
+  const id = req.params.id;
+  let client;
+  try {
+    client = await Client.find({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ client: client });
+};
 exports.createClient = createClient;
 exports.getAllClients = getAllClients;
+exports.getClientById = getClientById;
