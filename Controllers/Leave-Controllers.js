@@ -31,4 +31,19 @@ const createLeave = async (req, res, next) => {
   }
   res.status(201).json({ createdLeave: createdLeave });
 };
+const getAllLeaves = async (req, res, next) => {
+  let leaves;
+  try {
+    leaves = await Leave.find({});
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ leaves: leaves });
+};
+
 exports.createLeave = createLeave;
+exports.getAllLeaves = getAllLeaves;
