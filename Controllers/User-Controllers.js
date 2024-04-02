@@ -14,9 +14,9 @@ const inviteUser = async (req, res, next) => {
     });
   }
   const { email, role } = req.body;
-  let existingUser;
+  let user;
   try {
-    existingUser = await User.findOne({ email: email });
+    user = await User.findOne({ email: email });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
@@ -24,7 +24,7 @@ const inviteUser = async (req, res, next) => {
     );
     return next(error);
   }
-  if (existingUser) {
+  if (user) {
     const error = new HttpError("Email already exists, please try again", 500);
     return next(error);
   }
@@ -154,9 +154,9 @@ const getUserById = async (req, res, next) => {
 };
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-  let existingUser;
+  let user;
   try {
-    existingUser = await User.findOne({ email: email });
+    user = await User.findOne({ email: email });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
@@ -164,13 +164,13 @@ const login = async (req, res, next) => {
     );
     return next(error);
   }
-  if (!existingUser) {
+  if (!user) {
     const error = new HttpError("User not found, please try again", 500);
     return next(error);
   }
   let isValidPassword = false;
   try {
-    isValidPassword = await bcrypt.compare(password, existingUser.password);
+    isValidPassword = await bcrypt.compare(password, user.password);
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while verification of the password, please try again",
@@ -186,9 +186,9 @@ const login = async (req, res, next) => {
   try {
     token = jwt.sign(
       {
-        userId: existingUser.id,
-        email: existingUser.email,
-        role: existingUser.role,
+        userId: user.id,
+        email: user.email,
+        role: user.role,
       },
       process.env.JWT_KEY,
       { expiresIn: "1h" }
@@ -201,14 +201,87 @@ const login = async (req, res, next) => {
     return next(error);
   }
   res.status(200).json({
-    userId: existingUser.id,
-    email: existingUser.email,
-    role: existingUser.role,
+    userId: user.id,
+    email: user.email,
+    role: user.role,
     token,
   });
+};
+const updateUserById = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new HttpError("Invalid inputs, please try again", 422);
+    return next(error);
+  }
+  const id = req.params.id;
+  const { firstName, lastName, mobile, address, pincode, state, country } =
+    req.body;
+  let user;
+  try {
+    user = await User.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!user) {
+    const error = new HttpError("User not found, please try again", 500);
+    return next(error);
+  }
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while encrypting the password, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (req.file.path != null) {
+    user.image = req.file.path;
+  } else {
+    user.image = user.image;
+  }
+  user.firstName = firstName ? firstName : user.firstName;
+  user.lastName = lastName ? lastName : user.lastName;
+  user.mobile = mobile ? mobile : user.mobile;
+  user.address = address ? address : user.address;
+  user.pincode = pincode ? pincode : user.pincode;
+  user.state = state ? state : user.state;
+  user.country = country ? country : user.country;
+  user.image = image;
+  try {
+    await user.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while updating the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  try {
+    token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      process.env.JWT_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while generating the JWT token, please try again",
+      500
+    );
+    return next(error);
+  }
+  res
+    .status(201)
+    .json({ userId: user.id, email: user.email, role: user.role, token });
 };
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
 exports.getAllUsers = getAllUsers;
 exports.getUserById = getUserById;
 exports.login = login;
+exports.updateUserById = updateUserById;
