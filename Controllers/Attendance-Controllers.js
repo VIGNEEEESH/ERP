@@ -37,4 +37,19 @@ const createAttendance = async (req, res, next) => {
   }
   res.status(201).json({ attendance: createAttendance });
 };
+const getAllAttendance = async (req, res, next) => {
+  let attendance;
+  try {
+    attendance = await Attendance.find({});
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ attendance: attendance });
+};
+
 exports.createAttendance = createAttendance;
+exports.getAllAttendance = getAllAttendance;
