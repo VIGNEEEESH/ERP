@@ -152,7 +152,63 @@ const getUserById = async (req, res, next) => {
   }
   res.status(200).json({ user: user });
 };
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!existingUser) {
+    const error = new HttpError("User not found, please try again", 500);
+    return next(error);
+  }
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while verification of the password, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!isValidPassword) {
+    const error = new HttpError("Invalid crudentials, please try again", 401);
+    return next(error);
+  }
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: existingUser.id,
+        email: existingUser.email,
+        role: existingUser.role,
+      },
+      process.env.JWT_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while generating the JWT token, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({
+    userId: existingUser.id,
+    email: existingUser.email,
+    role: existingUser.role,
+    token,
+  });
+};
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
 exports.getAllUsers = getAllUsers;
 exports.getUserById = getUserById;
+exports.login = login;
