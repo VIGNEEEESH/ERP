@@ -103,8 +103,36 @@ const updateDepartmentById = async (req, res, next) => {
   }
   res.status(201).json({ department: department });
 };
+const deleteDepartmentById = async (req, res, next) => {
+  const id = req.params.id;
+  let department;
+  try {
+    department = await Department.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!department) {
+    const error = new HttpError("Department not found, please try again", 500);
+    return next(error);
+  }
+  try {
+    await department.deleteOne();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while deleting the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ message: "Department deleted successfully" });
+};
 
 exports.createDepartment = createDepartment;
 exports.getAllDepartments = getAllDepartments;
 exports.getDepartmentById = getDepartmentById;
 exports.updateDepartmentById = updateDepartmentById;
+exports.deleteDepartmentById = deleteDepartmentById;
