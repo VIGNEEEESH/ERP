@@ -11,6 +11,7 @@ const leaveRoutes = require("./Routes/Leave-Routes");
 const productRoutes = require("./Routes/Product-Routes");
 const projectRoutes = require("./Routes/Project-Routes");
 const userRoutes = require("./Routes/User-Routes");
+const workRoutes = require("./Routes/Work-Routes");
 const path = require("path");
 app.use(bodyParser.json());
 app.use(cors());
@@ -39,6 +40,7 @@ app.use("/api/erp/leave", leaveRoutes);
 app.use("/api/erp/product", productRoutes);
 app.use("/api/erp/project", projectRoutes);
 app.use("/api/erp/user", userRoutes);
+app.use("/api/erp/work", workRoutes);
 
 mongoose
   .connect(
