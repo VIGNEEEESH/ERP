@@ -8,24 +8,25 @@ const createAttendance = async (req, res, next) => {
     const error = new HttpError("Invalid inputs, please try again", 422);
     return next(error);
   }
-  const {
-    attendanceStatus,
-    date,
-    loggenIntime,
-    loggedOutTime,
-    workStatus,
-    userId,
-    email,
-  } = req.body;
+
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+
+  const currentTime = currentDate.toLocaleTimeString("en-US", {
+    hour12: false,
+  });
+
+  const { workStatus, userId, email } = req.body;
+
   const createdAttendance = new Attendance({
-    attendanceStatus,
-    date,
-    loggenIntime,
-    loggedOutTime,
+    attendanceStatus: "Present",
+    date: formattedDate,
+    loggenIntime: currentTime,
     workStatus,
     userId,
     email,
   });
+
   try {
     await createdAttendance.save();
   } catch (err) {
@@ -35,8 +36,10 @@ const createAttendance = async (req, res, next) => {
     );
     return next(error);
   }
-  res.status(201).json({ attendance: createAttendance });
+
+  res.status(201).json({ attendance: createdAttendance });
 };
+
 const getAllAttendance = async (req, res, next) => {
   let attendance;
   try {
@@ -117,10 +120,18 @@ const updateWorkStatus = async (req, res, next) => {
   res.status(201).json({ attendance: attendance });
 };
 const addLoggedOutTime = async (req, res, next) => {
-  const { date, userId, loggedOutTime } = req.body;
+  const { userId } = req.body;
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+  const currentTime = currentDate.toLocaleTimeString("en-US", {
+    hour12: false,
+  });
   let attendance;
   try {
-    attendance = await Attendance.findOne({ date: date, userId: userId });
+    attendance = await Attendance.findOne({
+      date: currentDate,
+      userId: userId,
+    });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
@@ -132,7 +143,8 @@ const addLoggedOutTime = async (req, res, next) => {
     const error = new HttpError("Attendance not found, please try again", 500);
     return next(error);
   }
-  attendance.loggedOutTime = loggedOutTime;
+
+  attendance.loggedOutTime = currentTime;
   try {
     await attendance.save();
   } catch (err) {
