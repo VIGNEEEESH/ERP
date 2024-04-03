@@ -4,7 +4,8 @@ const app = express();
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const cors = require("cors");
-
+const attendanceRoutes = require("./Routes/Attendance-Routes");
+const clientRoutes = require("./Routes/Client-Routes");
 const path = require("path");
 app.use(bodyParser.json());
 app.use(cors());
@@ -26,6 +27,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+app.use("/api/erp/attendance", attendanceRoutes);
+app.use("/api/erp/client", clientRoutes);
 
 mongoose
   .connect(

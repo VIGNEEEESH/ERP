@@ -6,11 +6,11 @@ const checkAuth = require("../Middleware/check-auth");
 
 router.get("/get/all/attendance", attendanceControllers.getAllAttendance);
 router.get(
-  "/get/attendance/byid/:date",
+  "/get/attendance/bydate/:date",
   attendanceControllers.getAttendanceByDate
 );
 router.get(
-  "/get/attendance/byid/:date/:userId",
+  "/get/attendance/bydateanduserid/:date/:userId",
   attendanceControllers.getAttendanceByDateAndUserId
 );
 router.post(
@@ -32,3 +32,4 @@ router.patch(
   [check("userId").notEmpty()],
   attendanceControllers.addLoggedOutTime
 );
+module.exports = router;
