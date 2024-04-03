@@ -114,7 +114,7 @@ const deleteProductById = async (req, res, next) => {
   const id = req.params.id;
   let product;
   try {
-    product = await product.findOne({ _id: id });
+    product = await Product.findOne({ _id: id });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while saving the data, please try again",
