@@ -7,6 +7,7 @@ const cors = require("cors");
 const attendanceRoutes = require("./Routes/Attendance-Routes");
 const clientRoutes = require("./Routes/Client-Routes");
 const departmentRoutes = require("./Routes/Department-Routes");
+const leaveRoutes = require("./Routes/Leave-Routes");
 const path = require("path");
 app.use(bodyParser.json());
 app.use(cors());
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 app.use("/api/erp/attendance", attendanceRoutes);
 app.use("/api/erp/client", clientRoutes);
 app.use("/api/erp/department", departmentRoutes);
+app.use("/api/erp/leave", leaveRoutes);
 
 mongoose
   .connect(
