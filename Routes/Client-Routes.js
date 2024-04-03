@@ -11,9 +11,9 @@ router.post(
   "/create/client",
   [
     check("clientName").isLength({ min: 2, max: 255 }),
-    check("companyName").isLength({ min: 2, max: 255 }),
-    check("projects").isLength({ min: 2 }),
-    check("mobile").isLength({ min: 6, max: 12 }),
+    check("companyName").isLength({ min: 2, max: 255 }).optional(),
+    check("projects").isLength({ min: 2 }).optional(),
+    check("mobile").isLength({ min: 6, max: 12 }).optional(),
     check("email").isEmail(),
   ],
   clientControllers.createClient
@@ -21,10 +21,10 @@ router.post(
 router.patch(
   "/update/client/byid/:id",
   [
-    check("clientName").isLength({ min: 2, max: 255 }),
-    check("companyName").isLength({ min: 2, max: 255 }),
-    check("projects").isLength({ min: 2 }),
-    check("mobile").isLength({ min: 6, max: 12 }),
+    check("clientName").isLength({ min: 2, max: 255 }).optional(),
+    check("companyName").isLength({ min: 2, max: 255 }).optional(),
+    check("projects").isLength({ min: 2 }).optional(),
+    check("mobile").isLength({ min: 6, max: 12 }).optional(),
   ],
   clientControllers.updateClientById
 );

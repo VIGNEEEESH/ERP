@@ -13,22 +13,22 @@ router.post(
   [
     check("projectName").isLength({ min: 2, max: 255 }),
     check("projectDescription").isLength({ min: 2 }),
-    check("members").isLength({ min: 2 }),
-    check("deadline").isLength({ min: 2, max: 255 }),
+    check("members").isLength({ min: 2 }).optional(),
+    check("deadline").isLength({ min: 2, max: 255 }).optional(),
     check("assignedDate").isLength({ min: 2, max: 255 }),
-    check("progress").isLength({ min: 2, max: 255 }),
+    check("progress").isLength({ min: 2, max: 255 }).optional(),
   ],
   projectControllers.createProject
 );
 router.patch(
   "/update/project/byid/:id",
   [
-    check("projectName").isLength({ min: 2, max: 255 }),
-    check("projectDescription").isLength({ min: 2 }),
-    check("members").isLength({ min: 2 }),
-    check("deadline").isLength({ min: 2, max: 255 }),
-    check("assignedDate").isLength({ min: 2, max: 255 }),
-    check("progress").isLength({ min: 2 }),
+    check("projectName").isLength({ min: 2, max: 255 }).optional(),
+    check("projectDescription").isLength({ min: 2 }).optional(),
+    check("members").isLength({ min: 2 }).optional().optional(),
+    check("deadline").isLength({ min: 2, max: 255 }).optional(),
+    check("assignedDate").isLength({ min: 2, max: 255 }).optional(),
+    check("progress").isLength({ min: 2 }).optional(),
   ],
   projectControllers.updateProjectById
 );

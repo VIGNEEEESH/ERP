@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 const projectSchema = new Schema({
   projectName: { type: String, required: true },
   projectDescription: { type: String, required: true },
-  members: [{ type: String, required: true }],
-  deadline: { type: String, required: true },
+  members: [{ type: String }],
+  deadline: { type: String },
   assignedDate: { type: String, required: true },
-  progress: { type: String, required: true },
+  progress: { type: String },
 });
 
 module.exports = mongoose.model("Project", projectSchema);
