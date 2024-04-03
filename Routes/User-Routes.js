@@ -3,6 +3,7 @@ const { check } = require("express-validator");
 const router = express.Router();
 const userControllers = require("../Controllers/User-Controllers");
 const checkAuth = require("../Middleware/check-auth");
+const imageUpload = require("../Middleware/image-upload");
 
 router.get("/get/all/users", userControllers.getAllUsers);
 router.get("/get/user/byid/:id", userControllers.getUserById);
