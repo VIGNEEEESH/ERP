@@ -65,7 +65,7 @@ const createUser = async (req, res, next) => {
   } = req.body;
   let user;
   try {
-    user = await findOne({ _id: id });
+    user = await User.findOne({ _id: id });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
@@ -75,6 +75,13 @@ const createUser = async (req, res, next) => {
   }
   if (!user) {
     const error = new HttpError("No user found, please try again", 500);
+    return next(error);
+  }
+  if (user.password) {
+    const error = new HttpError(
+      "User already got signed up, please try signing in",
+      500
+    );
     return next(error);
   }
   let hashedPassword;
@@ -230,17 +237,17 @@ const updateUserById = async (req, res, next) => {
     const error = new HttpError("User not found, please try again", 500);
     return next(error);
   }
-  let hashedPassword;
-  try {
-    hashedPassword = await bcrypt.hash(password, 12);
-  } catch (err) {
-    const error = new HttpError(
-      "Something went wrong while encrypting the password, please try again",
-      500
-    );
-    return next(error);
-  }
-  if (req.file.path != null) {
+  // let hashedPassword;
+  // try {
+  //   hashedPassword = await bcrypt.hash(password, 12);
+  // } catch (err) {
+  //   const error = new HttpError(
+  //     "Something went wrong while encrypting the password, please try again",
+  //     500
+  //   );
+  //   return next(error);
+  // }
+  if (req.file != null) {
     user.image = req.file.path;
   } else {
     user.image = user.image;
@@ -252,7 +259,6 @@ const updateUserById = async (req, res, next) => {
   user.pincode = pincode ? pincode : user.pincode;
   user.state = state ? state : user.state;
   user.country = country ? country : user.country;
-  user.image = image ? image : user.image;
   try {
     await user.save();
   } catch (err) {
