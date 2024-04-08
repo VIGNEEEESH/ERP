@@ -16,7 +16,7 @@ router.get(
 router.post(
   "/create/attendance",
   [
-    check("workStatus").isLength({ min: 2, max: 255 }),
+    check("attendanceStatus").isLength({ min: 2, max: 255 }),
     check("userId").notEmpty(),
     check("email").isEmail(),
   ],
@@ -24,7 +24,11 @@ router.post(
 );
 router.patch(
   "/update/workstatus",
-  [check("workStatus").isLength({ min: 2, max: 255 })],
+  [
+    check("workStatus").isLength({ min: 2, max: 255 }),
+    check("userId").notEmpty(),
+    check("date").isEmail(),
+  ],
   attendanceControllers.updateWorkStatus
 );
 router.patch(

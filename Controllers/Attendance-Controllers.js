@@ -15,21 +15,54 @@ const createAttendance = async (req, res, next) => {
   const currentTime = currentDate.toLocaleTimeString("en-US", {
     hour12: false,
   });
+  const { attendanceStatus, userId, email } = req.body;
 
-  const { workStatus, userId, email } = req.body;
+  let existingAttendance;
+  try {
+    existingAttendance = await Attendance.find({
+      userId: userId,
+      date: formattedDate,
+    });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
 
-  const createdAttendance = new Attendance({
-    attendanceStatus: "Present",
-    date: formattedDate,
-    loggenIntime: currentTime,
-    workStatus,
-    userId,
-    email,
-  });
+  if (existingAttendance.length > 0) {
+    const error = new HttpError(
+      "Attendance is already recorded, please come back tomorrow",
+      409
+    );
+    return next(error);
+  }
+
+  let createdAttendance;
+  if (attendanceStatus == "Absent" || attendanceStatus == "Leave") {
+    createdAttendance = new Attendance({
+      attendanceStatus,
+      date: formattedDate,
+      userId,
+      email,
+    });
+  } else {
+    createdAttendance = new Attendance({
+      attendanceStatus,
+      date: formattedDate,
+      loggedInTime: currentTime,
+      workStatus: "Working",
+      userId,
+      email,
+    });
+  }
 
   try {
     await createdAttendance.save();
   } catch (err) {
+    console.log(createdAttendance);
+    console.log(err);
     const error = new HttpError(
       "Something went wrong while saving the data, please try again",
       500
@@ -129,7 +162,7 @@ const addLoggedOutTime = async (req, res, next) => {
   let attendance;
   try {
     attendance = await Attendance.findOne({
-      date: currentDate,
+      date: formattedDate,
       userId: userId,
     });
   } catch (err) {
@@ -139,8 +172,13 @@ const addLoggedOutTime = async (req, res, next) => {
     );
     return next(error);
   }
+
   if (!attendance) {
     const error = new HttpError("Attendance not found, please try again", 500);
+    return next(error);
+  }
+  if (attendance.loggedOutTime) {
+    const error = new HttpError("Logged out already", 500);
     return next(error);
   }
 
