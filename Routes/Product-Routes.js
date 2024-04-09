@@ -21,8 +21,8 @@ router.patch(
   "/update/product/byid/:id",
   imageUpload.single("image"),
   [
-    check("productName").isLength({ min: 2, max: 255 }),
-    check("productDescription").isLength({ min: 2 }),
+    check("productName").isLength({ min: 2, max: 255 }).optional(),
+    check("productDescription").isLength({ min: 2 }).optional(),
   ],
   productControllers.updateProductById
 );

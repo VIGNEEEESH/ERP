@@ -89,16 +89,15 @@ const updateProductById = async (req, res, next) => {
     const error = new HttpError("Product not found, please try again", 500);
     return next(error);
   }
-  if (req.file.path != null) {
-    user.image = req.file.path;
+  if (req.file != null) {
+    product.image = req.file.path;
   } else {
-    user.image = user.image;
+    product.image = product.image;
   }
   product.productName = productName ? productName : product.productName;
   product.productDescription = productDescription
     ? productDescription
     : product.productDescription;
-  product.image = image ? image : product.image;
   try {
     product.save();
   } catch (err) {
