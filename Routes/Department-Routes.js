@@ -18,8 +18,8 @@ router.post(
 router.patch(
   "/update/department/byid/:id",
   [
-    check("departmentName").isLength({ min: 2, max: 255 }),
-    check("userId").notEmpty(),
+    check("departmentName").isLength({ min: 2, max: 255 }).optional(),
+    check("userId").notEmpty().optional(),
   ],
   departmentControllers.updateDepartmentById
 );

@@ -13,6 +13,11 @@ router.post(
   [check("role").isLength({ min: 2, max: 255 }), check("email").isEmail()],
   userControllers.inviteUser
 );
+router.post(
+  "/login",
+  [check("email").isEmail(), check("password").notEmpty()],
+  userControllers.login
+);
 router.patch(
   "/create/user",
   imageUpload.single("image"),
