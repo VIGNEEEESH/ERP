@@ -16,7 +16,6 @@ router.post(
     check("reason").isLength({ min: 2, max: 255 }),
     check("startDate").isLength({ min: 2, max: 255 }),
     check("endDate").isLength({ min: 2, max: 255 }),
-    check("status").isLength({ min: 2, max: 255 }),
     check("email").isEmail(),
   ],
   leaveControllers.createLeave

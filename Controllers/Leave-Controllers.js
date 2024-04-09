@@ -8,8 +8,7 @@ const createLeave = async (req, res, next) => {
     const error = new HttpError("Invalid inputs, please try again", 422);
     return next(error);
   }
-  const { firstName, lastName, email, reason, startDate, endDate, status } =
-    req.body;
+  const { firstName, lastName, email, reason, startDate, endDate } = req.body;
 
   const createdLeave = new Leave({
     firstName,
@@ -18,7 +17,7 @@ const createLeave = async (req, res, next) => {
     reason,
     startDate,
     endDate,
-    status,
+    status: "Requested",
   });
   try {
     await createdLeave.save();
