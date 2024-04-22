@@ -159,6 +159,20 @@ const getUserById = async (req, res, next) => {
   }
   res.status(200).json({ user: user });
 };
+const getUsersByRole = async (req, res, next) => {
+  const role = req.params.role;
+  let users;
+  try {
+    users = await User.find({ role: role });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ users: users });
+};
 const login = async (req, res, next) => {
   const { email, password } = req.body;
   let user;
@@ -320,6 +334,7 @@ exports.inviteUser = inviteUser;
 exports.createUser = createUser;
 exports.getAllUsers = getAllUsers;
 exports.getUserById = getUserById;
+exports.getUsersByRole = getUsersByRole;
 exports.login = login;
 exports.updateUserById = updateUserById;
 exports.deleteUserById = deleteUserById;

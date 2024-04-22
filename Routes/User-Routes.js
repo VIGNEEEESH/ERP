@@ -7,6 +7,7 @@ const imageUpload = require("../Middleware/image-upload");
 
 router.get("/get/all/users", userControllers.getAllUsers);
 router.get("/get/user/byid/:id", userControllers.getUserById);
+router.get("/get/users/byrole/:role", userControllers.getUsersByRole);
 
 router.post(
   "/invite/user",
