@@ -8,15 +8,16 @@ const fs = require("fs");
 const inviteUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return resolveSoa.status(422).json({
+    return res.status(422).json({
       message: "Invalid inputs passed, please try again",
       errors: errors.array(),
     });
   }
   const { email, role } = req.body;
   let user;
+
   try {
-    user = await User.findOne({ email: email });
+    user = await User.findOne({ email: email.toLowerCase() });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
@@ -30,7 +31,7 @@ const inviteUser = async (req, res, next) => {
   }
 
   const createdUser = new User({
-    email,
+    email: email.toLowerCase(),
     role,
   });
   try {
@@ -177,7 +178,7 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
   let user;
   try {
-    user = await User.findOne({ email: email });
+    user = await User.findOne({ email: email.toLowerCase() });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
