@@ -27,11 +27,14 @@ router.patch(
     check("firstName").isLength({ min: 2, max: 255 }),
     check("lastName").isLength({ min: 2, max: 255 }),
     check("password").isLength({ min: 2, max: 255 }),
-    check("mobile").isLength({ min: 2, max: 255 }),
+    check("mobile").isLength({ min: 6, max: 10 }),
     check("address").isLength({ min: 2, max: 255 }),
     check("pincode").isLength({ min: 2, max: 255 }),
     check("state").isLength({ min: 2, max: 255 }),
     check("country").isLength({ min: 2, max: 255 }),
+    check("salary").isLength({ min: 1, max: 255 }),
+    check("pan").isLength({ min: 2, max: 255 }),
+    check("aadhar").isLength({ min: 2, max: 255 }),
   ],
   userControllers.createUser
 );
@@ -46,6 +49,9 @@ router.patch(
     check("pincode").isLength({ min: 2, max: 255 }).optional(),
     check("state").isLength({ min: 2, max: 255 }).optional(),
     check("country").isLength({ min: 2, max: 255 }).optional(),
+    check("salary").isLength({ min: 1, max: 255 }).optional(),
+    check("pan").isLength({ min: 2, max: 255 }).optional(),
+    check("aadhar").isLength({ min: 2, max: 255 }).optional(),
   ],
   userControllers.updateUserById
 );

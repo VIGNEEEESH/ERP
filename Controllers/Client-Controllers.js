@@ -89,7 +89,10 @@ const updateClientById = async (req, res, next) => {
   client.clientName = clientName ? clientName : client.clientName;
   client.companyName = companyName ? companyName : client.companyName;
   client.mobile = mobile ? mobile : client.mobile;
-  client.projects = projects ? projects : client.projects;
+  client.projects = projects
+    ? [...client.projects, ...projects]
+    : client.projects;
+
   try {
     client.save();
   } catch (err) {

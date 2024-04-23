@@ -63,6 +63,9 @@ const createUser = async (req, res, next) => {
     pincode,
     state,
     country,
+    salary,
+    pan,
+    aadhar,
   } = req.body;
   let user;
   try {
@@ -104,6 +107,7 @@ const createUser = async (req, res, next) => {
   user.state = state;
   user.country = country;
   user.image = req.file.path;
+  (user.salary = salary), (user.pan = pan), (user.aadhar = aadhar);
   try {
     await user.save();
   } catch (err) {
@@ -236,8 +240,18 @@ const updateUserById = async (req, res, next) => {
     return next(error);
   }
   const id = req.params.id;
-  const { firstName, lastName, mobile, address, pincode, state, country } =
-    req.body;
+  const {
+    firstName,
+    lastName,
+    mobile,
+    address,
+    pincode,
+    state,
+    country,
+    salary,
+    pan,
+    aadhar,
+  } = req.body;
   let user;
   try {
     user = await User.findOne({ _id: id });
@@ -274,6 +288,9 @@ const updateUserById = async (req, res, next) => {
   user.pincode = pincode ? pincode : user.pincode;
   user.state = state ? state : user.state;
   user.country = country ? country : user.country;
+  user.salary = salary ? salary : user.salary;
+  user.pan = pan ? pan : user.pan;
+  user.aadhar = aadhar ? aadhar : user.aadhar;
   try {
     await user.save();
   } catch (err) {

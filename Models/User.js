@@ -12,6 +12,9 @@ const userSchema = new Schema({
   address: { type: String },
   pincode: { type: String },
   state: { type: String },
+  salary: { type: String },
+  pan: { type: String },
+  aadhar: { type: String },
   country: { type: String },
   image: { type: String },
 });
