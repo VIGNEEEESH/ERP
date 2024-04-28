@@ -58,6 +58,7 @@ const createUser = async (req, res, next) => {
     firstName,
     lastName,
     password,
+    email,
     mobile,
     address,
     pincode,
@@ -100,6 +101,7 @@ const createUser = async (req, res, next) => {
   }
   user.firstName = firstName;
   user.lastName = lastName;
+  user.email = email;
   user.password = hashedPassword;
   user.mobile = mobile;
   user.address = address;
