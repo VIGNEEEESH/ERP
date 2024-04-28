@@ -233,6 +233,70 @@ const login = async (req, res, next) => {
     token,
   });
 };
+const forgotPassword = async (req, res, next) => {
+  const { password, newPassword, userId, confirmPassword } = req.body;
+  // console.log(req.body);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ _id: userId });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while verifying the user, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  if (!existingUser) {
+    const error = new HttpError("Invalid email, please try again", 401);
+    return next(error);
+  }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Something went wrong while verifying the password, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError("Invalid credentials, please try again", 401);
+    return next(error);
+  }
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(newPassword, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while encrypting the password, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  // Update the password
+  existingUser.password = hashedPassword;
+
+  try {
+    // Save the updated admin document
+    await existingUser.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while updating the password, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  res.status(200).json({
+    message: "Password updated successfully",
+  });
+};
 const updateUserById = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -249,6 +313,7 @@ const updateUserById = async (req, res, next) => {
     state,
     country,
     salary,
+    role,
     pan,
     aadhar,
   } = req.body;
@@ -286,6 +351,7 @@ const updateUserById = async (req, res, next) => {
   user.mobile = mobile ? mobile : user.mobile;
   user.address = address ? address : user.address;
   user.pincode = pincode ? pincode : user.pincode;
+  user.role = role ? role : user.role;
   user.state = state ? state : user.state;
   user.country = country ? country : user.country;
   user.salary = salary ? salary : user.salary;
@@ -354,5 +420,6 @@ exports.getAllUsers = getAllUsers;
 exports.getUserById = getUserById;
 exports.getUsersByRole = getUsersByRole;
 exports.login = login;
+exports.forgotPassword = forgotPassword;
 exports.updateUserById = updateUserById;
 exports.deleteUserById = deleteUserById;
