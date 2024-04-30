@@ -14,7 +14,7 @@ router.get(
   attendanceControllers.getAttendanceByDateAndUserId
 );
 router.get(
-  "/get/attendance/byuserid/:userId",
+  "/get/attendance/byuserId/:userId",
   attendanceControllers.getAttendanceByUserId
 );
 router.post(
