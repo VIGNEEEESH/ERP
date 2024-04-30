@@ -13,6 +13,10 @@ router.get(
   "/get/attendance/bydateanduserid/:date/:userId",
   attendanceControllers.getAttendanceByDateAndUserId
 );
+router.get(
+  "/get/attendance/byuserid/:userId",
+  attendanceControllers.getAttendanceByUserId
+);
 router.post(
   "/create/attendance",
   [
