@@ -79,6 +79,20 @@ const getTaskById = async (req, res, next) => {
   }
   res.status(200).json({ task: task });
 };
+const getTasksByEmail = async (req, res, next) => {
+  const email = req.params.email;
+  let tasks;
+  try {
+    tasks = await Task.find({ members: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ tasks: tasks });
+};
 const updateTaskById = async (req, res, next) => {
   const id = req.params.id;
   let task;
@@ -185,6 +199,7 @@ const deleteTaskById = async (req, res, next) => {
 exports.createTask = createTask;
 exports.getAllTasks = getAllTasks;
 exports.getTaskById = getTaskById;
+exports.getTasksByEmail = getTasksByEmail;
 exports.updateTaskById = updateTaskById;
 exports.updateTaskProgressById = updateTaskProgressById;
 exports.deleteTaskById = deleteTaskById;
