@@ -33,7 +33,7 @@ router.patch(
   taskControllers.updateTaskById
 );
 router.patch(
-  "/update/projectprogress/byid/:id",
+  "/update/taskprogress/byid/:id",
   [check("progress").isLength({ min: 1 })],
   taskControllers.updateTaskProgressById
 );
