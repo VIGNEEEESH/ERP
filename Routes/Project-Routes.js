@@ -7,6 +7,10 @@ const imageUpload = require("../Middleware/image-upload");
 
 router.get("/get/all/projects", projectControllers.getAllProjects);
 router.get("/get/project/byid/:id", projectControllers.getProjectById);
+router.get(
+  "/get/projects/byEmail/:email",
+  projectControllers.getProjectsByEmail
+);
 
 router.post(
   "/create/project",

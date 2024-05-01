@@ -72,7 +72,7 @@ const getProjectById = async (req, res, next) => {
   const id = req.params.id;
   let project;
   try {
-    project = await Project.find({ _id: id });
+    project = await Project.findOne({ _id: id });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
@@ -81,6 +81,20 @@ const getProjectById = async (req, res, next) => {
     return next(error);
   }
   res.status(200).json({ project: project });
+};
+const getProjectsByEmail = async (req, res, next) => {
+  const email = req.params.email;
+  let projects;
+  try {
+    projects = await Project.find({ members: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ projects: projects });
 };
 const updateProjectById = async (req, res, next) => {
   const id = req.params.id;
@@ -188,6 +202,7 @@ const deleteProjectById = async (req, res, next) => {
 exports.createProject = createProject;
 exports.getAllProjects = getAllProjects;
 exports.getProjectById = getProjectById;
+exports.getProjectsByEmail = getProjectsByEmail;
 exports.updateProjectById = updateProjectById;
 exports.updateProjectProgressById = updateProjectProgressById;
 exports.deleteProjectById = deleteProjectById;
