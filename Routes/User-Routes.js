@@ -32,7 +32,7 @@ router.patch(
     check("pincode").isLength({ min: 2, max: 255 }),
     check("state").isLength({ min: 2, max: 255 }),
     check("country").isLength({ min: 2, max: 255 }),
-    check("salary").isLength({ min: 1, max: 255 }),
+
     check("pan").isLength({ min: 2, max: 255 }),
     check("aadhar").isLength({ min: 2, max: 255 }),
   ],

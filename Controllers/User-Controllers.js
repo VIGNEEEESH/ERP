@@ -58,7 +58,7 @@ const createUser = async (req, res, next) => {
     firstName,
     lastName,
     password,
-    email,
+
     mobile,
     address,
     pincode,
@@ -101,7 +101,7 @@ const createUser = async (req, res, next) => {
   }
   user.firstName = firstName;
   user.lastName = lastName;
-  user.email = email;
+
   user.password = hashedPassword;
   user.mobile = mobile;
   user.address = address;
@@ -113,6 +113,7 @@ const createUser = async (req, res, next) => {
   try {
     await user.save();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Something went wrong while saving the user, please try again",
       500
@@ -310,6 +311,7 @@ const updateUserById = async (req, res, next) => {
     firstName,
     lastName,
     mobile,
+    email,
     address,
     pincode,
     state,
@@ -351,6 +353,7 @@ const updateUserById = async (req, res, next) => {
   user.firstName = firstName ? firstName : user.firstName;
   user.lastName = lastName ? lastName : user.lastName;
   user.mobile = mobile ? mobile : user.mobile;
+  user.email = email ? email : user.email;
   user.address = address ? address : user.address;
   user.pincode = pincode ? pincode : user.pincode;
   user.role = role ? role : user.role;
