@@ -404,7 +404,7 @@ const deleteUserById = async (req, res, next) => {
     const error = new HttpError("User not found, please try again", 500);
     return next(error);
   }
-  const imagePath = user.image;
+
   try {
     await user.deleteOne();
   } catch (err) {
@@ -415,9 +415,12 @@ const deleteUserById = async (req, res, next) => {
     return next(error);
   }
   res.status(200).json({ message: "User deleted successfully" });
-  fs.unlink(imagePath, (err) => {
-    console.log(err);
-  });
+  if (user.image) {
+    const imagePath = user.image;
+    fs.unlink(imagePath, (err) => {
+      console.log(err);
+    });
+  }
 };
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
