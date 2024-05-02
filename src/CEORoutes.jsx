@@ -90,7 +90,7 @@ export const CEORoutes = [
       },
       {
         icon: <CalendarIcon {...icon} />,
-        name: "Employee Leaves",
+        name: "Employee Leave",
         path: "/employeeleaves",
         element: <Leave/>,
       },
