@@ -5,7 +5,7 @@ const Communication = () => {
   return (
     <div>
         <Card className='p-10 mt-4'>
-         Communication is comming very soon 💖
+         Communication is comming very very soon 💖
         </Card>
     </div>
   )
