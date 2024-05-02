@@ -8,12 +8,12 @@ import {
     Button,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
-import { PencilIcon, UserPlusIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { authorsTableData } from "@/data";
 import AddEmployeeForm from "./AddEmployee";
 import AddEmployeeShort from './AddEmployeeShort';
 import EditEmployee from './EditEmployee'; // Import EditEmployee component
-import { message } from 'antd';
+import { message,Modal } from 'antd';
 
 export function ManageEmployees() {
     
@@ -22,6 +22,8 @@ export function ManageEmployees() {
     const [editEmployeeData, setEditEmployeeData] = useState(null);
     const [showEditEmployee, setShowEditEmployee] = useState(false);
     const [employees, setEmployees] = useState([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [employeeToDelete, setEmployeeToDelete] = useState(null); 
     useEffect(() => {
         const fetchEmployees = async () => {
             
@@ -43,6 +45,7 @@ export function ManageEmployees() {
         };
         fetchEmployees()
       }, []);
+
       const data = useMemo(() => (employees ? employees : []), [employees])
     
     const columns = useMemo(
@@ -107,6 +110,15 @@ export function ManageEmployees() {
                     </Typography>
                 ),
             },
+            {
+                Header: '',
+                accessor: 'Delete',
+                Cell: ({ row }) => (
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => handleDeleteClick(row)}>
+                        <TrashIcon className="h-4 w-4 mr-2"/>
+                    </Typography>
+                ),
+            },
         ],
         []
     );
@@ -147,6 +159,52 @@ export function ManageEmployees() {
         setShowEditEmployee(false);
         setEditEmployeeData(null);
     };
+    const handleDeleteClick = (rowData) => {
+        setEmployeeToDelete(rowData.original);
+        setShowDeleteModal(true);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setEmployeeToDelete(null);
+    };
+
+// Inside ManageEmployees component
+
+// Update handleConfirmDelete function to send a delete request to the backend
+const handleConfirmDelete = async () => {
+    try {
+        
+        // Make a delete request to your backend API using fetch
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/delete/user/byid/${employeeToDelete._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any other headers if required
+            },
+        });
+
+        // Check if the request was successful (status code 200-299)
+        if (response.ok) {
+            console.log(employees)
+            // If the request is successful, remove the deleted employee from the local state
+            setEmployees(employees.filter(emp => emp._id !== employeeToDelete._id));
+
+            // Close the modal
+            setShowDeleteModal(false);
+            setEmployeeToDelete(null);
+            message.success("employee Sucessfully Deleted");
+        } else {
+            // If the request failed, throw an error
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    } catch (error) {
+        // Handle error (e.g., show error message)
+        console.error('Error deleting employee:', error);
+        // You can show an error message to the user here
+    }
+};
+
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -238,6 +296,19 @@ export function ManageEmployees() {
                         </div>
                     </CardBody>
                 )}
+                <Modal
+
+                title="Delete Employee"
+                open={showDeleteModal}
+                onOk={handleConfirmDelete}
+                onCancel={handleCloseDeleteModal}
+                okButtonProps={{ style: { backgroundColor: 'black' } }}
+            >
+                <p>Are you sure you want to delete this employee?</p>
+                {employeeToDelete && (
+                    <p>Name: {employeeToDelete.firstName} {employeeToDelete.lastName}</p>
+                )}
+            </Modal>
         
             </Card>
 
