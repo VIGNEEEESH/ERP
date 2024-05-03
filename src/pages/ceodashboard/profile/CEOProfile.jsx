@@ -319,10 +319,10 @@ const auth=useContext(AuthContext)
           <CardFooter className="flex justify-end p-4">
             {isEditing ? (
               <>
-                <Button color="blue" onClick={handleSaveClick}>
+                <Button  onClick={handleSaveClick}>
                   Save
                 </Button>
-                <Button color="gray" onClick={handleCancelClick} className="ml-2">
+                <Button variant="outlined" onClick={handleCancelClick} className="ml-2">
                   Cancel
                 </Button>
               </>

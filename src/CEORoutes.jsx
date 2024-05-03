@@ -11,6 +11,7 @@ import {
   ArrowRightOnRectangleIcon,
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
+  ClipboardDocumentListIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import Logout from "./pages/ceodashboard/logout";
@@ -25,6 +26,7 @@ import Leave from "./pages/ceodashboard/leaves/Leave";
 import CEOProfile from "./pages/ceodashboard/profile/CEOProfile";
 import Settings from "./pages/ceodashboard/settings/Settings";
 import Projects from "./pages/ceodashboard/projects/Projects";
+import TaskManager from "./pages/ceodashboard/task manager/taskmanager";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -69,6 +71,12 @@ export const CEORoutes = [
         name: "Work Status",
         path: "/workstatus",
         element: <WorkStatus />,
+      },
+      {
+        icon: <ClipboardDocumentListIcon {...icon} />,
+        name: "Manage Tasks",
+        path: "/managetasks",
+        element: <TaskManager/>,
       },
       {
         icon: <DocumentTextIcon {...icon} />,
