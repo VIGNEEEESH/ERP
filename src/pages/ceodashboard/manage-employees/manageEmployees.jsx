@@ -45,6 +45,7 @@ export function ManageEmployees() {
         };
         fetchEmployees()
       }, []);
+
       const data = useMemo(() => (employees ? employees : []), [employees])
     
     const columns = useMemo(
@@ -173,8 +174,9 @@ export function ManageEmployees() {
 // Update handleConfirmDelete function to send a delete request to the backend
 const handleConfirmDelete = async () => {
     try {
+        
         // Make a delete request to your backend API using fetch
-        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/delete/user/byid/${employeeToDelete.id}`, {
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/delete/user/byid/${employeeToDelete._id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -184,13 +186,14 @@ const handleConfirmDelete = async () => {
 
         // Check if the request was successful (status code 200-299)
         if (response.ok) {
+            console.log(employees)
             // If the request is successful, remove the deleted employee from the local state
-            setEmployees(employees.filter(emp => emp.id !== employeeToDelete.id));
+            setEmployees(employees.filter(emp => emp._id !== employeeToDelete._id));
 
             // Close the modal
-            setDeleteModalVisible(false);
+            setShowDeleteModal(false);
             setEmployeeToDelete(null);
-            message.success("employee Sucessfully Deleted");
+            message.success("Employee Sucessfully Deleted");
         } else {
             // If the request failed, throw an error
             throw new Error(`HTTP error! Status: ${response.status}`);
