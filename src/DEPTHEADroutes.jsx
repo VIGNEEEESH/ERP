@@ -18,7 +18,7 @@ import CompanyProducts from "./pages/deptheaddashboard/companyproducts/CompanyPr
 import Profile from "./pages/deptheaddashboard/profile.jsx";
 import MyOffice from "./pages/deptheaddashboard/myoffice.jsx";
 import Settings from "./pages/deptheaddashboard/settings/Settings.jsx";
-import TaskManager from "./pages/deptheaddashboard/task.jsx";
+import TaskManager from "./pages/deptheaddashboard/task manager/taskmanager.jsx";
 import Communication from "./pages/deptheaddashboard/communication/communication.jsx";
 
 const icon = {
@@ -44,8 +44,8 @@ export const DEPTHEADroutes = [
       {
         icon: <RectangleStackIcon {...icon} />,
         name: "Task Manager",
-        path: "/Task",
-        element: <TaskManager />,
+        path: "/managetask",
+        element: <TaskManager/>,
       },
       {
         icon: <CursorArrowRaysIcon {...icon} />,
@@ -60,7 +60,7 @@ export const DEPTHEADroutes = [
         element: <CompanyProducts />,
       },
       
-      {        icon: <BellAlertIcon {...icon} />,
+      {icon: <BellAlertIcon {...icon} />,
       name: "notifications",
       path: "/notifications",
       element: <Notifications />,

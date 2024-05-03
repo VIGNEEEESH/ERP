@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Card, CardHeader, CardBody, Typography } from "@material-tailwind/react";
+import { Card, CardHeader, CardBody, Typography,Input,Textarea,Button } from "@material-tailwind/react";
 import { message } from 'antd';
 import { AuthContext } from '../auth/Auth-context';
 
@@ -58,67 +58,66 @@ message.error("Error sending request, please try again")
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block mb-2 text-sm font-bold uppercase text-blue-gray-400">First Name:</label>
-                <input
+                <Input
                   type="text"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
+                  label='First Name'
                   required
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-bold uppercase text-blue-gray-400">Last Name:</label>
-                <input
+                <Input
                   type="text"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
                   required
+                  label='last Name'
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                 />
               </div>
              
               <div>
-                <label className="block mb-2 text-sm font-bold uppercase text-blue-gray-400">Reason for Leave:</label>
-                <textarea
+                <Textarea
                   name="reason"
                   value={formData.reason}
                   onChange={handleChange}
                   required
+                  label='reason for Leave'
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-bold uppercase text-blue-gray-400">Start Date:</label>
-                <input
+                <Input
                   type="date"
                   name="startDate"
                   value={formData.startDate}
                   onChange={handleChange}
                   required
+                  label='Start Date'
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-bold uppercase text-blue-gray-400">End Date:</label>
-                <input
+                <Input
                   type="date"
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleChange}
                   required
+                  label='End Date'
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
-            <button
-              type="submit"
-              className="mt-6 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-            >
+            <Button
+              type="submit" className='mt-4'>
+              
               Submit
-            </button>
+            </Button>
           </form>
         </CardBody>
       </Card>
