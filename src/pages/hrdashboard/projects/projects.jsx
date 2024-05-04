@@ -5,7 +5,7 @@ import { Progress } from "@material-tailwind/react";
 import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/solid';
 import AddProject from './AddProject';
 import UpdateProject from './UpdateProjects';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 
 // Sample projects data
 const sampleProjectsData = [
@@ -119,11 +119,11 @@ export function Projects({ onAddProject }) {
                 ),
             },
             {
-                Header: 'Action',
-                accessor: 'update',
+                Header: '',
+                accessor: 'edit',
                 Cell: ({ row }) => (
-                    <Typography onClick={() => handleUpdateClick(row.original)} className='flex cursor-pointer'>
-                        <PencilIcon strokeWidth={2} className="h-5 w-5 mr-2 cursor-pointer" /> Update
+                    <Typography onClick={() => handleUpdateClick(row.original)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
+                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
                     </Typography>
                 ),
             },
@@ -168,13 +168,13 @@ export function Projects({ onAddProject }) {
     };
 
     const handleDeleteClick = (rowData) => {
-        setprojectToDelete(rowData.original);
+        setProjectToDelete(rowData.original);
         setShowDeleteModal(true);
     };
 
     const handleCloseDeleteModal = () => {
         setShowDeleteModal(false);
-        setprojectToDelete(null);
+        setProjectToDelete(null);
     };
 
     const handleConfirmDelete = async () => {
@@ -204,7 +204,7 @@ export function Projects({ onAddProject }) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
         } catch (error) {
-            // Handle error (e.g., show error message)
+            message.success("Something went wrong while deleting the project, please try again");
             console.error('Error deleting project:', error);
             // You can show an error message to the user here
         }
