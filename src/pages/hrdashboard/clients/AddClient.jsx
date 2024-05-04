@@ -87,7 +87,6 @@ function AddClient() {
                         label="Projects (Comma-separated)"
                         name="projects"
                         onChange={handleInputChange}
-                        placeholder="Project1, Project2, Project3"
                     />
                 </div>
             </div>

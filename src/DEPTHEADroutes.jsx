@@ -20,6 +20,7 @@ import MyOffice from "./pages/deptheaddashboard/myoffice.jsx";
 import Settings from "./pages/deptheaddashboard/settings/Settings.jsx";
 import TaskManager from "./pages/deptheaddashboard/task manager/taskmanager.jsx";
 import Communication from "./pages/deptheaddashboard/communication/communication.jsx";
+import Projects from "./pages/deptheaddashboard/projects/projects.jsx";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -40,6 +41,12 @@ export const DEPTHEADroutes = [
         name: "My Office",
         path: "/loginstatus",
         element: <MyOffice />,
+      },
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "Manage Projects",
+        path: "/projects",
+        element: <Projects/>,
       },
       {
         icon: <RectangleStackIcon {...icon} />,

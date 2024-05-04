@@ -145,8 +145,9 @@ const auth=useContext(AuthContext)
                       value={formData.firstName}
                       onChange={handleInputChange}
                       label="First Name"
-                      className="border-b border-blue-gray-500 focus:border-blue-600 mb-2"
+                      className="border-b border-blue-gray-500 focus:border-blue-600 mr-4"
                     />
+                    <div className='mb-4'></div>
                     <Input
                       type="text"
                       name="lastName"
@@ -274,6 +275,7 @@ const auth=useContext(AuthContext)
                     type="text"
                     name="salary"
                     value={formData.salary}
+                    disabled
                     onChange={handleInputChange}
                     label="Salary"
                     className="border-b border-blue-gray-500 focus:border-blue-600"
@@ -317,10 +319,10 @@ const auth=useContext(AuthContext)
           <CardFooter className="flex justify-end p-4">
             {isEditing ? (
               <>
-                <Button color="blue" onClick={handleSaveClick}>
+                <Button  onClick={handleSaveClick}>
                   Save
                 </Button>
-                <Button color="gray" onClick={handleCancelClick} className="ml-2">
+                <Button variant="outlined" onClick={handleCancelClick} className="ml-2">
                   Cancel
                 </Button>
               </>
