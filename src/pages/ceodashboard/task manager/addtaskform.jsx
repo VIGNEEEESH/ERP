@@ -1,25 +1,34 @@
-import React, { useState } from 'react';
-import {
-    CardBody,
-    Input,
-    Button,
-    CardHeader,
-    Typography,
-} from "@material-tailwind/react";
+import React, { useEffect, useState } from 'react';
+import { CardBody, Input, Button } from "@material-tailwind/react";
 import { message } from 'antd';
 
 const AddTaskForm = () => {
     const [formData, setFormData] = useState({
         taskName: '',
         taskDescription: '',
-        selectedMembers: [''],
+        members: [''],
+        deadline: '',
+        assignedDate: new Date().toISOString().slice(0, 10), // Current date by default
     });
+    const [members,setMembers]=useState([])
 
-    const members = [
-        { id: 1, name: 'John Doe', img: '/img/team-1.jpeg' },
-        { id: 2, name: 'Jane Smith', img: '/img/team-2.jpeg' },
-        { id: 3, name: 'Alex Johnson', img: '/img/team-3.jpeg' }
-    ];
+    useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const response = await fetch(
+                    import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/user/get/all/users`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                setMembers(data.users);
+            } catch (err) {
+                message.error("Error fetching employees", err.message);
+            }
+        };
+        fetchMembers()
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -30,43 +39,55 @@ const AddTaskForm = () => {
     };
 
     const handleMemberChange = (e, index) => {
-        const updatedMembers = [...formData.selectedMembers];
+        const updatedMembers = [...formData.members];
         updatedMembers[index] = e.target.value;
         setFormData({
             ...formData,
-            selectedMembers: updatedMembers,
+            members: updatedMembers,
         });
     };
 
     const handleAddMember = () => {
         setFormData({
             ...formData,
-            selectedMembers: [...formData.selectedMembers, ''],
+            members: [...formData.members, ''],
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData); // For testing purposes
-
-        // Add your form submission logic here
+        
         try {
-            // Example: Send form data to backend
-            message.success(`Task "${formData.taskName}" added successfully`);
-            // Reset form after successful submission
-            setFormData({
-                taskName: '',
-                taskDescription: '',
-                selectedMembers: [''],
-            });
+            const response = await fetch(
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/create/task`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            message.success(`Task created successfully`)
+            const responseData = await response.json();
+            setTimeout(()=>{
+                window.location.reload()
+            },[500])
+            
+            
+            
         } catch (error) {
-            message.error(`Error adding task: ${error.message}`);
+            message.error(`Error creating task`)
             console.error("Error submitting form:", error.message);
         }
     };
 
     return (
-        <div >
+        <div>
             <CardBody>
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-4">
@@ -89,21 +110,39 @@ const AddTaskForm = () => {
                             />
                         </div>
                         <div>
+                            <Input
+                                type="date"
+                                name="deadline"
+                                value={formData.deadline}
+                                onChange={handleInputChange}
+                                label="Deadline"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="assignedDate"
+                                value={formData.assignedDate}
+                                onChange={handleInputChange}
+                                label="Assigned Date"
+                            />
+                        </div>
+                        <div>
                             <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
-                            {formData.selectedMembers.map((member, index) => (
+                            {formData.members.map((member, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     <select
-                                        name="selectedMember"
+                                        name="member"
                                         value={member}
                                         onChange={(e) => handleMemberChange(e, index)}
                                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                                     >
                                         <option value="">Select Member</option>
-                                        {members.map(member => (
-                                            <option key={member.id} value={member.name}>{member.name}</option>
+                                        {members.map(memberItem => (
+                                            <option key={memberItem._id} value={memberItem.email}>{memberItem.firstName} {memberItem.lastName}</option>
                                         ))}
                                     </select>
-                                    {index === formData.selectedMembers.length - 1 && (
+                                    {index === formData.members.length - 1 && (
                                         <button
                                             type="button"
                                             onClick={handleAddMember}

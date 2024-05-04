@@ -8,9 +8,11 @@ import {
     Button,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
-import { PencilIcon, UserPlusIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from "@heroicons/react/24/solid";
 import AddTaskForm from "./AddTaskForm"; // Import AddTaskForm component
 import EditTaskForm from './EditTaskForm'; // Import EditTaskForm component
+import { Progress } from "@material-tailwind/react";
+import { Modal, message } from 'antd';
 
 const TaskManager = () => {
     const [pageSize, setPageSize] = useState(5);
@@ -18,11 +20,30 @@ const TaskManager = () => {
     const [editTaskData, setEditTaskData] = useState(null);
     const [showEditTask, setShowEditTask] = useState(false);
     const [tasks, setTasks] = useState([]);
-
-    // Sample tasks data (replace with actual data)
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [taskToDelete, setTaskToDelete] = useState(null); 
+    
     useEffect(() => {
-        // Fetch tasks data or set initial tasks here
-    }, []);
+        const fetchTasks = async () => {
+            
+          try {
+            const response = await fetch(
+                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/task/get/all/tasks`
+            );
+    
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            setTasks(data.tasks);
+            
+          } catch (err) {
+            message.error("Error fetching tasks", err.message);
+          }
+        };
+        fetchTasks()
+      }, []);
 
     const data = useMemo(() => (tasks ? tasks : []), [tasks]);
 
@@ -34,26 +55,34 @@ const TaskManager = () => {
                 Cell: ({ row }) => (
                     <div>
                         <Typography className="font-semibold">{row.original.taskName}</Typography>
-                        <Typography className="text-xs text-blue-gray-500">{row.original.taskDescription}</Typography>
                     </div>
                 ),
             },
             {
-                Header: 'Assigned Members',
-                accessor: 'assignedMembers',
-                Cell: ({ value }) => (
-                    <div className="flex items-center gap-2">
-                        {value.map((member, index) => (
-                            <Avatar
-                                key={index}
-                                src={member.img}
-                                alt={member.name}
-                                size="sm"
-                                className="mr-2"
-                            />
-                        ))}
+                Header: 'Description',
+                accessor: 'taskDescription',
+                Cell: ({ row }) => (
+                    <div>
+                        <Typography className="font-semibold">{row.original.taskDescription}</Typography>
                     </div>
                 ),
+            },
+            {
+                Header: 'Members',
+                accessor: 'members',
+                Cell: ({ value }) => (
+                    <Typography className="text-xs font-normal text-blue-gray-500">
+                        {value.join(', ')}
+                    </Typography>
+                ),
+            },
+            {
+                Header: 'Deadline',
+                accessor: 'deadline',
+            },
+            {
+                Header: 'Assigned Date',
+                accessor: 'assignedDate',
             },
             {
                 Header: 'Progress',
@@ -66,7 +95,12 @@ const TaskManager = () => {
                         >
                             {value}%
                         </Typography>
-                        {/* Progress bar component */}
+                        <Progress
+                            value={value}
+                            variant="gradient"
+                            color={value === 100 ? "green" : "gray"}
+                            className="h-1"
+                        />
                     </div>
                 ),
             },
@@ -76,6 +110,16 @@ const TaskManager = () => {
                 Cell: ({ row }) => (
                     <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => handleEditClick(row)}>
                         <PencilIcon className="h-4 w-4 mr-2"/>Edit
+                    </Typography>
+                ),
+            },
+            
+            {
+                Header: 'Action',
+                accessor: 'Delete',
+                Cell: ({ row }) => (
+                    <Typography className='flex' onClick={() => handleDeleteClick(row)}>
+                        <TrashIcon strokeWidth={2} className="h-5 w-5 mr-2 cursor-pointer" />
                     </Typography>
                 ),
             },
@@ -119,6 +163,51 @@ const TaskManager = () => {
         setShowEditTask(false);
         setEditTaskData(null);
     };
+    const handleDeleteClick = (rowData) => {
+        setTaskToDelete(rowData.original);
+        setShowDeleteModal(true);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setTaskToDelete(null);
+    };
+
+
+
+
+const handleConfirmDelete = async () => {
+    try {
+        
+       
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/delete/task/byid/${taskToDelete._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                
+            },
+        });
+
+        
+        if (response.ok) {
+            console.log(tasks)
+            
+            setTasks(tasks.filter(task => task._id !== taskToDelete._id));
+
+            
+            setShowDeleteModal(false);
+            setTaskToDelete(null);
+            message.success("Employee deleted successfully");
+        } else {
+            
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    } catch (error) {
+        
+        console.error('Error deleting employee:', error);
+       
+    }
+};
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -204,6 +293,19 @@ const TaskManager = () => {
                         </div>
                     </CardBody>
                 )}
+                <Modal
+
+title="Delete task"
+open={showDeleteModal}
+onOk={handleConfirmDelete}
+onCancel={handleCloseDeleteModal}
+okButtonProps={{ style: { backgroundColor: 'black' } }}
+>
+<p>Are you sure you want to delete this task?</p>
+{taskToDelete && (
+    <p>Name: {taskToDelete.taskName}</p>
+)}
+</Modal>
             </Card>
         </div>
     );

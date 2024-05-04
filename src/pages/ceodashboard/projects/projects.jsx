@@ -119,11 +119,11 @@ export function Projects({ onAddProject }) {
                 ),
             },
             {
-                Header: 'Action',
-                accessor: 'update',
+                Header: '',
+                accessor: 'edit',
                 Cell: ({ row }) => (
-                    <Typography onClick={() => handleUpdateClick(row.original)} className='flex cursor-pointer'>
-                        <PencilIcon strokeWidth={2} className="h-5 w-5 mr-2 cursor-pointer" /> Update
+                    <Typography onClick={() => handleUpdateClick(row.original)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
+                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
                     </Typography>
                 ),
             },

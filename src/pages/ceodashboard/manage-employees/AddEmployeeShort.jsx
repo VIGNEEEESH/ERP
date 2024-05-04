@@ -31,7 +31,7 @@ export function AddEmployeeShort() {
         
         try {
             const response = await fetch(
-                "http://localhost:4444/api/erp/user/invite/user",
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/invite/user`,
                 {
                     method: "POST",
                     headers: {
