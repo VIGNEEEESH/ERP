@@ -203,7 +203,7 @@ const handleConfirmDelete = async () => {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
     } catch (error) {
-        
+        message.error("Something went wrong while deleting the task, please try again")
         console.error('Error deleting employee:', error);
        
     }
