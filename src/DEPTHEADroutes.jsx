@@ -10,6 +10,8 @@ import {
   UserGroupIcon,
   ArrowRightOnRectangleIcon,
   RectangleStackIcon,
+  PresentationChartLineIcon,
+  BuildingOfficeIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Notifications} from "@/pages/dashboard";
 import LeaveRequests  from "./pages/deptheaddashboard/leaverequest.jsx";
@@ -21,6 +23,7 @@ import Settings from "./pages/deptheaddashboard/settings/Settings.jsx";
 import TaskManager from "./pages/deptheaddashboard/task manager/taskmanager.jsx";
 import Communication from "./pages/deptheaddashboard/communication/communication.jsx";
 import Projects from "./pages/deptheaddashboard/projects/projects.jsx";
+import WorkStatus from "./pages/deptheaddashboard/workstatus/WorkStatus.jsx";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -43,21 +46,27 @@ export const DEPTHEADroutes = [
         element: <MyOffice />,
       },
       {
+        icon: <BuildingOfficeIcon {...icon} />,
+        name: "Work Status",
+        path: "/workstatus",
+        element: <WorkStatus />,
+      },
+      {
         icon: <RectangleStackIcon {...icon} />,
         name: "Manage Projects",
         path: "/projects",
         element: <Projects/>,
       },
       {
-        icon: <RectangleStackIcon {...icon} />,
+        icon: <PresentationChartLineIcon {...icon} />,
         name: "Task Manager",
         path: "/managetask",
         element: <TaskManager/>,
       },
       {
         icon: <CursorArrowRaysIcon {...icon} />,
-        name: "Leave Request",
-        path: "/leaverequest",
+        name: "Leave",
+        path: "/leave",
         element: <LeaveRequests />,
       },
       {
@@ -67,17 +76,19 @@ export const DEPTHEADroutes = [
         element: <CompanyProducts />,
       },
       
-      {icon: <BellAlertIcon {...icon} />,
-      name: "notifications",
-      path: "/notifications",
-      element: <Notifications />,
-    },
+     
     {
       icon: <ChatBubbleOvalLeftEllipsisIcon {...icon} />,
       name: "Communication",
       path: "/communication",
       element: <Communication />,
     },
+    {
+    icon: <BellAlertIcon {...icon} />,
+    name: "notifications",
+    path: "/notifications",
+    element: <Notifications />,
+  },
     {
       icon: <UserCircleIcon {...icon} />,
       name: "profile",

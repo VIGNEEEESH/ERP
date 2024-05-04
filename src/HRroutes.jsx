@@ -11,6 +11,7 @@ import {
   ArrowRightOnRectangleIcon,
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
+  ClipboardDocumentListIcon,
 } from "@heroicons/react/24/solid";
 import { SignIn, SignUp } from "@/pages/auth";
 import Home from "./pages/hrdashboard/home";
@@ -28,6 +29,7 @@ import Communication from "./pages/hrdashboard/communication/communication";
 import Projects from "./pages/hrdashboard/projects/projects";
 import Logout from "./pages/hrdashboard/logout";
 import Profile from "./pages/hrdashboard/profile/Profile";
+import TaskManager from "./pages/hrdashboard/task manager/taskmanager";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -72,6 +74,12 @@ export const HRroutes = [
         name: "Work Status",
         path: "/workstatus",
         element: <WorkStatus />,
+      },
+      {
+        icon: <ClipboardDocumentListIcon {...icon} />,
+        name: "Manage Tasks",
+        path: "/managetasks",
+        element: <TaskManager/>,
       },
       {
         icon: <DocumentTextIcon {...icon} />,

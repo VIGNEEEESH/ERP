@@ -13,6 +13,7 @@ import {
   ArrowRightOnRectangleIcon,
   PresentationChartLineIcon,
   CubeIcon,
+  BriefcaseIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
@@ -47,7 +48,7 @@ export const routes = [
 
 
       {
-        icon: <BuildingOfficeIcon {...icon} />,
+        icon: <BriefcaseIcon {...icon} />,
         name: "My Office",
         path: "/my-office",
         element: <MyOffice/>,
@@ -64,44 +65,35 @@ export const routes = [
         path: "/myProjects",
         element: <EmployeeProjects />,
       },
-
-      {
-        icon: <ChatBubbleOvalLeftEllipsisIcon {...icon} />,
-        name: "Communication",
-        path: "/communication",
-        element: <CommunicationComponent />,
-      },
       {
         icon: <PresentationChartLineIcon {...icon} />,
         name: "MyTasks",
         path: "/Tasks",
         element: <EmployeeTasks />,
       },
-      // {
-      //   icon: <InformationCircleIcon {...icon} />,
-      //   name: "My Office",
-      //   path: "/myoffice",
-      //   element: <Notifications />,
-      // },
-      
+
+     
       {
         icon: <TableCellsIcon {...icon} />,
         name: "Leave",
         path: "/leavereq",
         element: <LeaveForm />,
       },
-      // {
-      //   icon: <TableCellsIcon {...icon} />,
-      //   name: "tables",
-      //   path: "/tables",
-      //   element: <Tables />,
-      // },
       {
         icon: <CubeIcon {...icon} />,
         name: "CompanyProducts",
         path: "/companyproducts",
         element: <CompanyProducts />,
       },
+      {
+        icon: <ChatBubbleOvalLeftEllipsisIcon {...icon} />,
+        name: "Communication",
+        path: "/communication",
+        element: <CommunicationComponent />,
+      },
+      
+     
+      
     
       {
         icon: <InformationCircleIcon {...icon} />,
@@ -110,12 +102,6 @@ export const routes = [
         element: <Notifications />,
       },
     
-      // {
-      //   icon: <CalendarDaysIcon {...icon} />,
-      //   name: "Attendence Tracker", 
-      //   path: "/attendence-tracker", 
-      //   element: <AttendenceTracker />,
-      // },
       
       {
         icon: <UserCircleIcon {...icon} />,
@@ -135,12 +121,7 @@ export const routes = [
         path: "/logout",
         element: <Logout />,
       },
-      // {
-      //   icon: <CalendarIcon {...icon} />,
-      //   name: "Employee Leaves",
-      //   path: "/leave",
-      //   element: <Leave />,
-      // },
+  
     ],
   },
   {

@@ -193,7 +193,7 @@ const handleConfirmDelete = async () => {
             // Close the modal
             setShowDeleteModal(false);
             setEmployeeToDelete(null);
-            message.success("Employee Sucessfully Deleted");
+            message.success("Employee deleted successfully");
         } else {
             // If the request failed, throw an error
             throw new Error(`HTTP error! Status: ${response.status}`);
