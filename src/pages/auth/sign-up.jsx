@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Input,
   FileInput,
@@ -8,32 +8,48 @@ import {
   Step,
   Tooltip,
 } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
-import { BuildingOfficeIcon, HomeIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  BuildingOfficeIcon,
+  EyeIcon,
+  HomeIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/solid";
+import { message } from "antd";
+import { AuthContext } from "./Auth-context";
 
 export function SignUp() {
   const [isValidId, setIsValidId] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const auth = useContext(AuthContext);
+  const navigate=useNavigate()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
     address: "",
     pincode: "",
     state: "",
-    image: "",
-    offerLetter: "",
+    image: null,
+    password: "",
+    confirmPassword: "",
     pan: "",
     aadhar: "",
+    id: "",
+    mobile: "",
+    country:""
   });
-
-  const handleUniqueIdChange = (e) => {
-    const { value } = e.target;
-    setIsValidId(value === "validId");
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Check if the input is for Unique ID
+    if (name === "id") {
+      setIsValidId(value.length > 4);
+    }
+
+    // Update form data
     setFormData({
       ...formData,
       [name]: value,
@@ -54,6 +70,52 @@ export function SignUp() {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleSubmit = async () => {
+    
+    try {
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+  
+      const formDataToSend = new FormData();
+  
+      // Append form data fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && typeof value !== "undefined") {
+          formDataToSend.append(key, value);
+        }
+      });
+  
+      const response = await fetch(
+        `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/create/user`,
+        {
+          method: "PATCH",
+          body: formDataToSend,
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Could not create user, please try again");
+      }
+      const data = await response.json();
+      auth.login(data.userId, data.token, data.email, data.role);
+      message.success("Signed up successfully");
+      setTimeout(() => {
+        navigate(`/${data.role.toLowerCase()}/dashboard/home`);
+      });
+    } catch (err) {
+      message.error(err.message || "Sign up failed");
+    }
+  };
+  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prev) => !prev);
   };
 
   return (
@@ -81,20 +143,20 @@ export function SignUp() {
         </div>
 
         <Stepper activeStep={activeStep} alternativeLabel>
-          <Step >
+          <Step>
             <Tooltip content="Unique ID">
-            <InformationCircleIcon className="h-4 w-4"/>
+              <InformationCircleIcon className="h-4 w-4" />
             </Tooltip>
           </Step>
           <Step>
-          <Tooltip content="Personal Details">
-            <HomeIcon className="h-4 w-4"/>
+            <Tooltip content="Personal Details">
+              <HomeIcon className="h-4 w-4" />
             </Tooltip>
           </Step>
           <Step>
-          <Tooltip content="office details">
-            <BuildingOfficeIcon className="h-4 w-4"/>
-          </Tooltip>
+            <Tooltip content="office details">
+              <BuildingOfficeIcon className="h-4 w-4" />
+            </Tooltip>
           </Step>
         </Stepper>
 
@@ -104,16 +166,13 @@ export function SignUp() {
               <Input
                 size="lg"
                 label="Unique ID"
-                onChange={handleUniqueIdChange}
+                onChange={handleInputChange}
+                name="id"
               />
 
               {isValidId && (
                 <>
-                  <Button
-                    className="mt-6"
-                    fullWidth
-                    onClick={handleNext}
-                  >
+                  <Button className="mt-6" fullWidth onClick={handleNext}>
                     Next
                   </Button>
                 </>
@@ -137,13 +196,13 @@ export function SignUp() {
                 name="lastName"
                 onChange={handleInputChange}
               />
-              <Input
+              {/* <Input
                 size="lg"
                 label="Email"
                 name="email"
                 type="email"
                 onChange={handleInputChange}
-              />
+              /> */}
               <Input
                 size="lg"
                 label="Address"
@@ -163,11 +222,13 @@ export function SignUp() {
                 name="state"
                 onChange={handleInputChange}
               />
-              <Button
-                className="mt-6"
-                fullWidth
-                onClick={handleNext}
-              >
+              <Input
+                size="lg"
+                label="Country"
+                name="country"
+                onChange={handleInputChange}
+              />
+              <Button className="mt-6" fullWidth onClick={handleNext}>
                 Next
               </Button>
 
@@ -185,23 +246,58 @@ export function SignUp() {
         {activeStep === 2 && (
           <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
             <div className="mb-1 flex flex-col gap-6">
-            <Input
+              <Input
                 size="lg"
-                label="password"
-                name="image"
+                type={showPassword ? "text" : "password"}
+                label="Password"
+                name="password"
                 onChange={handleInputChange}
+                iconRight={
+                  <Button
+                    onClick={togglePasswordVisibility}
+                    size="small"
+                    iconOnly
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="w-5 h-5" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5" />
+                    )}
+                  </Button>
+                }
               />
               <Input
                 size="lg"
-                label="confirm Password"
-                name="image"
+                type={showConfirmPassword ? "text" : "password"}
+                label="Confirm Password"
+                name="confirmPassword"
                 onChange={handleInputChange}
+                iconRight={
+                  <Button
+                    onClick={toggleConfirmPasswordVisibility}
+                    size="small"
+                    iconOnly
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOffIcon className="w-5 h-5" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5" />
+                    )}
+                  </Button>
+                }
               />
 
               <Input
                 size="lg"
+                type="file"
                 label="Upload Image"
                 name="image"
+                onChange={handleFileChange}
+              />
+              <Input
+                size="lg"
+                label="Mobile Number"
+                name="mobile"
                 onChange={handleInputChange}
               />
               <Input
@@ -217,11 +313,7 @@ export function SignUp() {
                 onChange={handleInputChange}
               />
 
-              <Button
-                className="mt-6"
-                fullWidth
-                onClick={handleNext}
-              >
+              <Button className="mt-6" fullWidth onClick={handleSubmit}>
                 Register Now
               </Button>
 
@@ -237,9 +329,14 @@ export function SignUp() {
           </form>
         )}
 
-        <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
+        <Typography
+          variant="paragraph"
+          className="text-center text-blue-gray-500 font-medium mt-4"
+        >
           Already have an account?
-          <Link to="/auth/sign-in" className="text-gray-900 ml-1">Sign in</Link>
+          <Link to="/auth/sign-in" className="text-gray-900 ml-1">
+            Sign in
+          </Link>
         </Typography>
       </div>
     </section>
