@@ -55,6 +55,12 @@ router.patch(
   ],
   userControllers.updateUserById
 );
+router.patch(
+  "/update/image/byid/:id",
+  imageUpload.single("image"),
+
+  userControllers.updateUserImageById
+);
 router.patch("/forgotpassword", userControllers.forgotPassword);
 router.delete("/delete/user/byid/:id", userControllers.deleteUserById);
 
