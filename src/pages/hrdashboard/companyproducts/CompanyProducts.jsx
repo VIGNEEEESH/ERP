@@ -22,6 +22,7 @@ export function CompanyProducts() {
   const [productDescription, setProductDescription] = useState("");
   const [image, setImage] = useState("");
  const [productToDelete,setProductToDelete]=useState(null)
+ const [productToUpdate,setProductToUpdate]=useState(null)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -51,21 +52,37 @@ export function CompanyProducts() {
   };
 
   const handleUpdateProduct = (product) => {
-    setCurrentProduct(product);
+    console.log(product)
+    setCurrentProduct({
+      productName: product.productName,
+      productDescription: product.productDescription,
+      image: product.image,
+      _id: product._id
+    });
     setShowUpdateProduct(true);
   };
+  
 
   const handleUpdateCancel = () => {
     setShowUpdateProduct(false);
+    setProductDescription("")
+    setProductName("")
   };
 
   const handleProductNameChange = (e) => {
-    setProductName(e.target.value);
+    setCurrentProduct({
+      ...currentProduct,
+      productName: e.target.value
+    });
   };
-
+  
   const handleProductDescriptionChange = (e) => {
-    setProductDescription(e.target.value);
+    setCurrentProduct({
+      ...currentProduct,
+      productDescription: e.target.value
+    });
   };
+  
 
   const handleImageChange = (e) => {
     // Assuming you're only allowing single file uploads
@@ -73,10 +90,11 @@ export function CompanyProducts() {
     setImage(file);
   };
   const handleDeleteProduct = (_id, productName) => {
+    setShowDeleteModal(true);
     const product = { _id, productName }; // Creating a product object with _id and productName
     setProductToDelete(product);
-    setShowDeleteModal(true);
-    console.log(product)
+    
+    
   };
   
   
@@ -84,6 +102,7 @@ export function CompanyProducts() {
 const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setProductToDelete(null);
+
 };
 
     
@@ -138,6 +157,8 @@ const handleProductSubmit = async () => {
     message.success("Product created successfully");
 
     // Close the modal and reset form data
+    setProductDescription("")
+    setProductName("")
     setShowAddProducts(false);
      setTimeout(()=>{
       window.location.reload()
@@ -154,8 +175,36 @@ const handleProductSubmit = async () => {
 
   
 
-  const handleUpdateSubmit = () => {
-    // Handle update submission
+  const handleUpdateSubmit = async() => {
+    try{
+    const formData = new FormData();
+    
+    // Assuming you have variables `productName`, `productDescription`, and `productImage` containing the respective data
+    
+    formData.append('productName', currentProduct.productName);
+    formData.append('productDescription', currentProduct.productDescription);
+    formData.append('image', image); // Assuming productImage is the File object of the image
+    
+    const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/update/product/byid/${currentProduct._id}`, {
+      method: "PATCH",
+      body: formData 
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create product");
+    }
+
+    // Assuming the product creation was successful, you might want to handle this accordingly
+    message.success("Product created successfully");
+
+    // Close the modal and reset form data
+    setShowAddProducts(false);
+     setTimeout(()=>{
+      window.location.reload()
+     },[100])
+  } catch (error) {
+    message.error(`Failed to create product: ${error.message}`);
+  }
     setShowUpdateProduct(false);
     // Perform update operation with productName, productDescription, and productImage
   };
@@ -201,7 +250,7 @@ const handleProductSubmit = async () => {
                     {productDescription}
                   </Typography>
                   <div className="flex mt-4">
-                    <Button className="mr-4" onClick={() => handleUpdateProduct({ productName, productDescription, image })}>Update</Button>
+                    <Button className="mr-4" onClick={() => handleUpdateProduct({ productName, productDescription, image,_id })}>Update</Button>
                     <Button>
   <TrashIcon onClick={() => handleDeleteProduct(_id, productName)} className="w-4 h-4" />
 </Button>
@@ -300,6 +349,7 @@ const handleProductSubmit = async () => {
         <div className="p-4">
           <Input
             type="file"
+            name="image"
             className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             onChange={handleImageChange}
           />
