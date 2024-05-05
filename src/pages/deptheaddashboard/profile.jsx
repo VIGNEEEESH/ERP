@@ -21,7 +21,7 @@ import {
 import { AuthContext } from '@/pages/auth/Auth-context';
 import { message } from 'antd';
 
-export function Profile() {
+export function Employee() {
   const initialProfile = {
     firstName: 'Richard',
     lastName: 'Davis',
@@ -97,27 +97,27 @@ const auth=useContext(AuthContext)
       };
       fetchUser();
     }, []);
-    const handleProfileUpdate=async()=>{
-      try{
+    // const handleProfileUpdate=async()=>{
+    //   try{
         
-        const response=await fetch(import.meta.env.REACT_APP_BACKEND_URL+`/api/erp/user/update/user/byid/${auth.userId}`,
-        {
-          method:"PATCH",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify(formData)})
-          if(!response.ok){
-            return error(`Http error: `,response.message)
-          }
-          message.success("Profile updated successfully")
-          setTimeout(()=>{
-    window.location.reload()
-          },[300]
+    //     const response=await fetch(import.meta.env.REACT_APP_BACKEND_URL+`/api/erp/user/update/user/byid/${auth.userId}`,
+    //     {
+    //       method:"PATCH",
+    //       headers:{"Content-Type":"application/json"},
+    //       body:JSON.stringify(formData)})
+    //       if(!response.ok){
+    //         return error(`Http error: `,response.message)
+    //       }
+    //       message.success("Profile updated successfully")
+    //       setTimeout(()=>{
+    // window.location.reload()
+    //       },[300]
     
-          )
-      }catch(err){
-        message.error("Something went wrong, please try again")
-      }
-    }
+    //       )
+    //   }catch(err){
+    //     message.error("Something went wrong, please try again")
+    //   }
+    // }
   
 
   return (
@@ -253,6 +253,20 @@ const auth=useContext(AuthContext)
                   formData.state
                 )}
               </Typography>
+              <Typography variant="small" className="font-normal text-blue-gray-600">
+              {isEditing ? (
+                <Input
+                  type="text"
+                  name="aadhar"
+                  value={formData.aadhar}
+                  onChange={handleInputChange}
+                  label="Aadhar"
+                  className="border-b border-blue-gray-500 focus:border-blue-600"
+                />
+              ) : (
+                `Aadhar: ${formData.aadhar}`
+              )}
+            </Typography>
             </div>
             <div className="flex flex-col space-y-4">
               <Typography variant="small" className="font-normal text-blue-gray-600">
@@ -298,25 +312,31 @@ const auth=useContext(AuthContext)
                   `PAN: ${formData.pan}`
                 )}
               </Typography>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-4">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="small" className="font-normal text-blue-gray-600">
               {isEditing ? (
                 <Input
                   type="text"
-                  name="aadhar"
-                  value={formData.aadhar}
+                  name="mobile"
+                  value={formData.mobile}
                   onChange={handleInputChange}
-                  label="Aadhar"
+                  label="Mobile"
                   className="border-b border-blue-gray-500 focus:border-blue-600"
                 />
               ) : (
-                `Aadhar: ${formData.aadhar}`
+                `Mobile: ${formData.mobile}`
               )}
             </Typography>
+            
+            </div>
           </div>
-          <CardFooter className="flex justify-end p-4">
+          <div className="flex flex-col space-y-4">
+            
+            
+          </div>
+          
+            
+          
+          {/* <CardFooter className="flex justify-end p-4">
             {isEditing ? (
               <>
                 <Button  onClick={handleSaveClick}>
@@ -334,11 +354,11 @@ const auth=useContext(AuthContext)
                 />
               </Tooltip>
             )}
-          </CardFooter>
+          </CardFooter> */}
         </CardBody>
       </Card>
     </>
   );
 }
 
-export default Profile;
+export default Employee;
