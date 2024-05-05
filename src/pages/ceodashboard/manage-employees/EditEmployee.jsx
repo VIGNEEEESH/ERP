@@ -109,6 +109,15 @@ export function EditEmployee({ employeeData, onClose }) {
                         <div>
                             <Input
                                 type="text"
+                                name="mobile"
+                                value={formData.mobile}
+                                onChange={handleInputChange}
+                                label="Mobile"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="text"
                                 name="address"
                                 value={formData.address}
                                 onChange={handleInputChange}
