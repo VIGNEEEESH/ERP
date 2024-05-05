@@ -1,98 +1,165 @@
-import React, { useState } from 'react';
-import { Button, Input, Select, CardFooter } from "@material-tailwind/react";
+import React, { useEffect, useState } from 'react';
+import { CardBody, Input, Button } from "@material-tailwind/react";
+import { message } from 'antd';
 
-const AddProject = ({ onAddProject }) => {
-    const [projectName, setProjectName] = useState('');
-    const [selectedMembers, setSelectedMembers] = useState([]);
-    const [budget, setBudget] = useState('');
-    const [progress, setProgress] = useState(0);
+const AddProject = () => {
+    const [formData, setFormData] = useState({
+        projectName: '',
+        projectDescription: '',
+        members: [''],
+        deadline: '',
+        assignedDate: new Date().toISOString().slice(0, 10),
+    });
+    const [members,setMembers]=useState([])
 
-    // Sample members data
-    const sampleMembers = [
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Jane Doe" },
-        { id: 3, name: "Alice Smith" },
-        { id: 4, name: "Bob Smith" }
-    ];
+    useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const response = await fetch(
+                    import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/user/get/all/users`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                setMembers(data.users);
+            } catch (err) {
+                message.error("Error fetching employees", err.message);
+            }
+        };
+        fetchMembers()
+    }, []);
 
-    const toggleMember = (memberId) => {
-        const index = selectedMembers.findIndex(member => member.id === memberId);
-        if (index !== -1) {
-            setSelectedMembers(selectedMembers.filter(member => member.id !== memberId));
-        } else {
-            const member = sampleMembers.find(member => member.id === memberId);
-            setSelectedMembers([...selectedMembers, member]);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
+
+    const handleMemberChange = (e, index) => {
+        const updatedMembers = [...formData.members];
+        updatedMembers[index] = e.target.value;
+        setFormData({
+            ...formData,
+            members: updatedMembers,
+        });
+    };
+
+    const handleAddMember = () => {
+        setFormData({
+            ...formData,
+            members: [...formData.members, ''],
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const response = await fetch(
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/create/project`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            message.success(`Project created successfully`)
+            const responseData = await response.json();
+            setTimeout(()=>{
+                window.location.reload()
+            },[500])
+            
+            
+            
+        } catch (error) {
+            message.error(`Error creating project`)
+            console.error("Error submitting form:", error.message);
         }
     };
 
-    const removeMember = (memberId) => {
-        setSelectedMembers(selectedMembers.filter(member => member.id !== memberId));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const newProject = {
-            name: projectName,
-            members: selectedMembers,
-            budget,
-            completion: progress
-        };
-        onAddProject(newProject);
-        setProjectName('');
-        setSelectedMembers([]);
-        setBudget('');
-        setProgress(0);
-    };
-
     return (
-        <form onSubmit={handleSubmit}>
-            <div className="flex flex-col space-y-4 p-6">
-                <Input
-                    type="text"
-                    label="Project Name"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                />
-                <Select
-                    multiple
-                    value={selectedMembers.map(member => member.id)} // Use member id as value
-                    onChange={(e) => setSelectedMembers(sampleMembers.filter(member => e.target.value.includes(member.id)))} // Filter members by id
-                    label='Select Members'>
-                    {sampleMembers.map(member => (
-                        <option key={member.id} value={member.id} onClick={() => toggleMember(member.id)} className='cursor-pointer'>
-                            {member.name}
-                        </option> // Use member id as value
-                    ))}
-                </Select>
-                <div>
-                    <p>Selected Members:</p>
-                    <ul className="flex flex-wrap gap-2">
-                        {selectedMembers.map((member, index) => (
-                            <li key={index} className="bg-gray-600 text-white rounded p-2 flex items-center">
-                                <span>{member.name}</span>
-                                <button onClick={() => removeMember(member.id)} className="ml-1 focus:outline-none">&times;</button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <Input
-                    type="text"
-                    label="Budget"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                />
-                <Input
-                    type="number"
-                    label="Progress (0-100)"
-                    value={progress}
-                    onChange={(e) => setProgress(parseInt(e.target.value))}
-                />
-            </div>
-            <CardFooter>
-                <Button  onClick={handleSubmit}>Submit</Button>
-            </CardFooter>
-        </form>
+        <div>
+            <CardBody>
+                <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 gap-4">
+                        <div>
+                            <Input
+                                type="text"
+                                name="projectName"
+                                value={formData.projectName}
+                                onChange={handleInputChange}
+                                label="Project Name"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="text"
+                                name="projectDescription"
+                                value={formData.projectDescription}
+                                onChange={handleInputChange}
+                                label="Project Description"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="deadline"
+                                value={formData.deadline}
+                                onChange={handleInputChange}
+                                label="Deadline"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="assignedDate"
+                                value={formData.assignedDate}
+                                onChange={handleInputChange}
+                                label="Assigned Date"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
+                            {formData.members.map((member, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <select
+                                        name="member"
+                                        value={member}
+                                        onChange={(e) => handleMemberChange(e, index)}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
+                                    >
+                                        <option value="">Select Member</option>
+                                        {members.map(memberItem => (
+                                            <option key={memberItem._id} value={memberItem.email}>{memberItem.firstName} {memberItem.lastName}</option>
+                                        ))}
+                                    </select>
+                                    {index === formData.members.length - 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={handleAddMember}
+                                            className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 "
+                                        >
+                                            +
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <Button type="submit" className="mt-6">Add Project</Button>
+                </form>
+            </CardBody>
+        </div>
     );
-};
+}
 
 export default AddProject;
