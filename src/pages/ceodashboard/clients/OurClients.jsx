@@ -20,7 +20,6 @@ export function OurClients() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [clientToDelete, setClientToDelete] = useState(null);
-    const [clientToUpdate, setClientToUpdate] = useState(null);
 
     useEffect(() => {
         const fetchClients = async () => {

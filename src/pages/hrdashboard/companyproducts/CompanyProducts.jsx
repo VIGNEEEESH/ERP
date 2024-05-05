@@ -17,11 +17,11 @@ export function CompanyProducts() {
   const [showAddProducts, setShowAddProducts] = useState(false);
   const [showUpdateProduct, setShowUpdateProduct] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
-  const [productImage, setProductImage] = useState("");
-
+  const [image, setImage] = useState("");
+ const [productToDelete,setProductToDelete]=useState(null)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -67,13 +67,92 @@ export function CompanyProducts() {
     setProductDescription(e.target.value);
   };
 
-  const handleProductImageChange = (e) => {
-    // Handle file upload
+  const handleImageChange = (e) => {
+    // Assuming you're only allowing single file uploads
+    const file = e.target.files[0];
+    setImage(file);
   };
+  const handleDeleteProduct = (_id, productName) => {
+    const product = { _id, productName }; // Creating a product object with _id and productName
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+    console.log(product)
+  };
+  
+  
 
-  const handleProductSubmit = () => {
-    // Handle product submission
-  };
+const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
+};
+
+    
+
+const handleConfirmDelete = async () => {
+  try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/delete/product/byid/${productToDelete._id}`, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      if (response.ok) {
+          setProducts(products.filter(product => product._id !== productToDelete._id)); // <-- Here's the filter logic
+
+          setShowDeleteModal(false);
+          setProductToDelete(null);
+          message.success("Project Sucessfully Deleted");
+      } else {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  } catch (error) {
+      console.error('Error deleting project:', error);
+  }
+};
+
+
+
+  
+
+const handleProductSubmit = async () => {
+  try {
+    const formData = new FormData();
+    
+    // Assuming you have variables `productName`, `productDescription`, and `productImage` containing the respective data
+    
+    formData.append('productName', productName);
+    formData.append('productDescription', productDescription);
+    formData.append('image', image); // Assuming productImage is the File object of the image
+    console.log(image)
+    const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/create/product`, {
+      method: "POST",
+      body: formData 
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create product");
+    }
+
+    // Assuming the product creation was successful, you might want to handle this accordingly
+    message.success("Product created successfully");
+
+    // Close the modal and reset form data
+    setShowAddProducts(false);
+     setTimeout(()=>{
+      window.location.reload()
+     },[100])
+  } catch (error) {
+    message.error(`Failed to create product: ${error.message}`);
+  }
+};
+
+
+
+
+
+
+  
 
   const handleUpdateSubmit = () => {
     // Handle update submission
@@ -105,7 +184,7 @@ export function CompanyProducts() {
 
         <div className=" px-4 pb-4 mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
           {products.map(
-            ({ image, productName, productDescription }) => (
+            ({ image, productName, productDescription,_id }) => (
               <Card key={productName} color="transparent" shadow={false}>
                 <div className="mx-0 mt-0 mb-4 h-64 xl:h-40">
                   <img
@@ -123,7 +202,10 @@ export function CompanyProducts() {
                   </Typography>
                   <div className="flex mt-4">
                     <Button className="mr-4" onClick={() => handleUpdateProduct({ productName, productDescription, image })}>Update</Button>
-                    <Button><TrashIcon className="w-4 h-4" /></Button>
+                    <Button>
+  <TrashIcon onClick={() => handleDeleteProduct(_id, productName)} className="w-4 h-4" />
+</Button>
+
                   </div>
                 </CardBody>
               </Card>
@@ -131,7 +213,22 @@ export function CompanyProducts() {
           )}
         </div>
       </Card>
+      <Modal
+                title="Delete Product"
+                open={showDeleteModal}
+                onOk={handleConfirmDelete}
+                onCancel={handleCloseDeleteModal}
+                okButtonProps={{ style: { backgroundColor: 'black' } }}
 
+            >
+                <p>Are you sure you want to delete this Product?</p>
+                {productToDelete && (
+                    <div>
+                        <p>Product Name: {productToDelete.productName}</p>
+                        
+                    </div>
+                )}
+            </Modal>
       {/* Modal for adding product */}
       <Modal
         title="Add Product"
@@ -142,16 +239,19 @@ export function CompanyProducts() {
         <div className="p-4">
           <Input
             type="text"
+            name="productName"
             className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             label="Enter product name"
             value={productName}
             onChange={handleProductNameChange}
+            
           />
         </div>
         <div className="p-4">
           <Textarea
             className="form-textarea mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             rows={3}
+            name="productDescription"
             label="Enter product description"
             value={productDescription}
             onChange={handleProductDescriptionChange}
@@ -160,8 +260,9 @@ export function CompanyProducts() {
         <div className="p-4">
           <Input
             type="file"
+            name="image"
             className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            onChange={handleProductImageChange}
+            onChange={handleImageChange}
           />
         </div>
         <div className="p-4 flex justify-end">
@@ -200,7 +301,7 @@ export function CompanyProducts() {
           <Input
             type="file"
             className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            onChange={handleProductImageChange}
+            onChange={handleImageChange}
           />
         </div>
         <div className="p-4 flex justify-end">
