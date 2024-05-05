@@ -8,16 +8,26 @@ function AddClient() {
         clientName: '',
         companyName: '',
         mobile: '',
-        projects: []
+        projects: [""]
     });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+        if (name === 'projects') {
+            // Split the input value by comma and remove any leading/trailing spaces
+            const projectsArray = value.split(',').map(project => project.trim());
+            setFormData({
+                ...formData,
+                [name]: projectsArray,
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+        }
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();

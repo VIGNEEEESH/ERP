@@ -72,11 +72,11 @@ export function OurClients() {
                 ),
             },
             {
-                Header: 'Update',
-                accessor: 'update',
+                Header: '',
+                accessor: 'edit',
                 Cell: ({ row }) => (
-                    <Typography onClick={() => handleUpdateClick(row.original)} className='cursor-pointer'>
-                        <PencilIcon className="h-5 w-5" />
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => handleUpdateClick(row.original)}>
+                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
                     </Typography>
                 ),
             },
@@ -128,6 +128,8 @@ export function OurClients() {
         setShowDeleteModal(false);
         setClientToDelete(null);
     };
+   
+        
 
     const handleConfirmDelete = async () => {
         try {
@@ -158,7 +160,29 @@ export function OurClients() {
         setShowUpdateModal(false);
         setSelectedClient(null);
     };
-
+    const handleUpdate = async (client) => {
+        try {
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/update/client/byid/${client._id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(client) // Pass the updated client object in the request body
+            });
+    
+            if (!response.ok) {
+                throw new Error("Something went wrong, please try again");
+            }
+            
+            // Update the client in the local state with the updated data
+            setClients(clients.map(c => (c._id === client._id ? client : c)));
+    
+            message.success("Client updated successfully");
+            
+            setShowUpdateModal(false);
+            setSelectedClient(null);
+        } catch (err) {
+            message.error("Something went wrong, please try again");
+        }
+    };
     const handleUpdateClient = async (updatedClient) => {
         
         setShowUpdateModal(false);
@@ -270,7 +294,7 @@ export function OurClients() {
                 {selectedClient && (
                     <UpdateClientForm
                         client={selectedClient}
-                        onUpdate={handleUpdateClient}
+                        onUpdate={handleUpdate}
                     />
                 )}
             </Modal>
@@ -315,9 +339,11 @@ function UpdateClientForm({ client, onUpdate }) {
         }));
     };
 
+   
+    
     const handleSubmit = (e) => {
         e.preventDefault();
-        onUpdate(updatedClientData);
+        onUpdate(updatedClientData); 
     };
 
     return (
