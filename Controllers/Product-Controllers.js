@@ -1,13 +1,16 @@
 const HttpError = require("../Middleware/http-error");
 const { validationResult } = require("express-validator");
 const Product = require("../Models/Product");
-
+const fs = require("fs");
+const path = require("path");
 const createProduct = async (req, res, next) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     const error = new HttpError("Invalid inputs, please try again", 422);
     return next(error);
   }
+
   const { productName, productDescription } = req.body;
   let existingProduct;
   try {
@@ -111,6 +114,7 @@ const updateProductById = async (req, res, next) => {
 };
 const deleteProductById = async (req, res, next) => {
   const id = req.params.id;
+
   let product;
   try {
     product = await Product.findOne({ _id: id });
@@ -125,14 +129,23 @@ const deleteProductById = async (req, res, next) => {
     const error = new HttpError("Product not found, please try again", 500);
     return next(error);
   }
+  const imagePath = product.image;
+
   try {
-    await Product.deleteOne();
+    await product.deleteOne();
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while deleting the data, please try again",
       500
     );
     return next(error);
+  }
+  try {
+    // Delete the image file from the server
+    fs.unlinkSync(imagePath); // Adjust the path as per your directory structure
+  } catch (err) {
+    // Handle error if image deletion fails
+    console.error("Error deleting image:", err);
   }
   res.status(200).json({ message: "Product deleted successfully" });
 };

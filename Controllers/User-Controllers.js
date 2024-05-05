@@ -238,7 +238,7 @@ const login = async (req, res, next) => {
 };
 const forgotPassword = async (req, res, next) => {
   const { password, newPassword, userId, confirmPassword } = req.body;
-  // console.log(req.body);
+
   let existingUser;
   try {
     existingUser = await User.findOne({ _id: userId });

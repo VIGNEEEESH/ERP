@@ -61,7 +61,6 @@ const createAttendance = async (req, res, next) => {
   try {
     await createdAttendance.save();
   } catch (err) {
-    console.log(createdAttendance);
     console.log(err);
     const error = new HttpError(
       "Something went wrong while saving the data, please try again",
