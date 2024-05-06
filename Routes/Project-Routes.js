@@ -5,19 +5,30 @@ const projectControllers = require("../Controllers/Project-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
 
-router.get("/get/all/projects", projectControllers.getAllProjects);
-router.get("/get/project/byid/:id", projectControllers.getProjectById);
+router.get(
+  "/get/all/projects",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  projectControllers.getAllProjects
+);
+router.get(
+  "/get/project/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  projectControllers.getProjectById
+);
 router.get(
   "/get/projects/byEmail/:email",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   projectControllers.getProjectsByEmail
 );
 router.get(
   "/get/projects/bydepartmentandid/:id",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   projectControllers.getProjectsByDepartmentAndId
 );
 
 router.post(
   "/create/project",
+  checkAuth(["CEO", "HR", "DeptHead"]),
   [
     check("projectName").isLength({ min: 2, max: 255 }),
     check("projectDescription").isLength({ min: 2 }),
@@ -31,6 +42,7 @@ router.post(
 );
 router.patch(
   "/update/project/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead"]),
   [
     check("projectName").isLength({ min: 2, max: 255 }).optional(),
     check("projectDescription").isLength({ min: 2 }).optional(),
@@ -44,9 +56,14 @@ router.patch(
 );
 router.patch(
   "/update/projectprogress/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead"]),
   [check("progress").isLength({ min: 1 })],
   projectControllers.updateProjectProgressById
 );
-router.delete("/delete/project/byid/:id", projectControllers.deleteProjectById);
+router.delete(
+  "/delete/project/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead"]),
+  projectControllers.deleteProjectById
+);
 
 module.exports = router;

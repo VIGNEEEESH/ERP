@@ -20,7 +20,6 @@ router.get(
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   userControllers.getUsersByRole
 );
-
 router.post(
   "/invite/user",
   checkAuth(["CEO", "HR"]),
