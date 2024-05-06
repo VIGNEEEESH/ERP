@@ -10,8 +10,16 @@ router.get(
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   userControllers.getAllUsers
 );
-router.get("/get/user/byid/:id", userControllers.getUserById);
-router.get("/get/users/byrole/:role", userControllers.getUsersByRole);
+router.get(
+  "/get/user/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  userControllers.getUserById
+);
+router.get(
+  "/get/users/byrole/:role",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  userControllers.getUsersByRole
+);
 
 router.post(
   "/invite/user",
