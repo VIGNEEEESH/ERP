@@ -98,6 +98,10 @@ export function Projects({ onAddProject }) {
                 accessor: 'assignedDate',
             },
             {
+                Header: 'Department',
+                accessor: 'department',
+            },
+            {
                 Header: 'Progress',
                 accessor: 'progress',
                 Cell: ({ value }) => (

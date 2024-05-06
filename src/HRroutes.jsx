@@ -12,6 +12,7 @@ import {
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon,
+  WalletIcon,
 } from "@heroicons/react/24/solid";
 import { SignIn, SignUp } from "@/pages/auth";
 import Home from "./pages/hrdashboard/home";
@@ -30,6 +31,7 @@ import Projects from "./pages/hrdashboard/projects/projects";
 import Logout from "./pages/hrdashboard/logout";
 import Profile from "./pages/hrdashboard/profile/Profile";
 import TaskManager from "./pages/hrdashboard/task manager/taskmanager";
+import ManageDepartments from "./pages/hrdashboard/Departments/ManageDepartments";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -56,6 +58,12 @@ export const HRroutes = [
         name: "Attendence Tracker",
         path: "/attendence-tracker",
         element: <AttendenceTracker />,
+      },
+      {
+        icon: <WalletIcon {...icon} />,
+        name: "Manage Departments",
+        path: "/manage-departments",
+        element: <ManageDepartments />,
       },
       {
         icon: <BuildingOfficeIcon {...icon} />,
