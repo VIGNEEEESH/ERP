@@ -10,7 +10,12 @@ const ProfileImageUpdate = () => {
 const auth=useContext(AuthContext)
   useEffect(() => {
     const fetchImage=async()=>{
-      const response =await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`)
+      const response =await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
+      {
+        headers:{
+          Authorization: "Bearer " + auth.token, 
+        }
+      })
       if(!response.ok){
         message.error("Something went wrong while fetching the image, please try again")
 
@@ -46,6 +51,10 @@ const auth=useContext(AuthContext)
   
         const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/image/byid/${auth.userId}`, {
           method: 'PATCH',
+          headers: {
+            
+            Authorization: "Bearer " + auth.token,
+          },
           body: formData,
         });
   

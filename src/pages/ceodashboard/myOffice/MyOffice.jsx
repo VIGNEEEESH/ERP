@@ -26,7 +26,9 @@ export function MyOffice() {
                 const attendanceData = await attendanceResponse.json();
     
                 // Fetch employee data
-                const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`);
+                const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
+                    Authorization:"Bearer "+auth.token
+                }});
                 if (!employeeResponse.ok) {
                     throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
                 }

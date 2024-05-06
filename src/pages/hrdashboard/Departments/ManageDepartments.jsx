@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext } from 'react';
 import {
     Card,
     CardHeader,
@@ -13,6 +13,7 @@ import { useTable, usePagination } from 'react-table';
 import { authorsTableData } from "@/data";
 import AttendanceCalendar from "./AttendenceCalender";
 import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function ManageDepartments() {
     const [showCalendar, setShowCalendar] = useState(false);
@@ -23,7 +24,7 @@ export function ManageDepartments() {
     const [users, setUsers] = useState([]);
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
-
+    const auth=useContext(AuthContext)
 
     useEffect(() => {
     const fetchDepartments = async () => {
@@ -31,10 +32,12 @@ export function ManageDepartments() {
             
             const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`);
             if (!departmentResponse.ok) {
-                throw new Error(`Failed to fetch attendance data: ${departmentsResponse.status}`);
+                throw new Error(`Failed to fetch attendance data: ${departmentResponse.status}`);
             }
             const departmentData = await departmentResponse.json();
-            const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`);
+            const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
+                Authorization:"Bearer "+auth.token
+            }});
             if (!userResponse.ok) {
                 throw new Error(`Failed to fetch attendance data: ${userResponse.status}`);
             }

@@ -31,7 +31,9 @@ export function ManageEmployees() {
             
           try {
             const response = await fetch(
-                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/user/get/all/users`
+                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/user/get/all/users`,{headers:{
+                    Authorization:"Bearer "+auth.token
+                }}
             );
     
             if (!response.ok) {

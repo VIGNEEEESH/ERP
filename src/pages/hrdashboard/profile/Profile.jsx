@@ -80,7 +80,12 @@ const auth=useContext(AuthContext)
       const fetchUser = async () => {
         try {
           const response = await fetch(
-            `http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`
+            `http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`,
+            {
+              headers:{
+                Authorization: "Bearer " + auth.token, 
+              }
+            }
           );
   
           if (!response.ok) {

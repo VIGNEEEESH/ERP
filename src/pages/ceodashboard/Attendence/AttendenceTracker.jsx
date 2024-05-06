@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext } from 'react';
 import {
     Card,
     CardHeader,
@@ -13,6 +13,7 @@ import { useTable, usePagination } from 'react-table';
 import { authorsTableData } from "@/data";
 import AttendanceCalendar from "./AttendenceCalender";
 import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function AttendenceTracker() {
     const [showCalendar, setShowCalendar] = useState(false);
@@ -23,7 +24,7 @@ export function AttendenceTracker() {
     const [employees, setEmployees] = useState([]);
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
-
+const auth=useContext(AuthContext)
 // Handler for updating search query
 
 
@@ -39,7 +40,9 @@ export function AttendenceTracker() {
            
 
             // Fetch employee data
-            const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`);
+            const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
+                Authorization:"Bearer "+auth.token
+            }});
             if (!employeeResponse.ok) {
                 throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
             }

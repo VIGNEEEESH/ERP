@@ -66,7 +66,7 @@ const [formData,setFormData]=useState({
       const response=await fetch(import.meta.env.REACT_APP_BACKEND_URL+`/api/erp/user/forgotpassword`,
       {
         method:"PATCH",
-        headers:{"Content-Type":"application/json"},
+        headers:{"Content-Type":"application/json",Authorization: "Bearer " + auth.token,},
         body:JSON.stringify(formData)})
         if(!response.ok){
           return error(`Http error: `,response.message)

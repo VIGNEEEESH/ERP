@@ -27,7 +27,12 @@ export function Sidenav({ brandName, routes }) {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`);
+        const response = await fetch(`http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`,
+        {
+          headers:{
+            Authorization: "Bearer " + auth.token, 
+          }
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }

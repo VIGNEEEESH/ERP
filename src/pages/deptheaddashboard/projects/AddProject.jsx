@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { CardBody, Input, Button } from "@material-tailwind/react";
 import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 const AddProject = () => {
     const [formData, setFormData] = useState({
@@ -13,12 +14,14 @@ const AddProject = () => {
     });
     const [members,setMembers]=useState([])
     const [departments,setDepartments]=useState([])
-
+    const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchMembers = async () => {
             try {
                 const response = await fetch(
-                    import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/user/get/all/users`
+                    import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/user/get/all/users`,{headers:{
+                        Authorization:"Bearer "+auth.token
+                    }}
                 );
                 const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`);
                 if (!response.ok || !departmentResponse.ok) {
