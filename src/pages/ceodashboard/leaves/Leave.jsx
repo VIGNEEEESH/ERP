@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
     Card,
     CardHeader,
@@ -9,17 +9,18 @@ import {
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
 import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function Leave() {
     const [pageSize, setPageSize] = useState(5);
     const [pageIndex, setPageIndex] = useState(0);
     const [leaves, setLeaves] = useState([]);
-
+const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchLeaves = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:4444/api/erp/leave/get/all/leaves"
+                    "http://localhost:4444/api/erp/leave/get/all/leaves",{headers:{Authorization:"Bearer "+auth.token}}
                 );
 
                 if (!response.ok) {
@@ -128,6 +129,7 @@ export function Leave() {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
                     },
                     body: JSON.stringify({ status: "Approved" }),
                 }
@@ -154,6 +156,7 @@ export function Leave() {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
                     },
                     body: JSON.stringify({ status: "Declined" }),
                 }
