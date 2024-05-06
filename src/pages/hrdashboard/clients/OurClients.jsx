@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext } from 'react';
 import {
     Card,
     CardHeader,
@@ -11,6 +11,7 @@ import { ArrowLeftIcon, UserPlusIcon, PencilIcon, TrashIcon } from "@heroicons/r
 import { useTable, usePagination } from 'react-table';
 import AddClient from './AddClient';
 import { Modal, message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 
 export function OurClients() {
@@ -21,12 +22,12 @@ export function OurClients() {
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [clientToDelete, setClientToDelete] = useState(null);
     const [clientToUpdate, setClientToUpdate] = useState(null);
-
+    const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchClients = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:4444/api/erp/client/get/all/clients"
+                    "http://localhost:4444/api/erp/client/get/all/clients",{headers:{Authorization: "Bearer " + auth.token,}}
                 );
 
                 if (!response.ok) {
@@ -138,6 +139,7 @@ export function OurClients() {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: "Bearer " + auth.token,
                 },
             });
     
@@ -164,7 +166,7 @@ export function OurClients() {
         try {
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/update/client/byid/${client._id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json",Authorization: "Bearer " + auth.token, },
                 body: JSON.stringify(client) // Pass the updated client object in the request body
             });
     

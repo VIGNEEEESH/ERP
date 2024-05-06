@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { CardBody, Input, Button } from "@material-tailwind/react";
 import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 function AddClient() {
     const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ function AddClient() {
         mobile: '',
         projects: [""]
     });
-
+    const auth=useContext(AuthContext)
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         if (name === 'projects') {
@@ -39,6 +40,7 @@ function AddClient() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
                     },
                     body: JSON.stringify(formData),
                 }
