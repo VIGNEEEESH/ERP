@@ -15,6 +15,7 @@ const createTask = async (req, res, next) => {
     deadline,
     assignedDate,
     progress,
+    department,
   } = req.body;
   let existingTask;
   try {
@@ -40,6 +41,7 @@ const createTask = async (req, res, next) => {
     deadline,
     assignedDate,
     progress,
+    department,
   });
   try {
     await createdTask.save();
@@ -103,6 +105,7 @@ const updateTaskById = async (req, res, next) => {
     deadline,
     assignedDate,
     progress,
+    department,
   } = req.body;
   try {
     task = await Task.findOne({ _id: id });
@@ -126,6 +129,7 @@ const updateTaskById = async (req, res, next) => {
   task.deadline = deadline ? deadline : task.deadline;
   task.assignedDate = assignedDate ? assignedDate : task.assignedDate;
   task.progress = progress ? progress : task.progress;
+  task.department = department ? department : task.department;
 
   try {
     task.save();

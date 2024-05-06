@@ -18,6 +18,7 @@ router.post(
     check("deadline").isLength({ min: 2, max: 255 }).optional(),
     check("assignedDate").isLength({ min: 2, max: 255 }),
     check("progress").isLength({ min: 2, max: 255 }).optional(),
+    check("department").isLength({ min: 2, max: 255 }).optional(),
   ],
   taskControllers.createTask
 );
@@ -30,6 +31,7 @@ router.patch(
     check("deadline").isLength({ min: 2, max: 255 }).optional(),
     check("assignedDate").isLength({ min: 2, max: 255 }).optional(),
     check("progress").isLength({ min: 2 }).optional(),
+    check("department").isLength({ min: 2 }).optional(),
   ],
   taskControllers.updateTaskById
 );

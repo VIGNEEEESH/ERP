@@ -8,6 +8,7 @@ const projectSchema = new Schema({
   deadline: { type: String },
   assignedDate: { type: String, required: true },
   progress: { type: String },
+  department: { type: String, required: true },
 });
 
 module.exports = mongoose.model("Project", projectSchema);

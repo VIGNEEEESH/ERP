@@ -15,6 +15,7 @@ const createProject = async (req, res, next) => {
     deadline,
     assignedDate,
     progress,
+    department,
   } = req.body;
   let existingProject;
   try {
@@ -43,6 +44,7 @@ const createProject = async (req, res, next) => {
     deadline,
     assignedDate,
     progress,
+    department,
   });
   try {
     await createdProject.save();
@@ -106,6 +108,7 @@ const updateProjectById = async (req, res, next) => {
     deadline,
     assignedDate,
     progress,
+    department,
   } = req.body;
   try {
     project = await Project.findOne({ _id: id });
@@ -129,6 +132,7 @@ const updateProjectById = async (req, res, next) => {
   project.deadline = deadline ? deadline : project.deadline;
   project.assignedDate = assignedDate ? assignedDate : project.assignedDate;
   project.progress = progress ? progress : project.progress;
+  project.department = department ? department : project.department;
 
   try {
     project.save();
