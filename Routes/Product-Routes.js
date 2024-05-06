@@ -5,11 +5,20 @@ const productControllers = require("../Controllers/Product-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
 
-router.get("/get/all/products", productControllers.getAllProducts);
-router.get("/get/product/byid/:id", productControllers.getProductById);
+router.get(
+  "/get/all/products",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  productControllers.getAllProducts
+);
+router.get(
+  "/get/product/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  productControllers.getProductById
+);
 
 router.post(
   "/create/product",
+  checkAuth(["CEO", "HR"]),
   imageUpload.single("image"),
   [
     check("productName").isLength({ min: 2, max: 255 }),
@@ -19,6 +28,7 @@ router.post(
 );
 router.patch(
   "/update/product/byid/:id",
+  checkAuth(["CEO", "HR"]),
   imageUpload.single("image"),
   [
     check("productName").isLength({ min: 2, max: 255 }).optional(),
@@ -26,6 +36,10 @@ router.patch(
   ],
   productControllers.updateProductById
 );
-router.delete("/delete/product/byid/:id", productControllers.deleteProductById);
+router.delete(
+  "/delete/product/byid/:id",
+  checkAuth(["CEO", "HR"]),
+  productControllers.deleteProductById
+);
 
 module.exports = router;
