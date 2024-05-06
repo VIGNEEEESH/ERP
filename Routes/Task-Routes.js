@@ -7,6 +7,10 @@ const imageUpload = require("../Middleware/image-upload");
 
 router.get("/get/all/tasks", taskControllers.getAllTasks);
 router.get("/get/task/byid/:id", taskControllers.getTaskById);
+router.get(
+  "/get/tasks/bydepartmentandid/:id",
+  taskControllers.getTasksByDepartmentAndId
+);
 router.get("/get/tasks/byemail/:email", taskControllers.getTasksByEmail);
 
 router.post(

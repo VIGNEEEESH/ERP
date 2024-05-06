@@ -11,6 +11,10 @@ router.get(
   "/get/projects/byEmail/:email",
   projectControllers.getProjectsByEmail
 );
+router.get(
+  "/get/projects/bydepartmentandid/:id",
+  projectControllers.getProjectsByDepartmentAndId
+);
 
 router.post(
   "/create/project",

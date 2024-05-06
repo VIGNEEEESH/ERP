@@ -1,6 +1,7 @@
 const HttpError = require("../Middleware/http-error");
 const { validationResult } = require("express-validator");
 const Task = require("../Models/Task");
+const Department = require("../Models/Department");
 
 const createTask = async (req, res, next) => {
   const errors = validationResult(req);
@@ -95,6 +96,29 @@ const getTasksByEmail = async (req, res, next) => {
   }
   res.status(200).json({ tasks: tasks });
 };
+const getTasksByDepartmentAndId = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const department = await Department.findOne({ userId: id }).lean();
+    if (!department) {
+      throw new HttpError("Department not found", 404);
+    }
+
+    const tasks = await Task.find({ department: department.departmentName })
+      .lean()
+      .populate("department", "name");
+
+    res.status(200).json({ tasks: tasks });
+  } catch (err) {
+    console.error(err.message);
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+};
+
 const updateTaskById = async (req, res, next) => {
   const id = req.params.id;
   let task;
@@ -204,6 +228,7 @@ exports.createTask = createTask;
 exports.getAllTasks = getAllTasks;
 exports.getTaskById = getTaskById;
 exports.getTasksByEmail = getTasksByEmail;
+exports.getTasksByDepartmentAndId = getTasksByDepartmentAndId;
 exports.updateTaskById = updateTaskById;
 exports.updateTaskProgressById = updateTaskProgressById;
 exports.deleteTaskById = deleteTaskById;
