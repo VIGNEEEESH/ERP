@@ -19,7 +19,7 @@ export function MyOffice() {
         const fetchAttendanceAndEmployees = async () => {
             try {
                 // Fetch attendance data
-                const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/bydate/${formattedDate}`);
+                const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/bydate/${formattedDate}`,{headers:{Authorization:"Bearer "+auth.token}});
                 if (!attendanceResponse.ok) {
                     throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
                 }
@@ -49,6 +49,7 @@ export function MyOffice() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: "Bearer " + auth.token,
                 },
                 body: JSON.stringify(formData)
             });

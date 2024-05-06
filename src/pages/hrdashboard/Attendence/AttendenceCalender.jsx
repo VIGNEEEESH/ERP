@@ -1,18 +1,19 @@
+import { AuthContext } from '@/pages/auth/Auth-context';
 import { Card, CardHeader, Typography } from '@material-tailwind/react';
 import { message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Calendar from 'react-calendar'; // Assuming you've installed 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 
 function AttendanceCalendar({ attendanceData }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [attendance, setAttendance] = useState([]);
-
+  const auth=useContext(AuthContext)
   useEffect(() => {
     const fetchAttendanceAndEmployees = async () => {
       try {
         // Fetch attendance data
-        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData.userId}`);
+        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData.userId}`,{headers:{Authorization:"Bearer "+auth.token}});
         if (!attendanceResponse.ok) {
           throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
         }

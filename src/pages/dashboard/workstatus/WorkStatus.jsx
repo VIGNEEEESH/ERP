@@ -29,7 +29,7 @@ export function WorkStatus() {
         try {
             // Fetch attendance data
             
-            const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/bydateanduserid/${formattedDate}/${auth.userId}`);
+            const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/bydateanduserid/${formattedDate}/${auth.userId}`,{headers:{Authorization:"Bearer "+auth.token}});
             if (!attendanceResponse.ok) {
                 throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
             }
@@ -51,7 +51,7 @@ const handleWorkStatus=async()=>{
     const response=await fetch(import.meta.env.REACT_APP_BACKEND_URL+`/api/erp/attendance/update/workstatus`,
     {
       method:"PATCH",
-      headers:{"Content-Type":"application/json"},
+      headers:{"Content-Type":"application/json",Authorization: "Bearer " + auth.token,},
       body:JSON.stringify(formData)})
       if(!response.ok){
         return error(`Http error: `,response.message)
