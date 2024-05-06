@@ -1,119 +1,4 @@
-// import React from 'react';
-// import {
-//     Card,
-//     CardHeader,
-//     CardBody,
-//     Typography,
-//     Avatar,
-//     Button
-// } from "@material-tailwind/react";
-// import { leaveApplicationsData } from "@/data";
 
-// export function Leave() {
-// const handleApprove = (name) => {
-//     console.log(`Approved leave for ${name}`);
-// };
-
-// const handleDecline = (name) => {
-//     console.log(`Declined leave for ${name}`);
-// };
-//     return (
-//         <div className="mt-12 mb-8 flex flex-col gap-12">
-//             <Card>
-//                 <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-//                     <Typography variant="h6" color="white">
-//                         Employee Leave Approval
-//                     </Typography>
-//                 </CardHeader>
-//                 <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-//                     <table className="w-full min-w-[640px] table-auto">
-//                         <thead>
-//                             <tr>
-//                                 {["Image", "Name", "Email", "Message", "Start Date", "End Date", "Action"].map((el) => (
-//                                     <th
-//                                         key={el}
-//                                         className="border-b border-blue-gray-50 py-3 px-5 text-left"
-//                                     >
-//                                         <Typography
-//                                             variant="small"
-//                                             className="text-[11px] font-bold uppercase text-blue-gray-400"
-//                                         >
-//                                             {el}
-//                                         </Typography>
-//                                     </th>
-//                                 ))}
-//                             </tr>
-//                         </thead>
-//                         <tbody>
-//                             {leaveApplicationsData.map(
-//                                 ({ img, name, email, message, startDate, endDate }, key) => {
-//                                     const className = `py-3 px-5 ${
-//                                         key === leaveApplicationsData.length - 1
-//                                             ? ""
-//                                             : "border-b border-blue-gray-50"
-//                                     }`;
-
-//                                     return (
-//                                         <tr key={name}>
-//                                             <td className={className}>
-//                                                 <Avatar src={img} alt={name} size="sm" variant="rounded" />
-//                                             </td>
-//                                             <td className={className}>
-//                                                 <Typography className="text-xs font-semibold text-blue-gray-600">
-//                                                     {name}
-//                                                 </Typography>
-//                                             </td>
-//                                             <td className={className}>
-//                                                 <Typography className="text-xs font-normal text-blue-gray-500">
-//                                                     {email}
-//                                                 </Typography>
-//                                             </td>
-//                                             <td className={className}>
-//                                                 <Typography className="text-xs font-normal text-blue-gray-500">
-//                                                     {message}
-//                                                 </Typography>
-//                                             </td>
-//                                             <td className={className}>
-//                                                 <Typography className="text-xs font-normal text-blue-gray-500">
-//                                                     {startDate}
-//                                                 </Typography>
-//                                             </td>
-//                                             <td className={className}>
-//                                                 <Typography className="text-xs font-normal text-blue-gray-500">
-//                                                     {endDate}
-//                                                 </Typography>
-//                                             </td>
-//                                             <td className={className}>
-//                                                 <div className="flex gap-2">
-//                                                     <Button
-//                                                         color="green"
-//                                                         size="sm"
-//                                                         onClick={() => handleApprove(name)}
-//                                                     >
-//                                                         Approve
-//                                                     </Button>
-//                                                     <Button
-//                                                         color="red"
-//                                                         size="sm"
-//                                                         onClick={() => handleDecline(name)}
-//                                                     >
-//                                                         Decline
-//                                                     </Button>
-//                                                 </div>
-//                                             </td>
-//                                         </tr>
-//                                     );
-//                                 }
-//                             )}
-//                         </tbody>
-//                     </table>
-//                 </CardBody>
-//             </Card>
-//         </div>
-//     );
-// }
-
-// export default Leave;
 import React, { useMemo, useState } from 'react';
 import {
     Card,
@@ -209,11 +94,9 @@ export function Leave() {
     };
 
     const handleApprove = (id) => {
-        console.log(`Approved leave for ID: ${id}`);
     };
 
     const handleDecline = (id) => {
-        console.log(`Declined leave for ID: ${id}`);
     };
 
     return (

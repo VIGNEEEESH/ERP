@@ -18,7 +18,6 @@ const ProfileImageUpdate = () => {
         if (userData) {
           // Prepend base URL to the image path
           const imageUrl = `http://localhost:4444/${userData.user.image}`;
-          console.log("Profile Image URL:", imageUrl);
           setProfileImg(imageUrl);
         }
       } catch (error) {
@@ -59,7 +58,6 @@ const ProfileImageUpdate = () => {
         const imageUrl = `http://localhost:4444/${userData.user.image}`;
         setProfileImg(imageUrl);
 
-        console.log('Profile image updated successfully:', imageUrl);
       } catch (error) {
         console.error('Error updating profile image:', error);
       }

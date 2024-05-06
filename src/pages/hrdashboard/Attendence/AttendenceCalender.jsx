@@ -18,10 +18,8 @@ function AttendanceCalendar({ attendanceData }) {
         }
         const attendanceDataa = await attendanceResponse.json();
         setAttendance(attendanceDataa.attendance);
-        console.log(attendanceDataa.attendance);
 
       } catch (error) {
-        console.log(error);
         message.error("Error fetching attendance", error.message);
       }
     };

@@ -60,7 +60,6 @@ export function EditEmployee({ employeeData, onClose }) {
            
         }
         
-        console.log(formDataToSend);
 
         onClose(); 
     };

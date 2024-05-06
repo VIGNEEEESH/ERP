@@ -35,9 +35,7 @@ export function Sidenav({ brandName, routes }) {
         if (userData) {
           // Prepend base URL to the image path
           const imageUrl = `http://localhost:4444/${userData.user.image}`;
-          console.log("Profile Image URL:", imageUrl);
           setProfileImg(imageUrl);
-          console.log("First Name:", userData.firstName);
           setFirstName(userData.user.firstName);
         }
       } catch (error) {

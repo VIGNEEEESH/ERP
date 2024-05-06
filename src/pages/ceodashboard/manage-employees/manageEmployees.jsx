@@ -186,7 +186,6 @@ const handleConfirmDelete = async () => {
 
         // Check if the request was successful (status code 200-299)
         if (response.ok) {
-            console.log(employees)
             // If the request is successful, remove the deleted employee from the local state
             setEmployees(employees.filter(emp => emp._id !== employeeToDelete._id));
 

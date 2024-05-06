@@ -56,7 +56,6 @@ export function Projects({ onAddProject }) {
             const data = await response.json();
             setProjects(data.projects);
           } catch (error) {
-            console.log(error);
             message.error("Error fetching projects ", error.message);
           }
         };

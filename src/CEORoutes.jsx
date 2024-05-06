@@ -12,6 +12,7 @@ import {
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon,
+  WalletIcon
 } from "@heroicons/react/24/solid";
 import Logout from "./pages/ceodashboard/logout";
 import ManageEmployees from "./pages/ceodashboard/manage-employees/manageEmployees";
@@ -27,6 +28,7 @@ import Settings from "./pages/ceodashboard/settings/Settings";
 import Projects from "./pages/ceodashboard/projects/Projects";
 import TaskManager from "./pages/ceodashboard/task manager/taskmanager";
 import Home from "./pages/ceodashboard/home";
+import ManageDepartments from "./pages/ceodashboard/Departments/ManageDepartments";
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -52,6 +54,12 @@ export const CEORoutes = [
         name: "Attendence Tracker",
         path: "/attendence-tracker",
         element: <AttendenceTracker />,
+      },
+      {
+        icon: <WalletIcon {...icon} />,
+        name: "Manage Departments",
+        path: "/manage-departments",
+        element: <ManageDepartments />,
       },
       {
         icon: <BuildingOfficeIcon {...icon} />,

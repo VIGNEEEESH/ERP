@@ -37,7 +37,6 @@ export function CompanyProducts() {
         const data = await response.json();
         setProducts(data.products);
       } catch (error) {
-        console.log(error);
         message.error("Error fetching products ", error.message);
       }
     };

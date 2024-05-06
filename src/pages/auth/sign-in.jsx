@@ -50,7 +50,6 @@ export function SignIn() {
       setTimeout(() => {
         navigate(`/${data.role.toLowerCase()}/dashboard/home`);
       });
-      console.log("Sign in successful");
     } catch (error) {
       message.error("Login Failed. Pleae check Email and Password Again.");
       console.error("Error signing in:", error.message);

@@ -35,7 +35,7 @@ export function CompanyProducts() {
         const data = await response.json();
         setProducts(data.products);
       } catch (error) {
-        console.log(error);
+        
         message.error("Error fetching products ", error.message);
       }
     };
@@ -52,7 +52,7 @@ export function CompanyProducts() {
   };
 
   const handleUpdateProduct = (product) => {
-    console.log(product)
+    
     setCurrentProduct({
       productName: product.productName,
       productDescription: product.productDescription,
@@ -143,7 +143,7 @@ const handleProductSubmit = async () => {
     formData.append('productName', productName);
     formData.append('productDescription', productDescription);
     formData.append('image', image); // Assuming productImage is the File object of the image
-    console.log(image)
+    
     const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/create/product`, {
       method: "POST",
       body: formData 

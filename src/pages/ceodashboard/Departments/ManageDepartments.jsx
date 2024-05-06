@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     Card,
     CardHeader,
@@ -13,26 +12,83 @@ import {
 import { useTable, usePagination } from 'react-table';
 import { authorsTableData } from "@/data";
 import AttendanceCalendar from "./AttendenceCalender";
+import { message } from 'antd';
 
-export function AttendenceTracker() {
+export function ManageDepartments() {
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [pageSize, setPageSize] = useState(5);
+    const [attendance, setAttendance] = useState([]);
+    const [employees, setEmployees] = useState([]);
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
 
-    const data = useMemo(() => authorsTableData, []);
+
+    useEffect(() => {
+    const fetchAttendanceAndEmployees = async () => {
+        try {
+            
+            const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/bydate/${formattedDate}`);
+            if (!attendanceResponse.ok) {
+                throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
+            }
+            const attendanceData = await attendanceResponse.json();
+           
+
+            
+            const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`);
+            if (!employeeResponse.ok) {
+                throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
+            }
+            const employeeData = await employeeResponse.json();
+            setAttendance(attendanceData.attendance);
+            setEmployees(employeeData.users);
+        } catch (error) {
+            message.error("Error fetching attendance or employees", error.message);
+        }
+    };
+
+    fetchAttendanceAndEmployees();
+}, []);
+
+    
+    
+    const data = useMemo(() => {
+        return attendance.map(att => {
+            
+            const employee = employees.find(emp => emp._id === att.userId);
+            
+            return { ...att, employee };
+            
+        });
+    }, [attendance, employees]);
+    
+
+  
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
+    
+    const filteredData = useMemo(() => {
+        return data.filter(({ employee }) => {
+            const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
+            const email = employee.email.toLowerCase();
+            return fullName.includes(searchQuery.toLowerCase()) || email.includes(searchQuery.toLowerCase());
+        });
+    }, [data, searchQuery]);
 
     const columns = useMemo(
         () => [
             {
                 Header: 'Employee Details',
-                accessor: 'name',
+                accessor: 'firstName',
                 Cell: ({ row }) => (
                     <div className="flex items-center gap-4">
-                        <Avatar src={row.original.img} alt={row.original.name} size="sm" variant="rounded" />
+                        <Avatar src={`http://localhost:4444/${row.original.employee.image}`} alt={row.original.name} size="sm" variant="rounded" />
                         <div>
                             <Typography variant="small" color="blue-gray" className="font-semibold">
-                                {row.original.name}
+                                {row.original.employee.firstName}&nbsp;{row.original.employee.lastName}
                             </Typography>
                             <Typography className="text-xs font-normal text-blue-gray-500">
                                 {row.original.email}
@@ -43,26 +99,26 @@ export function AttendenceTracker() {
             },
             {
                 Header: 'Designation',
-                accessor: 'job',
-                Cell: ({ value }) => (
+                accessor: 'role',
+                Cell: ({ row }) => (
                     <div>
                         <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {value[0]}
+                            {row.original.employee.role}
                         </Typography>
-                        <Typography className="text-xs font-normal text-blue-gray-500">
-                            {value[1]}
-                        </Typography>
+                        {/* <Typography className="text-xs font-normal text-blue-gray-500">
+                            {row.original.employee.role}
+                        </Typography> */}
                     </div>
                 ),
             },
             {
                 Header: 'Status',
-                accessor: 'online',
+                accessor: 'workStatus',
                 Cell: ({ value }) => (
                     <Chip
                         variant="gradient"
-                        color={value ? "green" : "blue-gray"}
-                        value={value ? "online" : "offline"}
+                        // color={value ? "green" : "blue-gray"}
+                        value={value }
                         className="py-0.5 px-2 text-[11px] font-medium w-fit"
                     />
                 ),
@@ -94,7 +150,7 @@ export function AttendenceTracker() {
     } = useTable(
         {
             columns,
-            data,
+            data:filteredData,
             initialState: { pageIndex: 0, pageSize },
         },
         usePagination
@@ -106,17 +162,19 @@ export function AttendenceTracker() {
     };
 
     const filteredAuthorsTableData = useMemo(() => 
-        data.filter(({ name, email }) =>
-            name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            email.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        [data, searchQuery]
-    );
+    data.filter(({ firstName, email }) =>
+        (firstName && firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (email && email.toLowerCase().includes(searchQuery.toLowerCase()))
+    ),
+    [data, searchQuery]
+);
 
-    const handleViewClick = (employee) => {
-        setSelectedEmployee(employee);
-        setShowCalendar(true);
-    };
+
+const handleViewClick = (employee) => {
+    setSelectedEmployee(employee); // Assuming the userId is stored in employee.userId
+    setShowCalendar(true);
+};
+
 
     const mockAttendanceData = {
         '2024-04-01': 'present',
@@ -129,7 +187,7 @@ export function AttendenceTracker() {
         <div className="mt-12 mb-8 flex flex-col gap-12">
             <Card>
                 {showCalendar ? (
-                    <AttendanceCalendar attendanceData={mockAttendanceData} />
+                    <AttendanceCalendar attendanceData={selectedEmployee} />
                 ) : (
                     <>
                         <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
@@ -137,11 +195,12 @@ export function AttendenceTracker() {
                                 Attendence Tracker
                             </Typography>
                             <Input
-                                label="Search with the employee name"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className=" w-full bg-white text-black"
-                            />
+    label="Search with the employee name"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    className=" w-full bg-white text-black"
+/>
+
                         </CardHeader>
                         <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                             <table {...getTableProps()} className="w-full min-w-[640px] table-auto">
@@ -220,4 +279,4 @@ export function AttendenceTracker() {
     );
 }
 
-export default AttendenceTracker;
+export default ManageDepartments;

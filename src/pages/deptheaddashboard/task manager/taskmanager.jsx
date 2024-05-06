@@ -190,7 +190,6 @@ const handleConfirmDelete = async () => {
 
         
         if (response.ok) {
-            console.log(tasks)
             
             setTasks(tasks.filter(task => task._id !== taskToDelete._id));
 

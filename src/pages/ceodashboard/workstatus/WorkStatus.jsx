@@ -37,7 +37,6 @@ export function WorkStatus() {
             setAttendance(attendanceData.attendance);
             
         } catch (error) {
-          console.log(error)
             message.warning("Please clock in to get work status ", error.message);
         }
     };

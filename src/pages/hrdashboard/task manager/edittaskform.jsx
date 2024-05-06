@@ -46,7 +46,6 @@ const EditTaskForm = ({ taskData, onClose }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData); // For testing purposes
 
         // Add your form submission logic here
         try {

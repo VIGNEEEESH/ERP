@@ -31,7 +31,6 @@ function AddClient() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
         try {
             const response = await fetch(
                 "http://localhost:4444/api/erp/client/create/client",
