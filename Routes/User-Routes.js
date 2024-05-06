@@ -5,7 +5,11 @@ const userControllers = require("../Controllers/User-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
 
-router.get("/get/all/users", userControllers.getAllUsers);
+router.get(
+  "/get/all/users",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  userControllers.getAllUsers
+);
 router.get("/get/user/byid/:id", userControllers.getUserById);
 router.get("/get/users/byrole/:role", userControllers.getUsersByRole);
 
@@ -60,11 +64,16 @@ router.patch(
 );
 router.patch(
   "/update/image/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   imageUpload.single("image"),
 
   userControllers.updateUserImageById
 );
-router.patch("/forgotpassword", userControllers.forgotPassword);
+router.patch(
+  "/forgotpassword",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  userControllers.forgotPassword
+);
 router.delete(
   "/delete/user/byid/:id",
   checkAuth(["CEO", "HR"]),
