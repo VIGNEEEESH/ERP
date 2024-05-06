@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
     Card,
     CardHeader,
@@ -13,6 +13,7 @@ import AddTaskForm from "./AddTaskForm"; // Import AddTaskForm component
 import EditTaskForm from './EditTaskForm'; // Import EditTaskForm component
 import { Progress } from "@material-tailwind/react";
 import { Modal, message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 const TaskManager = () => {
     const [pageSize, setPageSize] = useState(5);
@@ -22,13 +23,13 @@ const TaskManager = () => {
     const [tasks, setTasks] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState(null); 
-    
+    const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchTasks = async () => {
             
           try {
             const response = await fetch(
-                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/task/get/all/tasks`
+                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/task/get/all/tasks`,{headers:{Authorization:"Bearer "+auth.token}}
             );
     
             if (!response.ok) {
@@ -188,7 +189,7 @@ const handleConfirmDelete = async () => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                
+                Authorization: "Bearer " + auth.token,
             },
         });
 

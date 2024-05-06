@@ -11,7 +11,7 @@ function EmployeeTasks() {
     const fetchTasks = async () => {
       try {
         // Fetch tasks data
-        const tasksResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/get/tasks/byemail/${auth.email}`);
+        const tasksResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/get/tasks/byemail/${auth.email}`,{headers:{Authorization:"Bearer "+auth.token}});
         if (!tasksResponse.ok) {
           throw new Error(`Failed to fetch tasks data: ${tasksResponse.status}`);
         }

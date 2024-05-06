@@ -31,7 +31,7 @@ const TaskManager = () => {
             
           try {
             const response = await fetch(
-                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/task/get/tasks/bydepartmentandid/${auth.userId}`
+                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/task/get/tasks/bydepartmentandid/${auth.userId}`,{headers:{Authorization:"Bearer "+auth.token}}
             );
           
     
@@ -195,6 +195,7 @@ const handleConfirmDelete = async () => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: "Bearer " + auth.token,
                 
             },
         });
