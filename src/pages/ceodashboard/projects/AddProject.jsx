@@ -24,7 +24,7 @@ const AddProject = () => {
                         Authorization:"Bearer "+auth.token
                     }}
                 );
-                const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`);
+                const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`,{headers:{Authorization:"Bearer "+auth.token}});
                 if (!response.ok || !departmentResponse.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }

@@ -30,7 +30,7 @@ export function ManageDepartments() {
     const fetchDepartments = async () => {
         try {
             
-            const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`);
+            const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`,{headers:{Authorization:"Bearer "+auth.token}});
             if (!departmentResponse.ok) {
                 throw new Error(`Failed to fetch attendance data: ${departmentResponse.status}`);
             }
