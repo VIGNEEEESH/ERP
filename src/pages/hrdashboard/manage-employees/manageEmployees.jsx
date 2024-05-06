@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
     Card,
     CardHeader,
@@ -14,6 +14,7 @@ import AddEmployeeForm from "./AddEmployee";
 import AddEmployeeShort from './AddEmployeeShort';
 import EditEmployee from './EditEmployee'; // Import EditEmployee component
 import { message,Modal } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function ManageEmployees() {
     
@@ -24,6 +25,7 @@ export function ManageEmployees() {
     const [employees, setEmployees] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null); 
+    const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchEmployees = async () => {
             
@@ -180,7 +182,8 @@ const handleConfirmDelete = async () => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                // Add any other headers if required
+                Authorization:"Bearer "+auth.token
+                
             },
         });
 

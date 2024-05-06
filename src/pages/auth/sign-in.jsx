@@ -32,6 +32,7 @@ export function SignIn() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            
           },
           body: JSON.stringify({
             email: email,
@@ -51,7 +52,7 @@ export function SignIn() {
         navigate(`/${data.role.toLowerCase()}/dashboard/home`);
       });
     } catch (error) {
-      message.error("Login Failed. Pleae check Email and Password Again.");
+      message.error("Login Failed. Please check Email and Password Again.");
       console.error("Error signing in:", error.message);
     }
   };

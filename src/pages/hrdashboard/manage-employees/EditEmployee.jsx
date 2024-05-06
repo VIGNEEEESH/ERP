@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
     Card,
     CardBody,
@@ -7,10 +7,11 @@ import {
     Input,
 } from "@material-tailwind/react";
 import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function EditEmployee({ employeeData, onClose }) {
     const [formData, setFormData] = useState(employeeData);
-
+const auth=useContext(AuthContext)
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
@@ -39,6 +40,7 @@ export function EditEmployee({ employeeData, onClose }) {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization:"Bearer "+auth.token
                     },
                     body: JSON.stringify(formData),
                 }

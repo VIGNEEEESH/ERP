@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
     CardBody,
     Input,
@@ -7,6 +7,7 @@ import {
 import QRCodePopup from './QRCodePopup';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function AddEmployeeShort() {
     const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ export function AddEmployeeShort() {
         role: '',
         salary:""
     });
+    const auth=useContext(AuthContext)
     
     const [qrCodeData, setQRCodeData] = useState(null);
     const [showQRCodePopup, setShowQRCodePopup] = useState(false);
@@ -36,6 +38,7 @@ export function AddEmployeeShort() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization:"Bearer "+auth.token,
                     },
                     body: JSON.stringify(formData),
                 }
