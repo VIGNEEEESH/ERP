@@ -49,7 +49,7 @@ export function Projects({ onAddProject }) {
         const fetchProjects = async () => {
           try {
             const response = await fetch(
-              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/projects/bydepartmentandid/${auth.userId}`
+              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/projects/bydepartmentandid/${auth.userId}`,{headers:{Authorization:"Bearer "+auth.token}}
             );
             if (!response.ok) {
               throw new Error(`Failed to fetch attendance data: ${response.status}`);
@@ -189,7 +189,7 @@ export function Projects({ onAddProject }) {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Add any other headers if required
+                    Authorization: "Bearer " + auth.token,
                 },
             });
     

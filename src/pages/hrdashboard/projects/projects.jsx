@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Card, CardHeader, CardBody, Typography, Avatar, Button } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
 import { Progress } from "@material-tailwind/react";
@@ -6,6 +6,7 @@ import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from '@heroicons/r
 import AddProject from './AddProject';
 import UpdateProject from './UpdateProjects';
 import { Modal, message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 // Sample projects data
 const sampleProjectsData = [
@@ -43,12 +44,12 @@ export function Projects({ onAddProject }) {
     const [selectedProject, setSelectedProject] = useState(null); // State to keep track of selected project for update
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [projectToDelete, setProjectToDelete] = useState(null); 
-
+    const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchProjects = async () => {
           try {
             const response = await fetch(
-              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`
+              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`,{headers:{Authorization:"Bearer "+auth.token}}
             );
             if (!response.ok) {
               throw new Error(`Failed to fetch attendance data: ${response.status}`);
@@ -188,7 +189,7 @@ export function Projects({ onAddProject }) {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Add any other headers if required
+                    Authorization: "Bearer " + auth.token,
                 },
             });
     

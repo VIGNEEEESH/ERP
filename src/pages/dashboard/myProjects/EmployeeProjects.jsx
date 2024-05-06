@@ -11,7 +11,7 @@ function EmployeeProjects() {
     const fetchProjects = async () => {
       try {
         // Fetch projects data
-        const projectsResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/projects/byemail/${auth.email}`);
+        const projectsResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/projects/byemail/${auth.email}`,{headers:{Authorization:"Bearer "+auth.token}});
         if (!projectsResponse.ok) {
           throw new Error(`Failed to fetch projects data: ${projectsResponse.status}`);
         }

@@ -72,6 +72,7 @@ const AddProject = () => {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization:"Bearer "+auth.token
                     },
                     body: JSON.stringify(formData),
                 }
