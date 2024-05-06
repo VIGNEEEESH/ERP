@@ -8,26 +8,33 @@ const AddTaskForm = () => {
         taskDescription: '',
         members: [''],
         deadline: '',
+        department:"",
         assignedDate: new Date().toISOString().slice(0, 10), // Current date by default
     });
     const [members,setMembers]=useState([])
+    const [departments,setDepartments]=useState([])
 
     useEffect(() => {
-        const fetchMembers = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch(
-                    import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/user/get/all/users`
-                );
-                if (!response.ok) {
+                const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`);
+                const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`);
+                
+                if (!userResponse.ok || !departmentResponse.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                const data = await response.json();
-                setMembers(data.users);
-            } catch (err) {
-                message.error("Error fetching employees", err.message);
+                
+                const userData = await userResponse.json();
+                const departmentData = await departmentResponse.json();
+                
+                setMembers(userData.users);
+                setDepartments(departmentData.departments);
+            } catch (error) {
+                message.error("Error fetching data: " + error.message);
             }
         };
-        fetchMembers()
+        
+        fetchData();
     }, []);
 
     const handleInputChange = (e) => {
@@ -126,6 +133,20 @@ const AddTaskForm = () => {
                                 onChange={handleInputChange}
                                 label="Assigned Date"
                             />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium text-blue-gray-500">Department</label>
+                            <select
+                                name="department"
+                                value={formData.department}
+                                onChange={handleInputChange}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="">Select Department</option>
+                                {departments.map(department => (
+                                    <option key={department._id} value={department.departmentName}>{department.departmentName}</option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
