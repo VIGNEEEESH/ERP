@@ -11,11 +11,13 @@ router.get("/get/users/byrole/:role", userControllers.getUsersByRole);
 
 router.post(
   "/invite/user",
-  [check("role").isLength({ min: 2, max: 255 }), check("email").isEmail()],
+  checkAuth(["CEO", "HR"]),
+  [(check("role").isLength({ min: 2, max: 255 }), check("email").isEmail())],
   userControllers.inviteUser
 );
 router.post(
   "/login",
+
   [check("email").isEmail(), check("password").notEmpty()],
   userControllers.login
 );
@@ -40,6 +42,7 @@ router.patch(
 );
 router.patch(
   "/update/user/byid/:id",
+  checkAuth(["CEO", "HR"]),
   imageUpload.single("image"),
   [
     check("firstName").isLength({ min: 2, max: 255 }).optional(),
@@ -62,6 +65,10 @@ router.patch(
   userControllers.updateUserImageById
 );
 router.patch("/forgotpassword", userControllers.forgotPassword);
-router.delete("/delete/user/byid/:id", userControllers.deleteUserById);
+router.delete(
+  "/delete/user/byid/:id",
+  checkAuth(["CEO", "HR"]),
+  userControllers.deleteUserById
+);
 
 module.exports = router;
