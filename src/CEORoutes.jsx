@@ -13,7 +13,6 @@ import {
   DocumentTextIcon,
   ClipboardDocumentListIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import Logout from "./pages/ceodashboard/logout";
 import ManageEmployees from "./pages/ceodashboard/manage-employees/manageEmployees";
 import AttendenceTracker from "./pages/ceodashboard/Attendence/AttendenceTracker";
@@ -27,7 +26,7 @@ import CEOProfile from "./pages/ceodashboard/profile/CEOProfile";
 import Settings from "./pages/ceodashboard/settings/Settings";
 import Projects from "./pages/ceodashboard/projects/Projects";
 import TaskManager from "./pages/ceodashboard/task manager/taskmanager";
-
+import Home from "./pages/ceodashboard/home";
 const icon = {
   className: "w-5 h-5 text-inherit",
 };

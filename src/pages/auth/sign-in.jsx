@@ -167,7 +167,7 @@ export function SignIn() {
       </div>
       <div className="w-2/5 h-full hidden lg:block">
         <img
-          src="/img/pattern.png"
+          src="/img/csc-logo.png"
           className="h-full w-full object-cover rounded-3xl"
         />
       </div>
