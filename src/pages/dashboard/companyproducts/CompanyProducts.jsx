@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Card,
   CardBody,
@@ -12,11 +12,12 @@ import {
 import { Link } from "react-router-dom";
 import { projectsData } from "@/data";
 import { message } from "antd";
+import { AuthContext } from "@/pages/auth/Auth-context";
 
 export function CompanyProducts() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [products, setProducts] = useState([]);
-
+const auth=useContext(AuthContext)
   const handleViewProject = (product) => {
     setSelectedProject(product);
   };
@@ -29,7 +30,7 @@ export function CompanyProducts() {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/get/all/products`
+          `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/get/all/products`,{headers:{Authorization:"Bearer "+auth.token}}
         );
         if (!response.ok) {
           throw new Error(`Failed to fetch attendance data: ${response.status}`);

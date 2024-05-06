@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Card,
   CardBody,
@@ -11,6 +11,7 @@ import {
 import { message } from "antd";
 import { TrashIcon } from "@heroicons/react/24/solid";
 import Modal from "antd/lib/modal/Modal";
+import { AuthContext } from "@/pages/auth/Auth-context";
 
 export function CompanyProducts() {
   const [products, setProducts] = useState([]);
@@ -21,13 +22,14 @@ export function CompanyProducts() {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [image, setImage] = useState("");
+  const auth=useContext(AuthContext)
  const [productToDelete,setProductToDelete]=useState(null)
  const [productToUpdate,setProductToUpdate]=useState(null)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/get/all/products`
+          `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/get/all/products`,{headers:{Authorization:"Bearer "+auth.token}}
         );
         if (!response.ok) {
           throw new Error(`Failed to fetch attendance data: ${response.status}`);
@@ -72,6 +74,7 @@ export function CompanyProducts() {
       ...currentProduct,
       productName: e.target.value
     });
+    setProductName(e.target.value);
   };
   
   const handleProductDescriptionChange = (e) => {
@@ -79,6 +82,7 @@ export function CompanyProducts() {
       ...currentProduct,
       productDescription: e.target.value
     });
+    setProductDescription(e.target.value);
   };
   
 
@@ -111,6 +115,7 @@ const handleConfirmDelete = async () => {
           method: 'DELETE',
           headers: {
               'Content-Type': 'application/json',
+              Authorization: "Bearer " + auth.token
           },
       });
 
@@ -143,6 +148,7 @@ const handleProductSubmit = async () => {
     formData.append('image', image); // Assuming productImage is the File object of the image
     const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/create/product`, {
       method: "POST",
+      headers:{ Authorization: "Bearer " + auth.token},
       body: formData 
     });
 
@@ -184,6 +190,7 @@ const handleProductSubmit = async () => {
     
     const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/update/product/byid/${currentProduct._id}`, {
       method: "PATCH",
+      headers:{ Authorization: "Bearer " + auth.token},
       body: formData 
     });
 
