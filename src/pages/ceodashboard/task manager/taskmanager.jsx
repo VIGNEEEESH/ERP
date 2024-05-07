@@ -160,7 +160,7 @@ const TaskManager = () => {
     };
 
     const handleEditClick = (rowData) => {
-        console.log(rowData.original)
+        
         setEditTaskData(rowData.original);
         setShowEditTask(true);
         
