@@ -148,8 +148,10 @@ const updateTaskById = async (req, res, next) => {
     const error = new HttpError("Task not found, please try again", 500);
     return next(error);
   }
+
   if (req.files) {
-    task.files.push(...req.files);
+    const filePaths = req.files.map((file) => file.path);
+    task.files.push(...filePaths);
   }
 
   task.taskName = taskName ? taskName : task.taskName;

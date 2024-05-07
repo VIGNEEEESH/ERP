@@ -151,7 +151,8 @@ const updateProjectById = async (req, res, next) => {
     return next(error);
   }
   if (req.files) {
-    project.files.push(...req.files);
+    const filePaths = req.files.map((file) => file.path);
+    project.files.push(...filePaths);
   }
 
   project.projectName = projectName ? projectName : project.projectName;
