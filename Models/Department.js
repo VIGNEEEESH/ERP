@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const departmentSchema = new Schema({
   departmentName: { type: String, required: true },
-  userId: [{ type: String, required: true }],
+  userId: [{ type: String }],
 });
 
 module.exports = mongoose.model("Department", departmentSchema);
