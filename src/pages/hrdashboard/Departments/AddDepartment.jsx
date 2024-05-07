@@ -55,6 +55,14 @@ export function AddDepartment() {
             userId: [...formData.userId, ''],
         });
     };
+    const handleDeleteUser = (index) => {
+        const updatedUsers = [...formData.userId];
+        updatedUsers.splice(index, 1);
+        setFormData({
+            ...formData,
+            userId: updatedUsers,
+        });
+    };
     const handleUserChange = (e, index) => {
         const updatedUsers = [...formData.userId];
         updatedUsers[index] = e.target.value;
@@ -63,6 +71,7 @@ export function AddDepartment() {
             userId: updatedUsers,
         });
     };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -119,9 +128,9 @@ export function AddDepartment() {
                             />
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
+                            <label className="text-sm font-medium text-blue-gray-500 ">Assigned Members</label>
                             {formData.userId.map((user, index) => (
-                                <div key={index} className="flex items-center gap-2">
+                                <div key={index} className="flex items-center gap-2" style={{ padding: '5px' }}>
                                     <select
                                         name="userId"
                                         value={user}
@@ -133,7 +142,16 @@ export function AddDepartment() {
                                             <option key={userItem._id} value={userItem._id}>{userItem.firstName} {userItem.lastName}</option>
                                         ))}
                                     </select>
-                                    {index === formData.userId.length - 1 && (
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteUser(index)}
+                                        className="bg-red-500 text-white px-3 py-3 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
+                                    >
+                                        Delete
+                                    </button>
+                                    
+                                    {/* {index === formData.userId.length - 1 && (
                                         <button
                                             type="button"
                                             onClick={handleAddUsers}
@@ -141,9 +159,16 @@ export function AddDepartment() {
                                         >
                                             +
                                         </button>
-                                    )}
+                                    )} */}
                                 </div>
                             ))}
+                           <center>  <button
+                                            type="button"
+                                            onClick={handleAddUsers}
+                                            className="bg-gray-800   text-white px-10 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+                                        >
+                                            +
+                                        </button></center>
                         </div>
                        
                     </div>

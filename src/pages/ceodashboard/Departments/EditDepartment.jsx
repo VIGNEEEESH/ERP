@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
+
+import React, { useContext, useEffect, useState } from 'react';
 import {
     Card,
     CardBody,
@@ -10,9 +11,10 @@ import { message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function EditDepartment({ departmentData, onClose }) {
-    const [formData, setFormData] = useState({departmentName:departmentData.departmentName,userId:departmentData.userId});
-    const auth=useContext(AuthContext)
-    const [users,setUsers]=useState([])
+    const [formData, setFormData] = useState({ departmentName: departmentData.departmentName, userId: departmentData.userId });
+    const auth = useContext(AuthContext);
+    const [users, setUsers] = useState([]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
@@ -20,36 +22,50 @@ export function EditDepartment({ departmentData, onClose }) {
             [name]: value,
         }));
     };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/users/byrole/DeptHead`,{headers:{
-                    Authorization:"Bearer "+auth.token
-                }});
-                
-                if (!userResponse.ok ) {
+                const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/users/byrole/DeptHead`, {
+                    headers: {
+                        Authorization: "Bearer " + auth.token
+                    }
+                });
+
+                if (!userResponse.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                
+
                 const userData = await userResponse.json();
-                
+
                 setUsers(userData.users);
             } catch (error) {
                 message.error("Error fetching data: " + error.message);
             }
         };
-        
+
         fetchData();
-    }, []);
+    }, [auth.token]);
+
     const handleAddUsers = () => {
         setFormData({
             ...formData,
             userId: [...formData.userId, ''],
         });
     };
+
     const handleUserChange = (e, index) => {
         const updatedUsers = [...formData.userId];
         updatedUsers[index] = e.target.value;
+        setFormData({
+            ...formData,
+            userId: updatedUsers,
+        });
+    };
+
+    const handleDeleteUser = (index) => {
+        const updatedUsers = [...formData.userId];
+        updatedUsers.splice(index, 1);
         setFormData({
             ...formData,
             userId: updatedUsers,
@@ -106,7 +122,7 @@ export function EditDepartment({ departmentData, onClose }) {
             <CardBody>
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                    <div>
+                        <div>
                             <Input
                                 type="text"
                                 name="departmentName"
@@ -118,7 +134,7 @@ export function EditDepartment({ departmentData, onClose }) {
                         <div>
                             <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
                             {formData.userId.map((user, index) => (
-                                <div key={index} className="flex items-center gap-2">
+                                <div key={index} className="flex items-center gap-2" style={{ padding: '5px' }}>
                                     <select
                                         name="userId"
                                         value={user}
@@ -130,17 +146,25 @@ export function EditDepartment({ departmentData, onClose }) {
                                             <option key={userItem._id} value={userItem._id}>{userItem.firstName} {userItem.lastName}</option>
                                         ))}
                                     </select>
-                                    {index === formData.userId.length - 1 && (
-                                        <button
-                                            type="button"
-                                            onClick={handleAddUsers}
-                                            className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 "
-                                        >
-                                            +
-                                        </button>
-                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteUser(index)}
+                                        className="bg-red-500 text-white px-3 py-3 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
+                                    >
+                                        Delete
+                                    </button>
+                                    
+                                        
+                                    
                                 </div>
                             ))}
+                           <center>  <button
+                                            type="button"
+                                            onClick={handleAddUsers}
+                                            className="bg-gray-800   text-white px-10 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+                                        >
+                                            +
+                                        </button></center>
                         </div>
                     </div>
                     <Button type="submit" className='mt-4'>Update Employee</Button>
