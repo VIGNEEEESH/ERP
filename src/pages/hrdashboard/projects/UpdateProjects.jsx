@@ -1,36 +1,210 @@
-// UpdateProject.js
-import React, { useState } from 'react';
-import { Card, CardHeader, CardBody, Typography, Avatar, Button, Input } from "@material-tailwind/react";
+import React, { useContext, useEffect, useState } from 'react';
+import {
+    CardBody,
+    Input,
+    Button,
+    Avatar,
+} from "@material-tailwind/react";
+import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
-function UpdateProject({ project, onUpdate, onCancel }) {
-    const [name, setName] = useState(project.name);
-    const [budget, setBudget] = useState(project.budget);
+const UpdateProject = ({ projectData, onClose }) => {
+    const [formData, setFormData] = useState({
+        projectName: projectData.projectName,
+        projectDescription: projectData.projectDescription,
+        department: projectData.department,
+        deadline:projectData.deadline,
+        assignedDate:projectData.assignedDate,
+        members: projectData.members,
+        progress:projectData.progress
+    });
+    const auth=useContext(AuthContext)
 
-    const handleUpdate = () => {
-        const updatedProject = { ...project, name, budget };
-        onUpdate(updatedProject);
+   const [members,setMembers]=useState([])
+   const [departments,setDepartments]=useState([])
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
+                    Authorization:"Bearer "+auth.token
+                }});
+                const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`,{headers:{Authorization:"Bearer "+auth.token}});
+                
+                if (!userResponse.ok || !departmentResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const userData = await userResponse.json();
+                const departmentData = await departmentResponse.json();
+                
+                setMembers(userData.users);
+                setDepartments(departmentData.departments);
+            } catch (error) {
+                message.error("Error fetching data: " + error.message);
+            }
+        };
+        
+        fetchData();
+    }, []);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
+
+    const handleMemberChange = (e, index) => {
+        const updatedMembers = [...formData.members];
+        updatedMembers[index] = e.target.value;
+        setFormData({
+            ...formData,
+            members: updatedMembers,
+        });
+    };
+
+    const handleAddMember = () => {
+        setFormData({
+            ...formData,
+            members: [...formData.members, ''],
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const response = await fetch(
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/update/project/byid/${projectData._id}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            message.success(`Project updated successfully`)
+            const responseData = await response.json();
+            setTimeout(()=>{
+                window.location.reload()
+            },[500])
+            onClose()
+            
+            
+            
+        } catch (error) {
+            message.error(`Error creating project`)
+            console.error("Error submitting form:", error.message);
+        }
     };
 
     return (
-        <Card className="max-w-md mx-auto">
-            <CardHeader variant="gradient" color="gray" className="p-6">
-                <Typography variant="h6" color="white">Update Project</Typography>
-            </CardHeader>
+        <div className="mt-4 mb-8">
             <CardBody>
-                <div className="mb-4">
-                    <Typography variant="subtitle">Project Name</Typography>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} />
-                </div>
-                <div className="mb-4">
-                    <Typography variant="subtitle">Budget</Typography>
-                    <Input value={budget} onChange={(e) => setBudget(e.target.value)} />
-                </div>
-                <div className="flex justify-end">
-                    <Button onClick={handleUpdate} color="green">Update</Button>
-                    <Button onClick={onCancel} color="red" className="ml-2">Cancel</Button>
-                </div>
+                <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 gap-4">
+                        <div>
+                            <Input
+                                type="text"
+                                name="projectName"
+                                value={formData.projectName}
+                                onChange={handleInputChange}
+                                label="Project Name"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="text"
+                                name="projectDescription"
+                                value={formData.projectDescription}
+                                onChange={handleInputChange}
+                                label="Project Description"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="number"
+                                name="progress"
+                                value={formData.progress}
+                                onChange={handleInputChange}
+                                label="progress"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="deadline"
+                                value={formData.deadline}
+                                onChange={handleInputChange}
+                                label="Deadline"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="assignedDate"
+                                value={formData.assignedDate}
+                                onChange={handleInputChange}
+                                label="Assigned Date"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="text-sm font-medium text-blue-gray-500">Department</label>
+                            <select
+                                name="department"
+                                value={formData.department}
+                                onChange={handleInputChange}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="">Select Department</option>
+                                {departments.map(department => (
+                                    <option key={department._id} value={department.departmentName}>{department.departmentName}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
+                            {formData.members.map((member, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <select
+                                        name="member"
+                                        value={member}
+                                        onChange={(e) => handleMemberChange(e, index)}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
+                                    >
+                                        <option value="">Select Member</option>
+                                        {members.map(memberItem => (
+                                            <option key={memberItem._id} value={memberItem.email}>{memberItem.firstName} {memberItem.lastName}</option>
+                                        ))}
+                                    </select>
+                                    {index === formData.members.length - 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={handleAddMember}
+                                            className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 "
+                                        >
+                                            +
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex justify-between mt-4">
+                        <Button type="submit">Update Project</Button>
+                        <Button onClick={onClose} color="red">Cancel</Button>
+                    </div>
+                </form>
             </CardBody>
-        </Card>
+        </div>
     );
 }
 

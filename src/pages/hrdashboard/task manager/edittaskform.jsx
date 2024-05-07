@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     CardBody,
     Input,
@@ -6,19 +6,46 @@ import {
     Avatar,
 } from "@material-tailwind/react";
 import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 const EditTaskForm = ({ taskData, onClose }) => {
     const [formData, setFormData] = useState({
         taskName: taskData.taskName,
         taskDescription: taskData.taskDescription,
-        selectedMembers: taskData.assignedMembers,
+        department: taskData.department,
+        deadline:taskData.deadline,
+        assignedDate:taskData.assignedDate,
+        members: taskData.members,
+        progress:taskData.progress
     });
+    const auth=useContext(AuthContext)
 
-    const members = [
-        { id: 1, name: 'John Doe', img: '/img/team-1.jpeg' },
-        { id: 2, name: 'Jane Smith', img: '/img/team-2.jpeg' },
-        { id: 3, name: 'Alex Johnson', img: '/img/team-3.jpeg' }
-    ];
+   const [members,setMembers]=useState([])
+   const [departments,setDepartments]=useState([])
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
+                    Authorization:"Bearer "+auth.token
+                }});
+                const departmentResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/all/departments`,{headers:{Authorization:"Bearer "+auth.token}});
+                
+                if (!userResponse.ok || !departmentResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const userData = await userResponse.json();
+                const departmentData = await departmentResponse.json();
+                
+                setMembers(userData.users);
+                setDepartments(departmentData.departments);
+            } catch (error) {
+                message.error("Error fetching data: " + error.message);
+            }
+        };
+        
+        fetchData();
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -29,32 +56,51 @@ const EditTaskForm = ({ taskData, onClose }) => {
     };
 
     const handleMemberChange = (e, index) => {
-        const updatedMembers = [...formData.selectedMembers];
+        const updatedMembers = [...formData.members];
         updatedMembers[index] = e.target.value;
         setFormData({
             ...formData,
-            selectedMembers: updatedMembers,
+            members: updatedMembers,
         });
     };
 
     const handleAddMember = () => {
         setFormData({
             ...formData,
-            selectedMembers: [...formData.selectedMembers, ''],
+            members: [...formData.members, ''],
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Add your form submission logic here
+        
         try {
-            // Example: Send form data to backend
-            message.success(`Task "${formData.taskName}" updated successfully`);
-            // Close the edit form after successful submission
-            onClose();
+            const response = await fetch(
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/update/task/byid/${taskData._id}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            message.success(`Task updated successfully`)
+            const responseData = await response.json();
+            setTimeout(()=>{
+                window.location.reload()
+            },[500])
+            onClose()
+            
+            
+            
         } catch (error) {
-            message.error(`Error updating task: ${error.message}`);
+            message.error(`Error creating task`)
             console.error("Error submitting form:", error.message);
         }
     };
@@ -74,34 +120,76 @@ const EditTaskForm = ({ taskData, onClose }) => {
                             />
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-blue-gray-500">Task Description</label>
-                            <textarea
+                            <Input
+                                type="text"
                                 name="taskDescription"
                                 value={formData.taskDescription}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full border border-blue-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                label="Task Description"
                             />
                         </div>
                         <div>
+                            <Input
+                                type="number"
+                                name="progress"
+                                value={formData.progress}
+                                onChange={handleInputChange}
+                                label="progress"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="deadline"
+                                value={formData.deadline}
+                                onChange={handleInputChange}
+                                label="Deadline"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="assignedDate"
+                                value={formData.assignedDate}
+                                onChange={handleInputChange}
+                                label="Assigned Date"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="text-sm font-medium text-blue-gray-500">Department</label>
+                            <select
+                                name="department"
+                                value={formData.department}
+                                onChange={handleInputChange}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="">Select Department</option>
+                                {departments.map(department => (
+                                    <option key={department._id} value={department.departmentName}>{department.departmentName}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
                             <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
-                            {formData.selectedMembers.map((member, index) => (
+                            {formData.members.map((member, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     <select
-                                        name="selectedMember"
+                                        name="member"
                                         value={member}
                                         onChange={(e) => handleMemberChange(e, index)}
                                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                                     >
                                         <option value="">Select Member</option>
-                                        {members.map(member => (
-                                            <option key={member.id} value={member.name}>{member.name}</option>
+                                        {members.map(memberItem => (
+                                            <option key={memberItem._id} value={memberItem.email}>{memberItem.firstName} {memberItem.lastName}</option>
                                         ))}
                                     </select>
-                                    {index === formData.selectedMembers.length - 1 && (
+                                    {index === formData.members.length - 1 && (
                                         <button
                                             type="button"
                                             onClick={handleAddMember}
-                                            className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                                            className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 "
                                         >
                                             +
                                         </button>

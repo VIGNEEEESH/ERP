@@ -12,9 +12,10 @@ const AddProject = () => {
         department:"",
         assignedDate: new Date().toISOString().slice(0, 10),
     });
+    const auth=useContext(AuthContext)
     const [members,setMembers]=useState([])
     const [departments,setDepartments]=useState([])
-    const auth=useContext(AuthContext)
+
     useEffect(() => {
         const fetchMembers = async () => {
             try {

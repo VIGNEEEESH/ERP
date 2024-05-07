@@ -160,8 +160,11 @@ const TaskManager = () => {
     };
 
     const handleEditClick = (rowData) => {
+        console.log(rowData.original)
         setEditTaskData(rowData.original);
         setShowEditTask(true);
+        
+        
     };
 
     const handleCloseEdit = () => {
@@ -169,6 +172,7 @@ const TaskManager = () => {
         setEditTaskData(null);
     };
     const handleDeleteClick = (rowData) => {
+        
         setTaskToDelete(rowData.original);
         setShowDeleteModal(true);
     };

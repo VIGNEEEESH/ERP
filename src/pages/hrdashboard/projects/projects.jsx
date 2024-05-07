@@ -43,13 +43,15 @@ export function Projects({ onAddProject }) {
     const [showAddProject, setShowAddProject] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null); // State to keep track of selected project for update
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [editProjectData, setEditProjectData] = useState(null);
+    const [showEditProject, setShowEditProject] = useState(false);
     const [projectToDelete, setProjectToDelete] = useState(null); 
-    const auth=useContext(AuthContext)
+const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchProjects = async () => {
           try {
             const response = await fetch(
-              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`,{headers:{Authorization:"Bearer "+auth.token}}
+              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`,{headers:{Authorization: "Bearer " + auth.token,}}
             );
             if (!response.ok) {
               throw new Error(`Failed to fetch attendance data: ${response.status}`);
@@ -126,7 +128,7 @@ export function Projects({ onAddProject }) {
                 Header: '',
                 accessor: 'edit',
                 Cell: ({ row }) => (
-                    <Typography onClick={() => handleUpdateClick(row.original)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
+                    <Typography onClick={() => handleEditClick(row)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
                         <PencilIcon className="h-4 w-4 mr-2"/>Edit
                     </Typography>
                 ),
@@ -180,6 +182,18 @@ export function Projects({ onAddProject }) {
         setShowDeleteModal(false);
         setProjectToDelete(null);
     };
+    const handleEditClick = (rowData) => {
+        console.log(rowData.original)
+        setEditProjectData(rowData.original);
+        setShowEditProject(true);
+        
+        
+    };
+
+    const handleCloseEdit = () => {
+        setShowEditProject(false);
+        setEditProjectData(null);
+    };
 
     const handleConfirmDelete = async () => {
         try {
@@ -228,6 +242,9 @@ export function Projects({ onAddProject }) {
                         {showAddProject ? 'Cancel' : 'Add Project'}
                     </Button>
                 </CardHeader>
+                {showEditProject && (
+                    <UpdateProject projectData={editProjectData} onClose={handleCloseEdit} />
+                )}
                 {showAddProject ? (
                     <AddProject onAddProject={AddProject} />
                 ) : (

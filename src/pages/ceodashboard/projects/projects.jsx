@@ -43,6 +43,8 @@ export function Projects({ onAddProject }) {
     const [showAddProject, setShowAddProject] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null); // State to keep track of selected project for update
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [editProjectData, setEditProjectData] = useState(null);
+    const [showEditProject, setShowEditProject] = useState(false);
     const [projectToDelete, setProjectToDelete] = useState(null); 
 const auth=useContext(AuthContext)
     useEffect(() => {
@@ -126,7 +128,7 @@ const auth=useContext(AuthContext)
                 Header: '',
                 accessor: 'edit',
                 Cell: ({ row }) => (
-                    <Typography onClick={() => handleUpdateClick(row.original)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
+                    <Typography onClick={() => handleEditClick(row)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
                         <PencilIcon className="h-4 w-4 mr-2"/>Edit
                     </Typography>
                 ),
@@ -180,6 +182,18 @@ const auth=useContext(AuthContext)
         setShowDeleteModal(false);
         setProjectToDelete(null);
     };
+    const handleEditClick = (rowData) => {
+        console.log(rowData.original)
+        setEditProjectData(rowData.original);
+        setShowEditProject(true);
+        
+        
+    };
+
+    const handleCloseEdit = () => {
+        setShowEditProject(false);
+        setEditProjectData(null);
+    };
 
     const handleConfirmDelete = async () => {
         try {
@@ -228,6 +242,9 @@ const auth=useContext(AuthContext)
                         {showAddProject ? 'Cancel' : 'Add Project'}
                     </Button>
                 </CardHeader>
+                {showEditProject && (
+                    <UpdateProject projectData={editProjectData} onClose={handleCloseEdit} />
+                )}
                 {showAddProject ? (
                     <AddProject onAddProject={AddProject} />
                 ) : (
