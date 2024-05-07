@@ -89,6 +89,7 @@ const UpdateProject = ({ projectData, onClose }) => {
             formDataToSend.append("deadline", formData.deadline);
             formDataToSend.append("assignedDate", formData.assignedDate);
             formDataToSend.append("department", formData.department);
+            formDataToSend.append("progress", formData.progress);
             
             // Append members individually
             for (let i = 0; i < formData.members.length; i++) {
