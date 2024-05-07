@@ -16,7 +16,8 @@ const UpdateProject = ({ projectData, onClose }) => {
         deadline:projectData.deadline,
         assignedDate:projectData.assignedDate,
         members: projectData.members,
-        progress:projectData.progress
+        progress:projectData.progress,
+        files:projectData.files
     });
     const auth=useContext(AuthContext)
 
@@ -48,11 +49,18 @@ const UpdateProject = ({ projectData, onClose }) => {
     }, []);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+        const { name, value, files } = e.target;
+        if (name === "files") {
+            setFormData({
+                ...formData,
+                [name]: files 
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+        }
     };
 
     const handleMemberChange = (e, index) => {
@@ -75,15 +83,32 @@ const UpdateProject = ({ projectData, onClose }) => {
         e.preventDefault();
         
         try {
+            const formDataToSend = new FormData();
+            formDataToSend.append("projectName", formData.projectName);
+            formDataToSend.append("projectDescription", formData.projectDescription);
+            formDataToSend.append("deadline", formData.deadline);
+            formDataToSend.append("assignedDate", formData.assignedDate);
+            formDataToSend.append("department", formData.department);
+            
+            // Append members individually
+            for (let i = 0; i < formData.members.length; i++) {
+                formDataToSend.append("members[]", formData.members[i]);
+            }
+    
+            // Append files
+            if (formData.files && formData.files.length > 0) {
+                for (let i = 0; i < formData.files.length; i++) {
+                    formDataToSend.append("files", formData.files[i]);
+                }
+            }
             const response = await fetch(
                 `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/update/project/byid/${projectData._id}`,
                 {
                     method: "PATCH",
                     headers: {
-                        "Content-Type": "application/json",
                         Authorization: "Bearer " + auth.token,
                     },
-                    body: JSON.stringify(formData),
+                    body: formDataToSend,
                 }
             );
 
@@ -126,6 +151,15 @@ const UpdateProject = ({ projectData, onClose }) => {
                                 value={formData.projectDescription}
                                 onChange={handleInputChange}
                                 label="Project Description"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="file"
+                                name="files"
+                                onChange={handleInputChange}
+                                label="Upload Files"
+                                multiple 
                             />
                         </div>
                         <div>
