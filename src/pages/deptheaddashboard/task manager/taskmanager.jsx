@@ -208,14 +208,14 @@ const handleConfirmDelete = async () => {
             
             setShowDeleteModal(false);
             setTaskToDelete(null);
-            message.success("Employee deleted successfully");
+            message.success("Task deleted successfully");
         } else {
             
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
     } catch (error) {
         message.error("Something went wrong while deleting the task, please try again")
-        console.error('Error deleting employee:', error);
+        console.error('Error deleting task:', error);
        
     }
 };

@@ -306,7 +306,7 @@ const auth=useContext(AuthContext)
             >
                 <p>Are you sure you want to delete this Project?</p>
                 {projectToDelete && (
-                    <p>Name: {projectToDelete.name}</p>
+                    <p>Name: {projectToDelete.projectName}</p>
                 )}
             </Modal>
         </div>

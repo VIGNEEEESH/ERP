@@ -305,7 +305,7 @@ export function Projects({ onAddProject }) {
             >
                 <p>Are you sure you want to delete this Project?</p>
                 {projectToDelete && (
-                    <p>Name: {projectToDelete.name}</p>
+                    <p>Name: {projectToDelete.projectName}</p>
                 )}
             </Modal>
         </div>

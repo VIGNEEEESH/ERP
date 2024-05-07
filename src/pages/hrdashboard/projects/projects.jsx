@@ -8,34 +8,7 @@ import UpdateProject from './UpdateProjects';
 import { Modal, message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
 
-// Sample projects data
-const sampleProjectsData = [
-    {
-        id: 1,
-        name: "Project A",
-        description: "Sample Description A",
-        members: [
-            { id: 1, name: "John Doe", img: "team-1.jpg" },
-            { id: 2, name: "Jane Doe", img: "jane.jpg" }
-        ],
-        deadline: "2024-05-15",
-        assignedDate: "2024-04-15",
-        completion: 50
-    },
-    {
-        id: 2,
-        name: "Project B",
-        description: "Sample Description B",
-        members: [
-            { id: 3, name: "Alice Smith", img: "alice.jpg" },
-            { id: 4, name: "Bob Smith", img: "bob.jpg" }
-        ],
-        deadline: "2024-06-30",
-        assignedDate: "2024-05-01",
-        completion: 75
-    },
-    // Add more projects as needed
-];
+
 
 export function Projects({ onAddProject }) {
     const [pageSize, setPageSize] = useState(5);
@@ -333,7 +306,7 @@ const auth=useContext(AuthContext)
             >
                 <p>Are you sure you want to delete this Project?</p>
                 {projectToDelete && (
-                    <p>Name: {projectToDelete.name}</p>
+                    <p>Name: {projectToDelete.projectName}</p>
                 )}
             </Modal>
         </div>
