@@ -10,17 +10,24 @@ import {
     Input,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
-import { authorsTableData } from "@/data";
-import AttendanceCalendar from "./AttendenceCalender";
-import { message } from 'antd';
+import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from "@heroicons/react/24/solid";
+
+import { Modal, message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
+import EditDepartment from './EditDepartment';
+import AddDepartment from './AddDepartment';
 
 export function ManageDepartments() {
     const [showCalendar, setShowCalendar] = useState(false);
-    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [selectedDepartment, setSelectedDepartment] = useState(null);
+    const [showAddDepartmentForm, setShowAddDepartmentForm] = useState(false);
+    const [editDepartmentData, setEditDepartmentData] = useState(null);
+    const [showEditDepartment, setShowEditDepartment] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [pageSize, setPageSize] = useState(5);
     const [departments,setDepartments] = useState([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [departmentToDelete, setDepartmentToDelete] = useState(null); 
     const [users, setUsers] = useState([]);
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
@@ -47,7 +54,7 @@ export function ManageDepartments() {
             setUsers(userData.users);
             
         } catch (error) {
-            message.error("Error fetching attendance or employees", error.message);
+            message.error("Error fetching attendance or department", error.message);
         }
     };
 
@@ -70,10 +77,6 @@ const data = useMemo(() => {
 
 
 
-console.log(users);
-console.log(data)
-    
-
   
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
@@ -88,14 +91,31 @@ console.log(data)
     // }, [data, searchQuery]);
     
     
-    
+    const handleEditClick = (rowData) => {
+        setEditDepartmentData(rowData.original);
+        setShowEditDepartment(true);
+    };
+
+    const handleCloseEdit = () => {
+        setShowEditDepartment(false);
+        setEditDepartmentData(null);
+    };
+    const handleDeleteClick = (rowData) => {
+        setDepartmentToDelete(rowData.original);
+        setShowDeleteModal(true);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setDepartmentToDelete(null);
+    };
     
     
 
     const columns = useMemo(
         () => [
             {
-                Header: 'Employee Details',
+                Header: 'Department Name',
                 accessor: 'departmentName',
                 Cell: ({ row }) => (
                     <div className="flex items-center gap-4">
@@ -108,16 +128,34 @@ console.log(data)
                 ),
             },
             {
-                Header: 'User',
+                Header: 'Department Head',
                 accessor: 'users',
                 Cell: ({ row }) => (
                     <div>
                         {row.original.users.map(user => (
                             <Typography key={user._id} className="text-xs font-semibold text-blue-gray-600">
-                                {user.firstName}&nbsp;{user.lastName} - {user.role}
+                                {user.firstName}&nbsp;{user.lastName} {/* - {user.role} */}
                             </Typography>
                         ))}
                     </div>
+                ),
+            },
+            {
+                Header: '',
+                accessor: 'edit',
+                Cell: ({ row }) => (
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => handleEditClick(row)}>
+                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
+                    </Typography>
+                ),
+            },
+            {
+                Header: '',
+                accessor: 'Delete',
+                Cell: ({ row }) => (
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => handleDeleteClick(row)}>
+                        <TrashIcon className="h-4 w-4 mr-2"/>
+                    </Typography>
                 ),
             },
             // {
@@ -179,39 +217,66 @@ console.log(data)
     [data, searchQuery]
 );
 
+const handleConfirmDelete = async () => {
+    try {
+        
+        // Make a delete request to your backend API using fetch
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/delete/department/byid/${departmentToDelete._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:"Bearer "+auth.token,
+            },
+        });
 
-const handleViewClick = (employee) => {
-    setSelectedEmployee(employee); // Assuming the userId is stored in employee.userId
-    setShowCalendar(true);
+        // Check if the request was successful (status code 200-299)
+        if (response.ok) {
+            // If the request is successful, remove the deleted department from the local state
+            setDepartments(departments.filter(emp => emp._id !== departmentToDelete._id));
+
+            // Close the modal
+            setShowDeleteModal(false);
+            setDepartmentToDelete(null);
+            message.success("Department deleted successfully");
+        } else {
+            // If the request failed, throw an error
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    } catch (error) {
+        // Handle error (e.g., show error message)
+        console.error('Error deleting department:', error);
+        // You can show an error message to the user here
+    }
 };
 
 
-    const mockAttendanceData = {
-        '2024-04-01': 'present',
-        '2024-04-02': 'leave',
-        '2024-04-03': 'absent',
-        // Add more entries as needed
-    };
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
             <Card>
-                {showCalendar ? (
-                    <AttendanceCalendar attendanceData={selectedEmployee} />
-                ) : (
+            <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
+                    <Typography variant="h6" color="white">
+                        {showAddDepartmentForm ? 'Add Department' : 'Manage Departments'}
+                    </Typography>
+                    <Button className="bg-white text-gray-900 flex hover:bg-gray-200" onClick={() => setShowAddDepartmentForm(!showAddDepartmentForm)}>
+                        <span>{showAddDepartmentForm ? <ArrowLeftIcon className="h-4 w-4 mr-2"/> :<UserPlusIcon className="h-4 w-4 mr-2"/>}</span>
+                        {showAddDepartmentForm ? 'Cancel' : 'Add Department'}
+                    </Button>
+                </CardHeader>
+                {showEditDepartment && (
+                <EditDepartment departmentData={editDepartmentData} onClose={handleCloseEdit} />
+                )}
+                {showAddDepartmentForm ? (
                     <>
-                        <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
-                            <Typography variant="h6" color="white">
-                                Attendence Tracker
-                            </Typography>
-                            <Input
-    label="Search with the employee name"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    className=" w-full bg-white text-black"
-/>
-
-                        </CardHeader>
+                        <AddDepartment />
+                        {/* <div className="flex justify-center items-center  w-full">
+                            <hr className="border-t-2 border-gray-300 w-full"/>
+                            <span className="mx-4 text-gray-500">OR</span>
+                            <hr className="border-t-2 border-gray-300 w-full"/>
+                        </div>
+                        <AddDepartment /> */}
+                    </>
+                ) : (
                         <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                             <table {...getTableProps()} className="w-full min-w-[640px] table-auto">
                                 <thead>
@@ -281,9 +346,20 @@ const handleViewClick = (employee) => {
                                     </span>
                                 </div>
                             </div>
-                        </CardBody>
-                    </>
-                )}
+                        </CardBody>)}
+                        <Modal
+
+title="Delete Department"
+open={showDeleteModal}
+onOk={handleConfirmDelete}
+onCancel={handleCloseDeleteModal}
+okButtonProps={{ style: { backgroundColor: 'black' } }}
+>
+<p>Are you sure you want to delete this department?</p>
+{departmentToDelete && (
+    <p>Name: {departmentToDelete.departmentName} </p>
+)}
+</Modal>
             </Card>
         </div>
     );

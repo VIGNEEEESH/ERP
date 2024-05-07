@@ -15,10 +15,11 @@ export function AddEmployeeShort() {
         role: '',
         salary:""
     });
+    const auth=useContext(AuthContext)
     
     const [qrCodeData, setQRCodeData] = useState(null);
     const [showQRCodePopup, setShowQRCodePopup] = useState(false);
-    const auth=useContext(AuthContext)
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -32,12 +33,12 @@ export function AddEmployeeShort() {
         
         try {
             const response = await fetch(
-                "http://localhost:4444/api/erp/user/invite/user",
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/invite/user`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization:"Bearer "+auth.token
+                        Authorization:"Bearer "+auth.token,
                     },
                     body: JSON.stringify(formData),
                 }
@@ -98,7 +99,7 @@ export function AddEmployeeShort() {
                                 className="mt-1 block w-full py-2 px-3 border border-blue-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             >
                                 <option value="">Select Role</option>
-                                
+                                <option value="CEO">CEO</option>
                                 <option value="HR">HR</option>
                                 <option value="DeptHead">DeptHead</option>
                                 <option value="Employee">Employee</option>

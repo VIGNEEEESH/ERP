@@ -11,7 +11,7 @@ import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function EditEmployee({ employeeData, onClose }) {
     const [formData, setFormData] = useState(employeeData);
-const auth=useContext(AuthContext)
+    const auth=useContext(AuthContext)
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
@@ -35,12 +35,12 @@ const auth=useContext(AuthContext)
         }
         try {
             const response = await fetch(
-                `http://localhost:4444/api/erp/user/update/user/byid/${formData._id}`,
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/user/byid/${formData._id}`,
                 {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization:"Bearer "+auth.token
+                        Authorization:"Bearer "+auth.token,
                     },
                     body: JSON.stringify(formData),
                 }
@@ -105,6 +105,15 @@ const auth=useContext(AuthContext)
                                 value={formData.role}
                                 onChange={handleInputChange}
                                 label="Role"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="text"
+                                name="mobile"
+                                value={formData.mobile}
+                                onChange={handleInputChange}
+                                label="Mobile"
                             />
                         </div>
                         <div>

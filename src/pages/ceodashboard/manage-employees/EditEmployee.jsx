@@ -35,7 +35,7 @@ export function EditEmployee({ employeeData, onClose }) {
         }
         try {
             const response = await fetch(
-                `http://localhost:4444/api/erp/user/update/user/byid/${formData._id}`,
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/user/byid/${formData._id}`,
                 {
                     method: "PATCH",
                     headers: {
