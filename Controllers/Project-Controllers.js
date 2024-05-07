@@ -2,7 +2,7 @@ const HttpError = require("../Middleware/http-error");
 const { validationResult } = require("express-validator");
 const Project = require("../Models/Project");
 const Department = require("../Models/Department");
-
+const fs = require("fs");
 const createProject = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -16,6 +16,7 @@ const createProject = async (req, res, next) => {
     deadline,
     assignedDate,
     progress,
+
     department,
   } = req.body;
   let existingProject;
@@ -37,7 +38,7 @@ const createProject = async (req, res, next) => {
     );
     return next(error);
   }
-
+  const filePaths = req.files.map((file) => file.path);
   const createdProject = new Project({
     projectName,
     projectDescription,
@@ -46,6 +47,7 @@ const createProject = async (req, res, next) => {
     assignedDate,
     progress,
     department,
+    files: filePaths,
   });
   try {
     await createdProject.save();
@@ -148,6 +150,9 @@ const updateProjectById = async (req, res, next) => {
     const error = new HttpError("Project not found, please try again", 500);
     return next(error);
   }
+  if (req.files) {
+    project.files.push(...req.files);
+  }
 
   project.projectName = projectName ? projectName : project.projectName;
   project.projectDescription = projectDescription
@@ -169,6 +174,37 @@ const updateProjectById = async (req, res, next) => {
     return next(error);
   }
   res.status(201).json({ project: project });
+};
+const addProjectFileById = async (req, res, next) => {
+  const id = req.params.id;
+  let project;
+
+  try {
+    project = await Project.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!project) {
+    const error = new HttpError("Project not found, please try again", 500);
+    return next(error);
+  }
+
+  project.files.push(...req.files);
+
+  try {
+    project.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({ task: task });
 };
 const updateProjectProgressById = async (req, res, next) => {
   const id = req.params.id;
@@ -217,8 +253,18 @@ const deleteProjectById = async (req, res, next) => {
     const error = new HttpError("Project not found, please try again", 500);
     return next(error);
   }
+  const filePaths = project.files;
   try {
     await Project.deleteOne();
+    filePaths.forEach((filePath) => {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("File deleted successfully:", filePath);
+        }
+      });
+    });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while deleting the data, please try again",
@@ -229,6 +275,7 @@ const deleteProjectById = async (req, res, next) => {
   res.status(200).json({ message: "Project deleted successfully" });
 };
 exports.createProject = createProject;
+exports.addProjectFileById = addProjectFileById;
 exports.getAllProjects = getAllProjects;
 exports.getProjectById = getProjectById;
 exports.getProjectsByEmail = getProjectsByEmail;

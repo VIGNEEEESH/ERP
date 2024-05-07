@@ -2,7 +2,7 @@ const HttpError = require("../Middleware/http-error");
 const { validationResult } = require("express-validator");
 const Task = require("../Models/Task");
 const Department = require("../Models/Department");
-
+const fs = require("fs");
 const createTask = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -34,7 +34,9 @@ const createTask = async (req, res, next) => {
     const error = new HttpError("Task already exists, please try again", 500);
     return next(error);
   }
+  console.log(req.files);
 
+  const filePaths = req.files.map((file) => file.path);
   const createdTask = new Task({
     taskName,
     taskDescription,
@@ -43,10 +45,12 @@ const createTask = async (req, res, next) => {
     assignedDate,
     progress,
     department,
+    files: filePaths,
   });
   try {
     await createdTask.save();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Something went wrong while saving the data, please try again",
       500
@@ -144,6 +148,9 @@ const updateTaskById = async (req, res, next) => {
     const error = new HttpError("Task not found, please try again", 500);
     return next(error);
   }
+  if (req.files) {
+    task.files.push(...req.files);
+  }
 
   task.taskName = taskName ? taskName : task.taskName;
   task.taskDescription = taskDescription
@@ -154,6 +161,37 @@ const updateTaskById = async (req, res, next) => {
   task.assignedDate = assignedDate ? assignedDate : task.assignedDate;
   task.progress = progress ? progress : task.progress;
   task.department = department ? department : task.department;
+
+  try {
+    task.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while saving the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({ task: task });
+};
+const addTaskFileById = async (req, res, next) => {
+  const id = req.params.id;
+  let task;
+
+  try {
+    task = await Task.findOne({ _id: id });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  if (!task) {
+    const error = new HttpError("Task not found, please try again", 500);
+    return next(error);
+  }
+
+  task.files.push(...req.files);
 
   try {
     task.save();
@@ -197,6 +235,7 @@ const updateTaskProgressById = async (req, res, next) => {
   }
   res.status(201).json({ task: task });
 };
+
 const deleteTaskById = async (req, res, next) => {
   const id = req.params.id;
   let task;
@@ -204,27 +243,43 @@ const deleteTaskById = async (req, res, next) => {
     task = await Task.findOne({ _id: id });
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong while saving the data, please try again",
+      "Something went wrong while finding the task, please try again",
       500
     );
     return next(error);
   }
+
   if (!task) {
-    const error = new HttpError("Task not found, please try again", 500);
+    const error = new HttpError("Task not found, please try again", 404);
     return next(error);
   }
+
+  const filePaths = task.files; // Get file paths associated with the task
   try {
-    await task.deleteOne();
+    await task.deleteOne(); // Delete task from the database
+    // Unlink (delete) associated files
+    filePaths.forEach((filePath) => {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("File deleted successfully:", filePath);
+        }
+      });
+    });
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong while deleting the data, please try again",
+      "Something went wrong while deleting the task, please try again",
       500
     );
     return next(error);
   }
+
   res.status(200).json({ message: "Task deleted successfully" });
 };
+
 exports.createTask = createTask;
+exports.addTaskFileById = addTaskFileById;
 exports.getAllTasks = getAllTasks;
 exports.getTaskById = getTaskById;
 exports.getTasksByEmail = getTasksByEmail;

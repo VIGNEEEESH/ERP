@@ -29,6 +29,7 @@ router.get(
 router.post(
   "/create/task",
   checkAuth(["CEO", "HR", "DeptHead"]),
+  imageUpload.any("files"),
   [
     check("taskName").isLength({ min: 2, max: 255 }),
     check("taskDescription").isLength({ min: 2 }),
@@ -43,6 +44,7 @@ router.post(
 router.patch(
   "/update/task/byid/:id",
   checkAuth(["CEO", "HR", "DeptHead"]),
+  imageUpload.any("files"),
   [
     check("taskName").isLength({ min: 2, max: 255 }).optional(),
     check("taskDescription").isLength({ min: 2 }).optional(),
@@ -59,6 +61,12 @@ router.patch(
   [check("progress").isLength({ min: 1 })],
   checkAuth(["CEO", "HR", "DeptHead"]),
   taskControllers.updateTaskProgressById
+);
+router.patch(
+  "/add/project/files/byid/:id",
+  imageUpload.any("files"),
+  checkAuth(["CEO", "HR", "DeptHead"]),
+  taskControllers.addTaskFileById
 );
 router.delete(
   "/delete/task/byid/:id",

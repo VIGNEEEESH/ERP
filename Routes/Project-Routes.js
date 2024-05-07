@@ -29,6 +29,7 @@ router.get(
 router.post(
   "/create/project",
   checkAuth(["CEO", "HR", "DeptHead"]),
+  imageUpload.any("files"),
   [
     check("projectName").isLength({ min: 2, max: 255 }),
     check("projectDescription").isLength({ min: 2 }),
@@ -43,6 +44,7 @@ router.post(
 router.patch(
   "/update/project/byid/:id",
   checkAuth(["CEO", "HR", "DeptHead"]),
+  imageUpload.any("files"),
   [
     check("projectName").isLength({ min: 2, max: 255 }).optional(),
     check("projectDescription").isLength({ min: 2 }).optional(),
@@ -53,6 +55,12 @@ router.patch(
     check("department").isLength({ min: 2 }).optional(),
   ],
   projectControllers.updateProjectById
+);
+router.patch(
+  "/add/project/files/byid/:id",
+  checkAuth(["CEO", "HR", "DeptHead"]),
+  imageUpload.any("files"),
+  projectControllers.addProjectFileById
 );
 router.patch(
   "/update/projectprogress/byid/:id",
