@@ -16,7 +16,8 @@ const EditTaskForm = ({ taskData, onClose }) => {
         deadline:taskData.deadline,
         assignedDate:taskData.assignedDate,
         members: taskData.members,
-        progress:taskData.progress
+        progress:taskData.progress,
+        files:taskData.files
     });
     const auth=useContext(AuthContext)
 
@@ -48,11 +49,18 @@ const EditTaskForm = ({ taskData, onClose }) => {
     }, []);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+        const { name, value, files } = e.target;
+        if (name === "files") {
+            setFormData({
+                ...formData,
+                [name]: files 
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+        }
     };
 
     const handleMemberChange = (e, index) => {
@@ -75,15 +83,33 @@ const EditTaskForm = ({ taskData, onClose }) => {
         e.preventDefault();
         
         try {
+            const formDataToSend = new FormData();
+            formDataToSend.append("taskName", formData.taskName);
+            formDataToSend.append("taskDescription", formData.taskDescription);
+            formDataToSend.append("deadline", formData.deadline);
+            formDataToSend.append("assignedDate", formData.assignedDate);
+            formDataToSend.append("department", formData.department);
+            
+            // Append members individually
+            for (let i = 0; i < formData.members.length; i++) {
+                formDataToSend.append("members[]", formData.members[i]);
+            }
+    
+            // Append files
+            if (formData.files && formData.files.length > 0) {
+                for (let i = 0; i < formData.files.length; i++) {
+                    formDataToSend.append("files", formData.files[i]);
+                }
+            }
             const response = await fetch(
                 `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/update/task/byid/${taskData._id}`,
                 {
                     method: "PATCH",
                     headers: {
-                        "Content-Type": "application/json",
+                        
                         Authorization: "Bearer " + auth.token,
                     },
-                    body: JSON.stringify(formData),
+                    body: formDataToSend,
                 }
             );
 
@@ -126,6 +152,15 @@ const EditTaskForm = ({ taskData, onClose }) => {
                                 value={formData.taskDescription}
                                 onChange={handleInputChange}
                                 label="Task Description"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="file"
+                                name="files"
+                                onChange={handleInputChange}
+                                label="Upload Files"
+                                multiple // Allow multiple file selection
                             />
                         </div>
                         <div>
