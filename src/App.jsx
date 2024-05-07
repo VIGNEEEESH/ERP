@@ -4,6 +4,7 @@ import { useAuth } from "./pages/auth/auth-hook";
 import { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { AuthContext } from "./pages/auth/Auth-context";
+import { SignIn, SignUp } from "./pages/auth";
 function App() {
   const { login, logout, userId, token, email, role } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -58,16 +59,12 @@ function App() {
       </Routes>
     )
   }else{
-    routes=(
+    routes = (
       <Routes>
-<Route path="/auth/*" element={<Auth />} />
-<Route path="/*" element={<Navigate to="/auth/sign-in" replace />} />
-      {/* <Route path="*" element={<Navigate to="/employee/dashboard/home" replace />} />
-      <Route path="*" element={<Navigate to="/ceo/dashboard/home" replace />} />
-      <Route path="*" element={<Navigate to="/hr/dashboard/home" replace />} />
-      <Route path="*" element={<Navigate to="/depthead/dashboard/home" replace />} /> */}
-      </Routes>
-    )
+        <Route path="/auth/sign-in" element={<SignIn />} />
+        <Route path="/auth/sign-up" element={<SignUp />} />
+        <Route path="/*" element={<Navigate to="/auth/sign-in" replace />} />
+      </Routes>)
   }
   return (
     <AuthContext.Provider
