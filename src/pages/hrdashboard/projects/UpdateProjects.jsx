@@ -78,6 +78,14 @@ const UpdateProject = ({ projectData, onClose }) => {
             members: [...formData.members, ''],
         });
     };
+    const handleDeleteMember = (index) => {
+        const updatedMembers = [...formData.members];
+        updatedMembers.splice(index, 1);
+        setFormData({
+            ...formData,
+            members: updatedMembers,
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -90,6 +98,7 @@ const UpdateProject = ({ projectData, onClose }) => {
             formDataToSend.append("assignedDate", formData.assignedDate);
             formDataToSend.append("department", formData.department);
             formDataToSend.append("progress", formData.progress);
+            
             // Append members individually
             for (let i = 0; i < formData.members.length; i++) {
                 formDataToSend.append("members[]", formData.members[i]);
@@ -207,7 +216,7 @@ const UpdateProject = ({ projectData, onClose }) => {
                         <div>
                             <label className="text-sm font-medium text-blue-gray-500">Assigned Members</label>
                             {formData.members.map((member, index) => (
-                                <div key={index} className="flex items-center gap-2">
+                                <div key={index} className="flex items-center gap-2" style={{ padding: '5px' }}>
                                     <select
                                         name="member"
                                         value={member}
@@ -219,7 +228,14 @@ const UpdateProject = ({ projectData, onClose }) => {
                                             <option key={memberItem._id} value={memberItem.email}>{memberItem.firstName} {memberItem.lastName}</option>
                                         ))}
                                     </select>
-                                    {index === formData.members.length - 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteMember(index)}
+                                        className="bg-red-500 text-white px-3 py-3 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
+                                    >
+                                        Delete
+                                    </button>
+                                    {/* {index === formData.members.length - 1 && (
                                         <button
                                             type="button"
                                             onClick={handleAddMember}
@@ -227,9 +243,17 @@ const UpdateProject = ({ projectData, onClose }) => {
                                         >
                                             +
                                         </button>
-                                    )}
+                                    )} */}
+                                   
                                 </div>
                             ))}
+                              <center>  <button
+                                            type="button"
+                                            onClick={handleAddMember}
+                                            className="bg-gray-800   text-white px-10 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+                                        >
+                                            +
+                                        </button></center>
                         </div>
                     </div>
                     <div className="flex justify-between mt-4">
