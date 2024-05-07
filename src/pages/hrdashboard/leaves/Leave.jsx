@@ -13,10 +13,8 @@ import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function Leave() {
     const [pageSize, setPageSize] = useState(5);
-    const [pageIndex, setPageIndex] = useState(0);
     const [leaves, setLeaves] = useState([]);
-    const auth=useContext(AuthContext)
-
+const auth=useContext(AuthContext)
     useEffect(() => {
         const fetchLeaves = async () => {
             try {
@@ -37,7 +35,7 @@ export function Leave() {
         };
         fetchLeaves();
     }, []);
-
+    const data = useMemo(() => (leaves ? leaves : []), [leaves]);
     const columns = useMemo(() => [
         {
             Header: 'First Name',
@@ -105,13 +103,14 @@ export function Leave() {
         previousPage,
         canNextPage,
         canPreviousPage,
-        pageCount,
-        prepareRow
+        state: { pageIndex },
+        prepareRow,
+        setPageSize: setTablePageSize,
     } = useTable(
         {
             columns,
             data: leaves,
-            initialState: { pageIndex, pageSize },
+            initialState: { pageIndex:0, pageSize },
         },
         usePagination
     );
@@ -119,8 +118,8 @@ export function Leave() {
     const handlePageSizeChange = (e) => {
         const newSize = Number(e.target.value);
         setPageSize(newSize);
-        setPageIndex(0);  // Reset pageIndex when pageSize changes
-    };
+        setTablePageSize(newSize);
+      };
 
     const handleApprove = async (_id) => {
         try {
@@ -222,31 +221,37 @@ export function Leave() {
                             )}
                         </tbody>
                     </table>
-                    <div className="mt-4 flex justify-between items-center">
-                        <div className='flex items-center'>
-                            <Typography className="text-sm text-blue-gray-600">
-                                Page {pageIndex + 1} of {pageCount}
-                            </Typography>
-                            <select
-                                value={pageSize}
-                                onChange={handlePageSizeChange}
-                                className="ml-2 border rounded px-2 py-1"
-                            >
-                                {[5, 10, 15].map((size) => (
-                                    <option key={size} value={size}>
-                                        Show {size}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <button onClick={() => setPageIndex((prevIndex) => prevIndex - 1)} disabled={!canPreviousPage} className='cursor-pointer'>
-                                {"< "}
-                            </button>
-                            <button onClick={() => setPageIndex((prevIndex) => prevIndex + 1)} disabled={!canNextPage} className='cursor-pointer'>
-                                {" >"}
-                            </button>
-                        </div>
+                    <div className="mt-4 ml-2 flex justify-between items-center">
+                            <div className='flex items-center'>
+                                <Typography className="text-sm text-blue-gray-600">
+                                    Page {pageIndex + 1} of {Math.ceil(data.length / pageSize)}
+                                </Typography>
+                                <select
+                                    value={pageSize}
+                                    onChange={handlePageSizeChange}
+                                    className="ml-2 border rounded px-2 py-1"
+                                >
+                                    {[5, 10, 15].map((size) => (
+                                        <option key={size} value={size}>
+                                            Show {size}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className='mr-4'>
+                                <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                    {"<< "}
+                                </span>
+                                <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                    {"< "}
+                                </span>
+                                <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                    {" >"}
+                                </span>
+                                <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                    {" >>"}
+                                </span>
+                            </div>
                     </div>
                 </CardBody>
             </Card>
