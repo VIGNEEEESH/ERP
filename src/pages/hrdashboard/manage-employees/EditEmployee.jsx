@@ -98,7 +98,7 @@ export function EditEmployee({ employeeData, onClose }) {
                                 label="Email"
                             />
                         </div>
-                        <div>
+                        {/* <div>
                             <Input
                                 type="text"
                                 name="role"
@@ -106,7 +106,7 @@ export function EditEmployee({ employeeData, onClose }) {
                                 onChange={handleInputChange}
                                 label="Role"
                             />
-                        </div>
+                        </div> */}
                         <div>
                             <Input
                                 type="text"
@@ -143,6 +143,7 @@ export function EditEmployee({ employeeData, onClose }) {
                                 label="State"
                             />
                         </div>
+                        
                         <div>
                             <Input
                                 type="text"
@@ -179,6 +180,21 @@ export function EditEmployee({ employeeData, onClose }) {
                                 onChange={handleInputChange}
                                 label="Aadhar Number"
                             />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium text-blue-gray-500">Role</label>
+                            <select
+                                name="role"
+                                value={formData.role}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full py-2 px-3 border border-blue-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                                <option value="">Select Role</option>
+                                <option value="CEO">CEO</option>
+                                <option value="HR">HR</option>
+                                <option value="DeptHead">DeptHead</option>
+                                <option value="Employee">Employee</option>
+                            </select>
                         </div>
                     </div>
                     <Button type="submit" className='mt-4'>Update Employee</Button>
