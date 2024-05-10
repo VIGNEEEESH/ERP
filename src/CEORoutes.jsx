@@ -29,6 +29,7 @@ import Projects from "./pages/ceodashboard/projects/Projects";
 import TaskManager from "./pages/ceodashboard/task manager/taskmanager";
 import Home from "./pages/ceodashboard/home";
 import ManageDepartments from "./pages/ceodashboard/Departments/ManageDepartments";
+import LogRecord from "./pages/ceodashboard/logrecord/LogRecord";
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -108,6 +109,12 @@ export const CEORoutes = [
         name: "Employee Leave",
         path: "/employeeleaves",
         element: <Leave/>,
+      },
+            {
+        icon: <CalendarDaysIcon {...icon} />,
+        name: "Log Record",
+        path: "/logrecord",
+        element: <LogRecord/>,
       },
       {
         icon: <UserCircleIcon {...icon} />,
