@@ -164,6 +164,7 @@ const Leave = lazy(() => import('./pages/ceodashboard/leaves/Leave'));
 const CEOProfile = lazy(() => import('./pages/ceodashboard/profile/CEOProfile'));
 const Settings = lazy(() => import('./pages/ceodashboard/settings/Settings'));
 const Logout = lazy(() => import('./pages/ceodashboard/logout'));
+const LogRecord = lazy(() => import('./pages/ceodashboard/logrecord/LogRecord'));
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
