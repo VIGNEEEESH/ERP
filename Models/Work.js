@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const uniqueValidator = require("mongoose-unique-validator");
 
 const workSchema = new Schema({
-  date: { type: String, required: true, unique: true },
+  date: { type: String, required: true },
   workDone: { type: String, required: true },
   userId: { type: String, required: true },
 });
