@@ -1,28 +1,29 @@
-import { AuthContext } from '@/pages/auth/Auth-context';
+import { Modal } from 'antd';
+import { useContext, useEffect, useState } from 'react';
 import { Card, CardHeader, Typography } from '@material-tailwind/react';
-import { message } from 'antd';
-import React, { useContext, useEffect, useState } from 'react';
-import Calendar from 'react-calendar'; // Assuming you've installed 'react-calendar'
+import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { message } from 'antd';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 function EmployeeRecord({ attendanceData }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [attendance, setAttendance] = useState([]);
-const auth=useContext(AuthContext)
+  const [logRecordData, setLogRecordData] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const auth = useContext(AuthContext);
+
   useEffect(() => {
     const fetchAttendanceAndEmployees = async () => {
       try {
         // Fetch attendance data
-        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData.userId}`,{headers:{Authorization:"Bearer "+auth.token}});
+        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData.userId}`, { headers: { Authorization: "Bearer " + auth.token } });
         if (!attendanceResponse.ok) {
           throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
         }
         const attendanceDataa = await attendanceResponse.json();
         setAttendance(attendanceDataa.attendance);
-        
-
       } catch (error) {
-        
         message.error("Error fetching attendance", error.message);
       }
     };
@@ -52,10 +53,17 @@ const auth=useContext(AuthContext)
     return isPresent ? 'bg-green-500 rounded-full text-white' : 'bg-red-500 rounded-full text-white'; // User is present or not
   };
 
-  // Get the present dates in the month
-  const presentDates = attendance
-    .filter(entry => entry.attendanceStatus === 'Present')
-    .map(entry => new Date(entry.date));
+  const handleTileClick = (value) => {
+    setSelectedDate(value);
+    const formattedDate = formatDate(value);
+    const logRecord = attendance.find(entry => entry.date === formattedDate);
+    setLogRecordData(logRecord);
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   return (
     <div>
@@ -70,18 +78,23 @@ const auth=useContext(AuthContext)
           value={selectedDate}
           tileClassName={getTileClassName}
           className="rounded-lg p-2 text-xl w-25"
+          onClickDay={handleTileClick}
         />
       </Card>
-      {/* <div className="mt-4 flex justify-center">
-        <Card className="p-4">
-          <Typography className="font-semibold mb-2">Present Days</Typography>
-          <ul>
-            
-              <li >{presentDates.length}</li>
-           
-          </ul>
-        </Card>
-      </div><br/><br/> */}
+      <Modal
+        title="Log Record"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        {logRecordData ? (
+          <div>
+            {/* Render log record data here */}
+          </div>
+        ) : (
+          <p>No record found for the selected date.</p>
+        )}
+      </Modal>
     </div>
   );
 }
