@@ -4,15 +4,41 @@ const router = express.Router();
 const productControllers = require("../Controllers/Product-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
+const redis = require("redis");
+const client = redis.createClient();
+
+client.on("connect", () => {
+  console.log("Client connected to redis");
+});
+client.on("error", (err) => {
+  console.log(err.message);
+});
+
+const cacheMiddleware = (req, res, next) => {
+  const key = req.originalUrl; // Using the request URL as the cache key
+  client.get(key, (err, data) => {
+    if (err) throw err;
+
+    if (data !== null) {
+      res.send(JSON.parse(data));
+    } else {
+      next();
+    }
+  });
+};
 
 router.get(
   "/get/all/products",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
   productControllers.getAllProducts
 );
+
+// GET route to get product by ID with Redis caching
 router.get(
   "/get/product/byid/:id",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
   productControllers.getProductById
 );
 
@@ -26,6 +52,7 @@ router.post(
   ],
   productControllers.createProduct
 );
+
 router.patch(
   "/update/product/byid/:id",
   checkAuth(["CEO", "HR"]),
@@ -36,6 +63,7 @@ router.patch(
   ],
   productControllers.updateProductById
 );
+
 router.delete(
   "/delete/product/byid/:id",
   checkAuth(["CEO", "HR"]),

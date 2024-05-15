@@ -4,25 +4,52 @@ const router = express.Router();
 const taskControllers = require("../Controllers/Task-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
+const redis = require("redis");
+const client = redis.createClient();
 
+client.on("connect", () => {
+  console.log("Client connected to redis");
+});
+client.on("error", (err) => {
+  console.log(err.message);
+});
+// Middleware function to cache responses for GET requests
+const cacheMiddleware = (req, res, next) => {
+  const key = req.originalUrl; // Using the request URL as the cache key
+  client.get(key, (err, data) => {
+    if (err) throw err;
+
+    if (data !== null) {
+      // If data exists in cache, return it
+      res.send(JSON.parse(data));
+    } else {
+      // If data doesn't exist in cache, proceed to the route handler
+      next();
+    }
+  });
+};
 router.get(
   "/get/all/tasks",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
   taskControllers.getAllTasks
 );
 router.get(
   "/get/task/byid/:id",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
   taskControllers.getTaskById
 );
 router.get(
   "/get/tasks/bydepartmentandid/:id",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
   taskControllers.getTasksByDepartmentAndId
 );
 router.get(
   "/get/tasks/byemail/:email",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
   taskControllers.getTasksByEmail
 );
 
