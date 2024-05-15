@@ -496,13 +496,13 @@ const resetPassword = async (req, res, next) => {
     port: 587,
     secure: false,
     auth: {
-      user: "correctstepsconsultancy@outlook.com", // Replace with your Outlook email
-      pass: "CorrectSteps@2024", // Replace with your Outlook password
+      user: "support@thecorrectsteps.com", // Replace with your Outlook email
+      pass: "Sajaljain@390", // Replace with your Outlook password
     },
   });
 
   const mailOptions = {
-    from: "correctstepsconsultancy@outlook.com", // Replace with your Outlook email
+    from: "support@thecorrectsteps.com", // Replace with your Outlook email
     to: email,
     subject: "Password Reset request for ERP",
     html: `
