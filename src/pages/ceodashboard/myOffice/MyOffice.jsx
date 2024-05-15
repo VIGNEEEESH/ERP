@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { Card, CardHeader, CardBody, Typography, Avatar, Chip, Button } from "@material-tailwind/react";
 import { message, Modal } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
-import "./MyOffice.css"
+
 export function MyOffice() {
     const [isChecked, setIsChecked] = useState(false);
     const [attendance, setAttendance] = useState([]);
@@ -10,6 +10,7 @@ export function MyOffice() {
     const [confirmModalVisible, setConfirmModalVisible] = useState(false);
     const [confirmClockOutModalVisible, setConfirmClockOutModalVisible] = useState(false);
     const [isClockedIn, setIsClockedIn] = useState(false);
+    const [isClockedOut, setIsClockedOut] = useState(false);
     const auth = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
@@ -53,6 +54,7 @@ export function MyOffice() {
                 setAttendance(attendanceData.attendance);
                 setEmployees(employeeData.users);
                 setIsClockedIn(statusData.attendance.attendanceStatus);
+                setIsClockedOut(statusData.attendance.loggedOutTime);
                 
             } catch (error) {
                 message.error("Error fetching data, please clock in: " + error.message);
@@ -163,7 +165,7 @@ const handleClockOut = async () => {
         </Button>
         <Button
             color="red"
-            disabled={isClockedIn!=="Present"}
+            disabled={isClockedOut || !isClockedIn}
             onClick={() => setConfirmClockOutModalVisible(true)}
             className="ml-4"
         >
