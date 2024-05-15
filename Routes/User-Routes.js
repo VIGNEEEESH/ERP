@@ -86,5 +86,12 @@ router.delete(
   checkAuth(["CEO", "HR"]),
   userControllers.deleteUserById
 );
+router.post(
+  "/reset-password",
+  [check("email").normalizeEmail().isEmail()],
+  userControllers.resetPassword
+);
+
+router.post("/update-password", userControllers.updatePassword);
 
 module.exports = router;

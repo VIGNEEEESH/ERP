@@ -4,6 +4,7 @@ const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
 
 const inviteUser = async (req, res, next) => {
   const errors = validationResult(req);
@@ -449,6 +450,140 @@ const deleteUserById = async (req, res, next) => {
     });
   }
 };
+const resetPassword = async (req, res, next) => {
+  const { email } = req.body;
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the user data, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  if (!existingUser) {
+    const error = new HttpError("No user found with that email address", 404);
+    return next(error);
+  }
+
+  // Generate a unique token
+  const token = jwt.sign(
+    { userId: existingUser.id, email: existingUser.email },
+    process.env.JWT_KEY,
+    { expiresIn: "1h" }
+  );
+
+  // Update the user's reset password token
+  existingUser.resetPasswordToken = token;
+  existingUser.resetPasswordTokenExpiration = Date.now() + 3600000; // 1 hour
+
+  try {
+    await existingUser.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while updating the user data, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  // Create transporter using Outlook mail SMTP server
+  const transporter = nodemailer.createTransport({
+    host: "smtp.office365.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: "your-email@outlook.com", // Replace with your Outlook email
+      pass: "yourpassword", // Replace with your Outlook password
+    },
+  });
+
+  const mailOptions = {
+    from: "your-email@outlook.com", // Replace with your Outlook email
+    to: email,
+    subject: "Password Reset request for ERP",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2>Hello ${existingUser.firstName},</h2>
+        <p>Please click on the following link to reset your password:</p>
+        <a href="http://localhost:5173/reset-password?token=${token}" 
+           style="display: inline-block; padding: 10px 20px; margin: 10px 0; 
+                  font-size: 16px; color: #fff; background-color: #007bff; 
+                  text-decoration: none; border-radius: 5px;">
+          Reset Password
+        </a>
+        <p>If the button above does not work, please copy and paste the following link into your web browser:</p>
+        <p><a href="http://localhost:5173/reset-password?token=${token}">
+          http://localhost:5173/reset-password?token=${token}
+        </a></p>
+        <p>Thank you!</p>
+      </div>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending email:", error);
+      const error = new HttpError("Failed to send reset password email", 500);
+      return next(error);
+    }
+    console.log("Email sent:", info.response);
+    res
+      .status(200)
+      .json({ message: "Reset password instructions sent to your email" });
+  });
+};
+
+const updatePassword = async (req, res, next) => {
+  const { email, newPassword } = req.body;
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the user data, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  if (!existingUser) {
+    const error = new HttpError("No user found with that email", 404);
+    return next(error);
+  }
+
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(newPassword, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while encrypting the password, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  existingUser.password = hashedPassword;
+
+  try {
+    await existingUser.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while updating the user data, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  res.status(200).json({ message: "Password updated successfully" });
+};
+
+exports.updatePassword=updatePassword;
+exports.resetPassword = resetPassword;
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
 exports.getAllUsers = getAllUsers;
