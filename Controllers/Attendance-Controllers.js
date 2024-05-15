@@ -205,7 +205,7 @@ const addLoggedOutTime = async (req, res, next) => {
   }
 
   attendance.loggedOutTime = currentTime;
-  attendance.attendanceStatus = "Absent";
+
   try {
     await attendance.save();
   } catch (err) {
