@@ -175,6 +175,7 @@ const updateWorkStatus = async (req, res, next) => {
 };
 const addLoggedOutTime = async (req, res, next) => {
   const { userId } = req.body;
+
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().split("T")[0];
   const currentTime = currentDate.toLocaleTimeString("en-US", {
@@ -204,6 +205,7 @@ const addLoggedOutTime = async (req, res, next) => {
   }
 
   attendance.loggedOutTime = currentTime;
+  attendance.attendanceStatus = "Absent";
   try {
     await attendance.save();
   } catch (err) {
@@ -215,6 +217,48 @@ const addLoggedOutTime = async (req, res, next) => {
   }
   res.status(201).json({ attendance: attendance });
 };
+// Function to log out all users
+const logoutAllUsers = async () => {
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+  const currentTime = currentDate.toLocaleTimeString("en-US", {
+    hour12: false,
+  });
+
+  try {
+    // Find all users who are still logged in
+    const loggedInUsers = await Attendance.find({
+      date: formattedDate,
+      loggedOutTime: { $exists: false },
+    });
+
+    // Log out each user
+    loggedInUsers.forEach(async (user) => {
+      user.loggedOutTime = currentTime;
+      await user.save();
+    });
+
+    console.log("All users logged out successfully.");
+  } catch (err) {
+    console.error("Error logging out users:", err);
+  }
+};
+
+// Schedule the function to run at the end of the working day (e.g., after 12:00 AM)
+const scheduleLogout = () => {
+  // Calculate the time until the end of the day (in milliseconds)
+  const now = new Date();
+
+  const endOfDay = new Date(now);
+  endOfDay.setHours(24, 0, 0, 0);
+  const timeUntilEndOfDay = endOfDay - now;
+
+  // Schedule the logout function to run at the end of the day
+  setTimeout(logoutAllUsers, timeUntilEndOfDay);
+};
+
+// Call the function to schedule the logout task
+scheduleLogout();
 
 exports.createAttendance = createAttendance;
 exports.getAllAttendance = getAllAttendance;
