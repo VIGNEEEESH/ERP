@@ -8,19 +8,21 @@ import 'react-calendar/dist/Calendar.css';
 function AttendanceCalendar({ attendanceData }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [attendance, setAttendance] = useState([]);
-  const auth=useContext(AuthContext)
+const auth=useContext(AuthContext)
   useEffect(() => {
     const fetchAttendanceAndEmployees = async () => {
       try {
         // Fetch attendance data
-        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData.userId}`,{headers:{Authorization:"Bearer "+auth.token}});
+        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData._id}`,{headers:{Authorization:"Bearer "+auth.token}});
         if (!attendanceResponse.ok) {
           throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
         }
         const attendanceDataa = await attendanceResponse.json();
         setAttendance(attendanceDataa.attendance);
+        
 
       } catch (error) {
+        
         message.error("Error fetching attendance", error.message);
       }
     };
@@ -47,7 +49,7 @@ function AttendanceCalendar({ attendanceData }) {
     const isPresent = attendance.some(entry => entry.date === formattedDate && entry.attendanceStatus === 'Present');
 
     // Determine the background color based on attendance status
-    return isPresent ? 'bg-green-500' : 'bg-red-500'; // User is present or not
+    return isPresent ? 'bg-green-500 rounded-full text-white' : 'bg-red-500 rounded-full text-white'; // User is present or not
   };
 
   // Get the present dates in the month
@@ -67,7 +69,7 @@ function AttendanceCalendar({ attendanceData }) {
           onChange={setSelectedDate}
           value={selectedDate}
           tileClassName={getTileClassName}
-          className="br-4"
+          className="rounded-lg p-2 text-xl w-25"
         />
       </Card>
       {/* <div className="mt-4 flex justify-center">
