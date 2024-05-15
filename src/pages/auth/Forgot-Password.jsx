@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:4444/api/erp/user/reset-password", {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
