@@ -89,6 +89,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
 import { AuthContext } from "./pages/auth/Auth-context";
 import { useAuth } from "./pages/auth/auth-hook";
+import ForgotPassword from "./pages/auth/Forgot-Password";
+import UpdatePassword from "./pages/auth/reset-password";
 
 // Lazy-loaded components
 const Dashboard = lazy(() => import("@/layouts/Dashboard"));
@@ -98,6 +100,7 @@ const DEPTHEADDashboard = lazy(() => import("@/layouts/DEPTHEADDashboard"));
 const HRDashboard = lazy(() => import("@/layouts/HRDashboard"));
 const SignIn = lazy(() => import("./pages/auth/sign-in"));
 const SignUp = lazy(() => import("./pages/auth/sign-up"));
+
 
 function App() {
   const { login, logout, userId, token, email, role } = useAuth();
@@ -157,6 +160,8 @@ function App() {
         <Route path="/auth/sign-in" element={<SignIn />} />
         <Route path="/auth/sign-up" element={<SignUp />} />
         <Route path="/*" element={<Navigate to="/auth/sign-in" replace />} />
+        <Route path="/auth/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<UpdatePassword/>} />
       </Routes>
     );
   }
