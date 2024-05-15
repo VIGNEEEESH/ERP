@@ -13,7 +13,7 @@ const auth=useContext(AuthContext)
     const fetchAttendanceAndEmployees = async () => {
       try {
         // Fetch attendance data
-        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData.userId}`,{headers:{Authorization:"Bearer "+auth.token}});
+        const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/byuserId/${attendanceData._id}`,{headers:{Authorization:"Bearer "+auth.token}});
         if (!attendanceResponse.ok) {
           throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
         }
