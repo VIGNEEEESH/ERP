@@ -496,13 +496,13 @@ const resetPassword = async (req, res, next) => {
     port: 587,
     secure: false,
     auth: {
-      user: "your-email@outlook.com", // Replace with your Outlook email
-      pass: "yourpassword", // Replace with your Outlook password
+      user: "correctstepsconsultancy@outlook.com", // Replace with your Outlook email
+      pass: "CorrectSteps@2024", // Replace with your Outlook password
     },
   });
 
   const mailOptions = {
-    from: "your-email@outlook.com", // Replace with your Outlook email
+    from: "correctstepsconsultancy@outlook.com", // Replace with your Outlook email
     to: email,
     subject: "Password Reset request for ERP",
     html: `
@@ -527,8 +527,11 @@ const resetPassword = async (req, res, next) => {
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending email:", error);
-      const error = new HttpError("Failed to send reset password email", 500);
-      return next(error);
+      const httpError = new HttpError(
+        "Failed to send reset password email",
+        500
+      ); // Rename error variable
+      return next(httpError);
     }
     console.log("Email sent:", info.response);
     res
@@ -582,7 +585,7 @@ const updatePassword = async (req, res, next) => {
   res.status(200).json({ message: "Password updated successfully" });
 };
 
-exports.updatePassword=updatePassword;
+exports.updatePassword = updatePassword;
 exports.resetPassword = resetPassword;
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
