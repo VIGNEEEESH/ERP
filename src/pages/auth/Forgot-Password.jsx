@@ -1,10 +1,11 @@
 import { Card, Input, Button, Typography } from "@material-tailwind/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { message } from "antd";
+import { message, Spin } from "antd";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -12,6 +13,7 @@ const ForgotPassword = () => {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch("http://localhost:4444/api/erp/user/reset-password", {
         method: "POST",
@@ -27,9 +29,12 @@ const ForgotPassword = () => {
       } else {
         message.error(data.message || "Failed to send reset password email.");
       }
+
     } catch (error) {
       message.error("Failed to send reset password email. Please try again.");
       console.error("Error:", error.message);
+    } finally {
+      setLoading(false); // Set loading state to false after the request is complete
     }
   };
 
@@ -57,7 +62,7 @@ const ForgotPassword = () => {
             />
           </div>
           <Button type="submit" className="mt-6" fullWidth>
-            Reset Password
+            {loading ? <Spin /> : "Reset Password"} {/* Display spinner if loading state is true */}
           </Button>
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
             Remember your password? <Link to="/auth/sign-in" className="text-gray-900 ml-1">Sign in</Link>
