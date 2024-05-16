@@ -27,7 +27,7 @@ const auth=useContext(AuthContext)
                 }
 
                 const data = await response.json();
-                setLeaves(data.leaves);
+                setLeaves(data.leaves.reverse());
 
             } catch (err) {
                 message.error("Error fetching leaves:", err.message);

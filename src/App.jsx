@@ -133,24 +133,28 @@ function App() {
   if (role === "CEO") {
     routes = (
       <Routes>
+        <Route path="/*" element={<Navigate to="/ceo/dashboard/home" replace />} />
         <Route path="/ceo/dashboard/*" element={<CEODashboard />} />
       </Routes>
     );
   } else if (role === "HR") {
     routes = (
       <Routes>
+        <Route path="/*" element={<Navigate to="/hr/dashboard/home" replace />} />
         <Route path="/hr/dashboard/*" element={<HRDashboard />} />
       </Routes>
     );
   } else if (role === "DeptHead") {
     routes = (
       <Routes>
+        <Route path="/*" element={<Navigate to="/depthead/dashboard/home" replace />} />
         <Route path="/depthead/dashboard/*" element={<DEPTHEADDashboard />} />
       </Routes>
     );
   } else if (role === "Employee") {
     routes = (
       <Routes>
+        <Route path="/*" element={<Navigate to="/employee/dashboard/home" replace />} />
         <Route path="/employee/dashboard/*" element={<Dashboard />} />
       </Routes>
     );
