@@ -10,16 +10,17 @@ import {
     Input,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
+import { authorsTableData } from "@/data";
+import AttendanceCalendar from "./AttendenceCalender";
 import { message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
-import EmployeeRecord from './EmployeeRecord';
 
 export function LogRecord() {
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [pageSize, setPageSize] = useState(5);
-    const [attendance, setAttendance] = useState([]);
+    // const [attendance, setAttendance] = useState([]);
     const [employees, setEmployees] = useState([]);
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
@@ -30,15 +31,6 @@ const auth=useContext(AuthContext)
     useEffect(() => {
     const fetchAttendanceAndEmployees = async () => {
         try {
-            // Fetch attendance data
-            const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/attendance/bydate/${formattedDate}`,{headers:{Authorization:"Bearer "+auth.token}});
-            if (!attendanceResponse.ok) {
-                throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
-            }
-            const attendanceData = await attendanceResponse.json();
-           
-
-            // Fetch employee data
             const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
                 Authorization:"Bearer "+auth.token
             }});
@@ -46,7 +38,7 @@ const auth=useContext(AuthContext)
                 throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
             }
             const employeeData = await employeeResponse.json();
-            setAttendance(attendanceData.attendance);
+            // setAttendance(attendanceData.attendance);
             setEmployees(employeeData.users);
         } catch (error) {
             message.error("Error fetching attendance or employees", error.message);
@@ -58,16 +50,7 @@ const auth=useContext(AuthContext)
 
     
     
-    const data = useMemo(() => {
-        // Map attendance data with user information
-        return attendance.map(att => {
-            
-            const employee = employees.find(emp => emp._id === att.userId);
-            
-            return { ...att, employee };
-            
-        });
-    }, [attendance, employees]);
+const data = useMemo(() => (employees ? employees : []), [employees]);
     
 
   
@@ -77,24 +60,23 @@ const auth=useContext(AuthContext)
     
     // Filter data based on search query
     const filteredData = useMemo(() => {
-        return data.filter(({ employee }) => {
-            const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
-            const email = employee.email.toLowerCase();
-            return fullName.includes(searchQuery.toLowerCase()) || email.includes(searchQuery.toLowerCase());
+        return data.filter(({ firstName, lastName, email }) => {
+            const fullName = `${firstName} ${lastName}`.toLowerCase();
+            return fullName.includes(searchQuery.toLowerCase()) || email.toLowerCase().includes(searchQuery.toLowerCase());
         });
     }, [data, searchQuery]);
 
-    const columns = useMemo( 
+    const columns = useMemo(
         () => [
             {
                 Header: 'Employee Details',
                 accessor: 'firstName',
                 Cell: ({ row }) => (
                     <div className="flex items-center gap-4">
-                        <Avatar src={`http://localhost:4444/${row.original.employee.image}`} alt={row.original.name} size="sm" variant="rounded" />
+                        <Avatar src={`http://localhost:4444/${row.original.image}`} alt={row.original.name} size="sm" variant="rounded" />
                         <div>
                             <Typography variant="small" color="blue-gray" className="font-semibold">
-                                {row.original.employee.firstName}&nbsp;{row.original.employee.lastName}
+                                {row.original.firstName}&nbsp;{row.original.lastName}
                             </Typography>
                             <Typography className="text-xs font-normal text-blue-gray-500">
                                 {row.original.email}
@@ -109,24 +91,12 @@ const auth=useContext(AuthContext)
                 Cell: ({ row }) => (
                     <div>
                         <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {row.original.employee.role}
+                            {row.original.role}
                         </Typography>
                         {/* <Typography className="text-xs font-normal text-blue-gray-500">
                             {row.original.employee.role}
                         </Typography> */}
                     </div>
-                ),
-            },
-            {
-                Header: 'Status',
-                accessor: 'workStatus',
-                Cell: ({ value }) => (
-                    <Chip
-                        variant="gradient"
-                        // color={value ? "green" : "blue-gray"}
-                        value={value }
-                        className="py-0.5 px-2 text-[11px] font-medium w-fit"
-                    />
                 ),
             },
             {
@@ -181,19 +151,23 @@ const handleViewClick = (employee) => {
     setShowCalendar(true);
 };
 
-
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
             <Card>
                 {showCalendar ? (
-                    <EmployeeRecord attendanceData={selectedEmployee} />
+                    <AttendanceCalendar attendanceData={selectedEmployee} />
                 ) : (
                     <>
                         <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
                             <Typography variant="h6" color="white">
                                 Log Record
                             </Typography>
-                            <Input label="Search with the employee name" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className=" w-full bg-white text-black"/>
+                            <Input
+    label="Search with the employee name"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    className=" w-full bg-white text-black"
+/>
 
                         </CardHeader>
                         <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
