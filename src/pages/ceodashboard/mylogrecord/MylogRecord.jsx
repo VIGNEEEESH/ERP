@@ -33,7 +33,7 @@ export function MyLogRecord() {
                 }
                 const logData = await logResponse.json();
                 setLogs(logData.work.reverse());
-                console.log(logData.work)
+                
             } catch (error) {
                 message.error("Error fetching logs: " + error.message);
             }

@@ -172,6 +172,7 @@ import {
   ClipboardDocumentListIcon,
   WalletIcon,
 } from "@heroicons/react/24/solid";
+import LogRecord from './pages/ceodashboard/logrecord/LogRecord';
 const Home = lazy(() => import("./pages/hrdashboard/home"));
 const Tables = lazy(() => import("./pages/hrdashboard/tables"));
 const Notifications = lazy(() => import("./pages/hrdashboard/notifications"));
@@ -269,6 +270,12 @@ export const HRroutes = [
         name: "Employee Leaves",
         path: "/employeeleaves",
         element: <Leave />,
+      },
+      {
+        icon: <CalendarDaysIcon {...icon} />,
+        name: "Manage Log Record",
+        path: "/logrecord",
+        element: <LogRecord/>,
       },
       {
         icon: <UserCircleIcon {...icon} />,

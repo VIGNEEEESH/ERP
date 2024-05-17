@@ -156,7 +156,7 @@ const auth=useContext(AuthContext)
         setProjectToDelete(null);
     };
     const handleEditClick = (rowData) => {
-        console.log(rowData.original)
+        
         setEditProjectData(rowData.original);
         setShowEditProject(true);
         

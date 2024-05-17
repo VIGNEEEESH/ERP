@@ -151,7 +151,7 @@ export function Projects({ onAddProject }) {
         setShowDeleteModal(true);
     };
     const handleEditClick = (rowData) => {
-        console.log(rowData.original)
+        
         setEditProjectData(rowData.original);
         setShowEditProject(true);
         
