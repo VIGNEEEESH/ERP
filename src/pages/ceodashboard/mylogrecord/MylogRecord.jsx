@@ -10,7 +10,7 @@ import { useTable, usePagination } from 'react-table';
 import { message, Modal, Input } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
 
-export function MyLogRecord({ employeeId, onBack }) {
+export function MyLogRecord() {
     const [logs, setLogs] = useState([]);
     const [confirmModalVisible, setConfirmModalVisible] = useState(false);
     const [confirmUpdateModalVisible, setConfirmUpdateModalVisible] = useState(false);
@@ -22,7 +22,7 @@ export function MyLogRecord({ employeeId, onBack }) {
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const logResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/get/work/byuserid/${auth._id}`, {
+                const logResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/get/work/byuserid/${auth.userId}`, {
                     headers: {
                         Authorization: "Bearer " + auth.token,
                     },
@@ -32,13 +32,14 @@ export function MyLogRecord({ employeeId, onBack }) {
                 }
                 const logData = await logResponse.json();
                 setLogs(logData.work);
+                console.log(logData.work)
             } catch (error) {
                 message.error("Error fetching logs: " + error.message);
             }
         };
 
         fetchLogs();
-    }, [employeeId, auth.token]);
+    }, [auth.token]);
 
     const columns = React.useMemo(
         () => [
@@ -157,7 +158,7 @@ export function MyLogRecord({ employeeId, onBack }) {
                 <Typography variant="h6" color="white">
                     Log Records
                 </Typography>
-                <Button onClick={onBack} className="text-xs font-semibold">
+                <Button  className="text-xs font-semibold">
                     Back
                 </Button>
             </CardHeader>
