@@ -25,7 +25,7 @@ import {
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
-import { CheckCircleIcon, ClockIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { CalendarDaysIcon, ChartBarIcon, CheckCircleIcon, ClipboardDocumentCheckIcon, ClipboardDocumentIcon, ClipboardDocumentListIcon, ClockIcon, FolderIcon, UserCircleIcon, UserIcon, UsersIcon } from "@heroicons/react/24/solid";
 
 export function Home() {
   return (
@@ -39,19 +39,19 @@ export function Home() {
         />
         <StatisticsCard
         title="Employees Clocked In"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        icon={<UsersIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
         <StatisticsCard
         title="Projects Ongoing"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        icon={<ChartBarIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
         <StatisticsCard
         title="Tasks Pending"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        icon={<ClipboardDocumentListIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
@@ -63,13 +63,13 @@ export function Home() {
         />
         <StatisticsCard
         title="Leaves Pending"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        icon={<CalendarDaysIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
         <StatisticsCard
         title="No of Products"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        icon={<FolderIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
@@ -81,13 +81,13 @@ export function Home() {
         />
         <StatisticsCard
         title="People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        icon={<UserIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
         <StatisticsCard
         title="Completed Projects"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        icon={<ClipboardDocumentCheckIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
