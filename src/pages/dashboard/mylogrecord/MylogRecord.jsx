@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useContext } from 'react';
 import {
     Card,
@@ -7,22 +8,26 @@ import {
     Button,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
-import { message, Modal, Input } from 'antd';
+import { message, Modal, Input, DatePicker } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
+import { PencilIcon } from '@heroicons/react/24/solid';
+import moment from 'moment';
 
-export function MyLogRecord({ employeeId, onBack }) {
+export function MyLogRecord() {
     const [logs, setLogs] = useState([]);
     const [confirmModalVisible, setConfirmModalVisible] = useState(false);
     const [confirmUpdateModalVisible, setConfirmUpdateModalVisible] = useState(false);
+    const [addModalVisible, setAddModalVisible] = useState(false);
     const [selectedLog, setSelectedLog] = useState(null);
-    const [updateInput, setUpdateInput] = useState("");  
+    const [updateInput, setUpdateInput] = useState("");
+    const [newWorkDate, setNewWorkDate] = useState(new Date());
+    const [newWorkDone, setNewWorkDone] = useState("");
     const auth = useContext(AuthContext);
-    
 
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const logResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/get/work/byuserid/${auth._id}`, {
+                const logResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/get/work/byuserid/${auth.userId}`, {
                     headers: {
                         Authorization: "Bearer " + auth.token,
                     },
@@ -31,14 +36,15 @@ export function MyLogRecord({ employeeId, onBack }) {
                     throw new Error(`Failed to fetch log data: ${logResponse.status}`);
                 }
                 const logData = await logResponse.json();
-                setLogs(logData.work);
+                setLogs(logData.work.reverse());
+                
             } catch (error) {
                 message.error("Error fetching logs: " + error.message);
             }
         };
 
         fetchLogs();
-    }, [employeeId, auth.token]);
+    }, [auth.token]);
 
     const columns = React.useMemo(
         () => [
@@ -54,9 +60,9 @@ export function MyLogRecord({ employeeId, onBack }) {
                 Header: 'Update',
                 accessor: 'update',
                 Cell: ({ row }) => (
-                    <Button onClick={() => showUpdateModal(row.original)}>
-                        Update
-                    </Button>
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex"onClick={() => showUpdateModal(row.original)}>
+                        <PencilIcon className="h-4 w-4 mr-2"/>edit
+                    </Typography>
                 ),
             },
         ],
@@ -80,6 +86,9 @@ export function MyLogRecord({ employeeId, onBack }) {
             setLogs(logs.map(l => (l._id === log._id ? updatedLog : l)));
             message.success('Log updated successfully');
             setConfirmUpdateModalVisible(false);
+            setTimeout(()=>{
+                window.location.reload()
+            },[300])
         } catch (error) {
             message.error("Error updating log: " + error.message);
         }
@@ -111,7 +120,7 @@ export function MyLogRecord({ employeeId, onBack }) {
 
     const showUpdateModal = (log) => {
         setSelectedLog(log);
-        setUpdateInput(log.workDone); 
+        setUpdateInput(log.workDone);
         setConfirmUpdateModalVisible(true);
     };
 
@@ -129,6 +138,39 @@ export function MyLogRecord({ employeeId, onBack }) {
 
     const handleCancelUpdate = () => {
         setConfirmUpdateModalVisible(false);
+    };
+
+    const handleAddLog = async () => {
+        try {
+            const newLog = {
+                date: newWorkDate.toISOString().split('T')[0], // Format the date as needed (YYYY-MM-DD)
+                workDone: newWorkDone,
+                userId:auth.userId
+            };
+console.log(newLog)
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/create/work`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + auth.token,
+                },
+                body: JSON.stringify(newLog),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to add log: ${response.status}`);
+            }
+
+            const logData = await response.json();
+            setLogs([logData, ...logs]); // Assuming the response contains the added log
+            message.success('Log added successfully');
+            setAddModalVisible(false);
+            setTimeout(()=>{
+                window.location.reload()
+            },[300])
+        } catch (error) {
+            message.error("Error adding log: " + error.message);
+        }
     };
 
     const {
@@ -157,8 +199,8 @@ export function MyLogRecord({ employeeId, onBack }) {
                 <Typography variant="h6" color="white">
                     Log Records
                 </Typography>
-                <Button onClick={onBack} className="text-xs font-semibold">
-                    Back
+                <Button onClick={() => setAddModalVisible(true)} className="text-xs font-semibold">
+                    Add Log Record
                 </Button>
             </CardHeader>
             <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
@@ -202,13 +244,19 @@ export function MyLogRecord({ employeeId, onBack }) {
                     <Typography className="text-sm text-blue-gray-600">
                         Page {pageIndex + 1} of {Math.ceil(logs.length / 5)}
                     </Typography>
-                    <div>
-                        <Button onClick={() => previousPage()} disabled={!canPreviousPage} className='text-xs font-semibold'>
-                            {"<"}
-                        </Button>
-                        <Button onClick={() => nextPage()} disabled={!canNextPage} className='text-xs font-semibold'>
-                            {">"}
-                        </Button>
+                    <div className='p-2 mr-4'>
+                        <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                            {"<< "}
+                        </span>
+                        <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                            {"< "}
+                        </span>
+                        <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                            {" >"}
+                        </span>
+                        <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                            {" >>"}
+                        </span>
                     </div>
                 </div>
             </CardBody>
@@ -239,6 +287,28 @@ export function MyLogRecord({ employeeId, onBack }) {
                     onChange={(e) => setUpdateInput(e.target.value)}
                     rows={4}
                     placeholder="Update the work done"
+                />
+            </Modal>
+            {/* Add Log Modal */}
+            <Modal
+                title="Add Log Record"
+                open={addModalVisible}
+                onOk={handleAddLog}
+                okType="default"
+                onCancel={() => setAddModalVisible(false)}
+            >
+<DatePicker
+    onChange={(date) => date && setNewWorkDate(date)}
+    defaultValue={moment()} // Initialize with current date
+    format="YYYY-MM-DD"
+    style={{ marginBottom: '1rem', width: '100%' }}
+/>
+
+                <Input.TextArea
+                    value={newWorkDone}
+                    onChange={(e) => setNewWorkDone(e.target.value)}
+                    rows={4}
+                    placeholder="Enter work done"
                 />
             </Modal>
         </Card>
