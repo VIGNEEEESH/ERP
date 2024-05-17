@@ -5,20 +5,22 @@ import {
     CardBody,
     Typography,
     Button,
-    Input,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function EmployeeLog({ employeeId, onBack }) {
     const [logs, setLogs] = useState([]);
+    const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+    const [confirmUpdateModalVisible, setConfirmUpdateModalVisible] = useState(false);
+    const [selectedLog, setSelectedLog] = useState(null);
     const auth = useContext(AuthContext);
 
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const logResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/logs/get/${employeeId}`, {
+                const logResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/get/work/byuserid/${employeeId}`, {
                     headers: {
                         Authorization: "Bearer " + auth.token,
                     },
@@ -27,21 +29,22 @@ export function EmployeeLog({ employeeId, onBack }) {
                     throw new Error(`Failed to fetch log data: ${logResponse.status}`);
                 }
                 const logData = await logResponse.json();
-                setLogs(logData.logs);
+                setLogs(logData.work);
             } catch (error) {
-                message.error("Error fetching logs", error.message);
+                message.error("Error fetching logs: " + error.message);
             }
         };
 
         fetchLogs();
     }, [employeeId, auth.token]);
+    
 
     const columns = React.useMemo(
         () => [
             {
                 Header: 'Date',
                 accessor: 'date',
-                Cell: ({ value }) => new Date(value).toLocaleDateString(),
+               
             },
             {
                 Header: 'Work Done',
@@ -51,7 +54,7 @@ export function EmployeeLog({ employeeId, onBack }) {
                 Header: 'Update',
                 accessor: 'update',
                 Cell: ({ row }) => (
-                    <Button onClick={() => handleUpdate(row.original)}>
+                    <Button onClick={() => showUpdateModal(row.original)}>
                         Update
                     </Button>
                 ),
@@ -60,7 +63,7 @@ export function EmployeeLog({ employeeId, onBack }) {
                 Header: 'Delete',
                 accessor: 'delete',
                 Cell: ({ row }) => (
-                    <Button onClick={() => handleDelete(row.original.id)}>
+                    <Button onClick={() => showDeleteModal(row.original._id)}>
                         Delete
                     </Button>
                 ),
@@ -72,11 +75,13 @@ export function EmployeeLog({ employeeId, onBack }) {
     const handleUpdate = (log) => {
         // Implement the logic to update the log record
         console.log('Update log:', log);
+        setConfirmUpdateModalVisible(false);
     };
 
     const handleDelete = async (logId) => {
         try {
-            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/logs/delete/${logId}`, {
+            console.log(logId)
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/delete/work/byid/${logId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: "Bearer " + auth.token,
@@ -87,9 +92,39 @@ export function EmployeeLog({ employeeId, onBack }) {
             }
             setLogs(logs.filter(log => log.id !== logId));
             message.success('Log deleted successfully');
+            setTimeout(() => {
+                window.location.reload();
+            }, 300);
         } catch (error) {
-            message.error("Error deleting log", error.message);
+            message.error("Error deleting log: " + error.message);
         }
+        setConfirmModalVisible(false);
+    };
+
+    const showDeleteModal = (logId) => {
+        setSelectedLog(logId);
+        setConfirmModalVisible(true);
+    };
+
+    const showUpdateModal = (log) => {
+        setSelectedLog(log);
+        setConfirmUpdateModalVisible(true);
+    };
+
+    const handleConfirmDelete = () => {
+        handleDelete(selectedLog);
+    };
+
+    const handleConfirmUpdate = () => {
+        handleUpdate(selectedLog);
+    };
+
+    const handleCancelDelete = () => {
+        setConfirmModalVisible(false);
+    };
+
+    const handleCancelUpdate = () => {
+        setConfirmUpdateModalVisible(false);
     };
 
     const {
@@ -173,6 +208,30 @@ export function EmployeeLog({ employeeId, onBack }) {
                     </div>
                 </div>
             </CardBody>
+            {/* Confirmation Delete Modal */}
+            <Modal
+                title="Confirm Delete"
+                visible={confirmModalVisible}
+                onOk={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                okType='default'
+                okText="Yes"
+                cancelText="Cancel"
+            >
+                Are you sure you want to delete this log?
+            </Modal>
+            {/* Confirmation Update Modal */}
+            <Modal
+                title="Confirm Update"
+                visible={confirmUpdateModalVisible}
+                onOk={handleConfirmUpdate}
+                onCancel={handleCancelUpdate}
+                okType='default'
+                okText="Yes"
+                cancelText="Cancel"
+            >
+                Are you sure you want to update this log?
+            </Modal>
         </Card>
     );
 }
