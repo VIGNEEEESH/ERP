@@ -9,6 +9,7 @@ import {
 import { useTable, usePagination } from 'react-table';
 import { message, Modal, Input } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
+import { PencilIcon } from '@heroicons/react/24/solid';
 
 export function MyLogRecord() {
     const [logs, setLogs] = useState([]);
@@ -31,7 +32,7 @@ export function MyLogRecord() {
                     throw new Error(`Failed to fetch log data: ${logResponse.status}`);
                 }
                 const logData = await logResponse.json();
-                setLogs(logData.work);
+                setLogs(logData.work.reverse());
                 console.log(logData.work)
             } catch (error) {
                 message.error("Error fetching logs: " + error.message);
@@ -55,9 +56,9 @@ export function MyLogRecord() {
                 Header: 'Update',
                 accessor: 'update',
                 Cell: ({ row }) => (
-                    <Button onClick={() => showUpdateModal(row.original)}>
-                        Update
-                    </Button>
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex"onClick={() => showUpdateModal(row.original)}>
+                        <PencilIcon className="h-4 w-4 mr-2"/>update
+                    </Typography>
                 ),
             },
         ],
@@ -159,7 +160,7 @@ export function MyLogRecord() {
                     Log Records
                 </Typography>
                 <Button  className="text-xs font-semibold">
-                    Back
+                    Add Log Record
                 </Button>
             </CardHeader>
             <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
@@ -203,20 +204,26 @@ export function MyLogRecord() {
                     <Typography className="text-sm text-blue-gray-600">
                         Page {pageIndex + 1} of {Math.ceil(logs.length / 5)}
                     </Typography>
-                    <div>
-                        <Button onClick={() => previousPage()} disabled={!canPreviousPage} className='text-xs font-semibold'>
-                            {"<"}
-                        </Button>
-                        <Button onClick={() => nextPage()} disabled={!canNextPage} className='text-xs font-semibold'>
-                            {">"}
-                        </Button>
-                    </div>
+                    <div className='p-2 mr-4'>
+                                <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                                    {"<< "}
+                                </span>
+                                <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                                    {"< "}
+                                </span>
+                                <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                                    {" >"}
+                                </span>
+                                <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                                    {" >>"}
+                                </span>
+                            </div>
                 </div>
             </CardBody>
             {/* Confirmation Delete Modal */}
             <Modal
                 title="Confirm Delete"
-                visible={confirmModalVisible}
+                open={confirmModalVisible}
                 onOk={handleConfirmDelete}
                 onCancel={handleCancelDelete}
                 okType='default'
@@ -228,7 +235,7 @@ export function MyLogRecord() {
             {/* Confirmation Update Modal */}
             <Modal
                 title="Update Log"
-                visible={confirmUpdateModalVisible}
+                open={confirmUpdateModalVisible}
                 onOk={handleConfirmUpdate}
                 onCancel={handleCancelUpdate}
                 okType='default'

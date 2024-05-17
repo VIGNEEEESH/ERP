@@ -198,14 +198,20 @@ export function EmployeeLog({ employeeId, onBack }) {
                     <Typography className="text-sm text-blue-gray-600">
                         Page {pageIndex + 1} of {Math.ceil(logs.length / 5)}
                     </Typography>
-                    <div>
-                        <Button onClick={() => previousPage()} disabled={!canPreviousPage} className='text-xs font-semibold'>
-                            {"<"}
-                        </Button>
-                        <Button onClick={() => nextPage()} disabled={!canNextPage} className='text-xs font-semibold'>
-                            {">"}
-                        </Button>
-                    </div>
+                   <div className='p-2 mr-4'>
+                                <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                                    {"<< "}
+                                </span>
+                                <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                                    {"< "}
+                                </span>
+                                <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                                    {" >"}
+                                </span>
+                                <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                                    {" >>"}
+                                </span>
+                            </div>
                 </div>
             </CardBody>
             {/* Confirmation Delete Modal */}
@@ -223,7 +229,7 @@ export function EmployeeLog({ employeeId, onBack }) {
             {/* Confirmation Update Modal */}
             <Modal
                 title="Confirm Update"
-                visible={confirmUpdateModalVisible}
+                open={confirmUpdateModalVisible}
                 onOk={handleConfirmUpdate}
                 onCancel={handleCancelUpdate}
                 okType='default'
