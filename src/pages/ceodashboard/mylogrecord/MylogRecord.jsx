@@ -292,7 +292,7 @@ export function MyLogRecord() {
                 }
                 const logData = await logResponse.json();
                 setLogs(logData.work.reverse());
-                console.log(logData.work);
+                
             } catch (error) {
                 message.error("Error fetching logs: " + error.message);
             }
@@ -315,8 +315,8 @@ export function MyLogRecord() {
                 Header: 'Update',
                 accessor: 'update',
                 Cell: ({ row }) => (
-                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => showUpdateModal(row.original)}>
-                        <PencilIcon className="h-4 w-4 mr-2"/>update
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex"onClick={() => showUpdateModal(row.original)}>
+                        <PencilIcon className="h-4 w-4 mr-2"/>edit
                     </Typography>
                 ),
             },
