@@ -25,7 +25,7 @@ import {
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
-import { CheckCircleIcon, ClockIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { CalendarDaysIcon, ChartPieIcon, CheckCircleIcon, ClipboardDocumentIcon, ClockIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 
 export function Home() {
   return (
@@ -48,53 +48,30 @@ export function Home() {
           />
         ))} */}
         <StatisticsCard
-        title="No of People Avalible"
+        title="No of Projects Involved"
         icon={<UserCircleIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
         <StatisticsCard
-        title="No of People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        title="No of pending leaves"
+        icon={<CalendarDaysIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
         <StatisticsCard
-        title="No of People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        title="No of Tasks Pending"
+        icon={<ClipboardDocumentIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
         <StatisticsCard
-        title="No of People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
+        title="No of Projects Completed"
+        icon={<ChartPieIcon className="w-8 h-8"/>}
         color="gray"
         value="50"
         />
-        <StatisticsCard
-        title="No of People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
-        color="gray"
-        value="50"
-        />
-        <StatisticsCard
-        title="No of People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
-        color="gray"
-        value="50"
-        />
-        <StatisticsCard
-        title="No of People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
-        color="gray"
-        value="50"
-        />
-        <StatisticsCard
-        title="No of People Avalible"
-        icon={<UserCircleIcon className="w-8 h-8"/>}
-        color="gray"
-        value="50"
-        />
+        
       </div>
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
         {statisticsChartsData.map((props) => (
