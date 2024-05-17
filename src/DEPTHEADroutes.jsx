@@ -16,7 +16,7 @@ import {
   BuildingOfficeIcon,
   CalendarDaysIcon,
 } from "@heroicons/react/24/solid";
-const Home = lazy(() => import('@/pages/dashboard/Home'));
+const Home = lazy(() => import('@/pages/deptheaddashboard/Home'));
 const Notifications = lazy(() => import('@/pages/dashboard/Notifications'));
 const LeaveRequests = lazy(() => import('./pages/deptheaddashboard/leaverequest'));
 const Logout = lazy(() => import('./pages/deptheaddashboard/logout'));
