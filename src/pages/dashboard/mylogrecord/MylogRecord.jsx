@@ -12,6 +12,8 @@ import { AuthContext } from '@/pages/auth/Auth-context';
 import { PencilIcon } from '@heroicons/react/24/solid';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import "./DatePickerStyle.css"
+import { subDays } from 'date-fns';
 
 export function MyLogRecord() {
     const [logs, setLogs] = useState([]);
@@ -23,6 +25,13 @@ export function MyLogRecord() {
     const [newWorkDate, setNewWorkDate] = useState(new Date());
     const [newWorkDone, setNewWorkDone] = useState("");
     const auth = useContext(AuthContext);
+    const filterLast5Days = (date) => {
+    const now = new Date();
+    const fiveDaysAgo = subDays(now, 5);
+    return date >= fiveDaysAgo && date <= now;
+    };
+    const today = new Date();
+    const minDate = subDays(today, 5)
 
     useEffect(() => {
         const fetchLogs = async () => {
@@ -297,12 +306,15 @@ export function MyLogRecord() {
                 okType="default"
                 onCancel={() => setAddModalVisible(false)}
             >
+                <div className='datepicker-container'>
                 <ReactDatePicker
                     selected={newWorkDate}
                     onChange={(date) => setNewWorkDate(date)}
                     dateFormat="yyyy-MM-dd"
-                    className="w-full mb-4"
-                />
+                    className="custom-datepicker"
+                     minDate={minDate}
+                    maxDate={today}
+                /></div>
                 <Input.TextArea
                     value={newWorkDone}
                     onChange={(e) => setNewWorkDone(e.target.value)}
