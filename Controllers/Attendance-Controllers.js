@@ -1,7 +1,7 @@
 const HttpError = require("../Middleware/http-error");
 const { validationResult } = require("express-validator");
 const Attendance = require("../Models/Attendance");
-
+const Work = require("../Models/Work"); // Ensure this path is correct
 const createAttendance = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -217,7 +217,7 @@ const addLoggedOutTime = async (req, res, next) => {
   }
   res.status(201).json({ attendance: attendance });
 };
-// Function to log out all users
+
 const logoutAllUsers = async () => {
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().split("T")[0];
@@ -226,35 +226,59 @@ const logoutAllUsers = async () => {
   });
 
   try {
-    // Find all users who are still logged in
+    // Find all users who are still logged in (exclude those who have logged out)
     const loggedInUsers = await Attendance.find({
       date: formattedDate,
       loggedOutTime: { $exists: false },
     });
 
-    // Log out each user
-    loggedInUsers.forEach(async (user) => {
-      user.loggedOutTime = currentTime;
-      await user.save();
-    });
+    // Log out each user and create an empty work entry if it doesn't exist
+    for (const user of loggedInUsers) {
+      try {
+        // Check if a work entry already exists for the user on the current date
+        const existingWork = await Work.findOne({
+          date: formattedDate,
+          userId: user.userId,
+        });
 
-    console.log("All users logged out successfully.");
+        if (!existingWork) {
+          // Create an empty work entry
+          const newWork = new Work({
+            date: formattedDate,
+            workDone: "-",
+            userId: user.userId,
+          });
+          // await newWork.save();
+        }
+
+        // Log out the user
+        user.loggedOutTime = currentTime;
+        await user.save();
+      } catch (err) {
+        console.error(`Error processing user ${user.userId}:`, err);
+      }
+    }
+
+    console.log("All users logged out and work entries created successfully.");
   } catch (err) {
-    console.error("Error logging out users:", err);
+    console.error("Error logging out users and creating work entries:", err);
   }
 };
 
-// Schedule the function to run at the end of the working day (e.g., after 12:00 AM)
+// Schedule the function to run at the end of the working day (e.g., 12:00 AM)
 const scheduleLogout = () => {
-  // Calculate the time until the end of the day (in milliseconds)
+  // Calculate the time until 12:00 AM tomorrow (in milliseconds)
   const now = new Date();
-
   const endOfDay = new Date(now);
   endOfDay.setHours(24, 0, 0, 0);
   const timeUntilEndOfDay = endOfDay - now;
 
-  // Schedule the logout function to run at the end of the day
-  setTimeout(logoutAllUsers, timeUntilEndOfDay);
+  // Schedule the initial logout function to run at the end of the day
+  setTimeout(() => {
+    logoutAllUsers();
+    // Schedule the logout function to run every 24 hours
+    setInterval(logoutAllUsers, 24 * 60 * 60 * 1000);
+  }, timeUntilEndOfDay);
 };
 
 // Call the function to schedule the logout task

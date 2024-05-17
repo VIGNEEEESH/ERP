@@ -42,7 +42,6 @@ router.get(
 router.post(
   "/create/work",
   [
-    check("date").isLength({ min: 2, max: 255 }),
     check("workDone").isLength({ min: 2 }),
     check("userId").isLength({ min: 2 }),
   ],
