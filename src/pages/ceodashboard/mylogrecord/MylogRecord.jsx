@@ -57,7 +57,7 @@ export function MyLogRecord() {
                 accessor: 'update',
                 Cell: ({ row }) => (
                     <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex"onClick={() => showUpdateModal(row.original)}>
-                        <PencilIcon className="h-4 w-4 mr-2"/>update
+                        <PencilIcon className="h-4 w-4 mr-2"/>edit
                     </Typography>
                 ),
             },
