@@ -99,7 +99,6 @@ export function AddEmployeeShort() {
                                 className="mt-1 block w-full py-2 px-3 border border-blue-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             >
                                 <option value="">Select Role</option>
-                                <option value="CEO">CEO</option>
                                 <option value="HR">HR</option>
                                 <option value="DeptHead">DeptHead</option>
                                 <option value="Employee">Employee</option>
