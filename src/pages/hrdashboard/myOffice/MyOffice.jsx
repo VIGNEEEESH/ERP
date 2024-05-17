@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { Card, CardHeader, CardBody, Typography, Avatar, Chip, Button } from "@material-tailwind/react";
-import { message, Modal } from 'antd';
+import { message, Modal, Input } from 'antd';  // Import Input from antd
 import { AuthContext } from '@/pages/auth/Auth-context';
 
 export function MyOffice() {
@@ -11,6 +11,7 @@ export function MyOffice() {
     const [confirmClockOutModalVisible, setConfirmClockOutModalVisible] = useState(false);
     const [isClockedIn, setIsClockedIn] = useState(false);
     const [isClockedOut, setIsClockedOut] = useState(false);
+    const [workDone, setWorkDone] = useState("");  // State for work done input
     const auth = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
@@ -99,8 +100,55 @@ export function MyOffice() {
     const handleCancelClockIn = () => {
         setConfirmModalVisible(false);
     };
+
+    const handleClockOut = async () => {
+        try {
+            const attendanceData = {
+                ...formData,
+                attendanceStatus: "Absent"
+            };
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/add/loggedouttime`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + auth.token,
+                },
+                body: JSON.stringify(attendanceData)
+            });
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            // Post work done data
+            const workData = {
+                date: formattedDate,
+                workDone,
+                userId: auth.userId
+            };
+            const workResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/create/work`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + auth.token,
+                },
+                body: JSON.stringify(workData)
+            });
+            if (!workResponse.ok) {
+                throw new Error("Failed to submit work done data");
+            }
+
+            setIsClockedIn(false);
+            message.success("Clocked Out successfully");
+            setTimeout(()=>{
+                window.location.reload()
+            },[300])
+        } catch (err) {
+            message.error("Something went wrong while creating the attendance, please try again");
+        }
+    };
+
     const handleConfirmClockOut = () => {
-        handleClockOut("Absent");
+        handleClockOut();
         setConfirmClockOutModalVisible(false);
     };
 
@@ -114,65 +162,35 @@ export function MyOffice() {
             return { ...att, employee };
         });
     }, [attendance, employees]);
-// Function for clocking out
-const handleClockOut = async () => {
-    try {
-        const attendanceData = {
-            ...formData,
-            attendanceStatus: "Absent"
-        };
-        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/add/loggedouttime`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + auth.token,
-            },
-            body: JSON.stringify(attendanceData)
-        });
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        setIsClockedIn(false);
-        message.success("Clocked Out successfully")
-        setTimeout(()=>{
-            window.location.reload()
-        },[300])
-    } catch (err) {
-        message.error("Something went wrong while creating the attendance, please try again");
-    }
-};
-
-
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
             <Card>
-           
-<CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex items-center justify-between">
-    <div className="flex items-center">
-        <Typography variant="h6" color="white" className="mr-4">
-            My Office
-        </Typography>
-        <span>Last Logged in at so & so</span>
-    </div>
-    <div className="ml-auto">
-        <Button
-            color="green"
-            disabled={isClockedIn==="Present"}
-            onClick={() => setConfirmModalVisible(true)}
-        >
-            Clock In
-        </Button>
-        <Button
-            color="red"
-            disabled={isClockedOut || !isClockedIn}
-            onClick={() => setConfirmClockOutModalVisible(true)}
-            className="ml-4"
-        >
-            Clock Out
-        </Button>
-    </div>
-</CardHeader>
+                <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex items-center justify-between">
+                    <div className="flex items-center">
+                        <Typography variant="h6" color="white" className="mr-4">
+                            My Office
+                        </Typography>
+                        <span>Last Logged in at so & so</span>
+                    </div>
+                    <div className="ml-auto">
+                        <Button
+                            color="green"
+                            disabled={isClockedIn === "Present"}
+                            onClick={() => setConfirmModalVisible(true)}
+                        >
+                            Clock In
+                        </Button>
+                        <Button
+                            color="red"
+                            disabled={isClockedOut || !isClockedIn}
+                            onClick={() => setConfirmClockOutModalVisible(true)}
+                            className="ml-4"
+                        >
+                            Clock Out
+                        </Button>
+                    </div>
+                </CardHeader>
                 <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                     <table className="w-full min-w-[640px] table-auto">
                         <thead>
@@ -227,7 +245,6 @@ const handleClockOut = async () => {
             </Card>
             
             <Modal  
-            
                 title="Confirm Clock In"
                 visible={confirmModalVisible}
                 onOk={handleConfirmClockIn}
@@ -247,7 +264,14 @@ const handleClockOut = async () => {
                 okType='default'
                 cancelText="Cancel"
             >
-                Are you sure you want to clock out?
+                <div>Are you sure you want to clock out?</div>
+                <Input.TextArea
+                    placeholder="Enter the work done for the day"
+                    value={workDone}
+                    onChange={(e) => setWorkDone(e.target.value)}
+                    rows={4}
+                    className="mt-4"
+                />
             </Modal>
         </div>
     );
