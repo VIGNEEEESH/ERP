@@ -31,7 +31,7 @@ const CEOProfile = lazy(() => import('./pages/ceodashboard/profile/CEOProfile'))
 const Settings = lazy(() => import('./pages/ceodashboard/settings/Settings'));
 const Logout = lazy(() => import('./pages/ceodashboard/logout'));
 const LogRecord = lazy(() => import('./pages/ceodashboard/logrecord/LogRecord'));
-const MyLogRecord = lazy(() => import('./pages/ceodashboard/Mylogrecord/MylogRecord'));
+const MyLogRecord = lazy(() => import('./pages/ceodashboard/mylogrecord/MylogRecord'));
 
 const icon = {
   className: "w-5 h-5 text-inherit",
