@@ -163,7 +163,7 @@ const EmployeeTasks = lazy(() => import("./pages/dashboard/Tasks/EmployeeTasks")
 const CompanyProducts = lazy(() => import("./pages/dashboard/companyproducts/CompanyProducts"));
 const Employee = lazy(() => import("./pages/dashboard/profile/Employee"));
 const WorkStatus = lazy(() => import("./pages/dashboard/workstatus/WorkStatus"));
-
+const MyLogRecord = lazy(() => import("./pages/dashboard/mylogrecord/MylogRecord"));
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -219,6 +219,12 @@ export const routes = [
         name: "Communication",
         path: "/communication",
         element: <CommunicationComponent />,
+      },
+      {
+        icon: <CalendarDaysIcon {...icon} />,
+        name: "My Log Record",
+        path: "/mylogrecord",
+        element: <MyLogRecord/>,
       },
       {
         icon: <InformationCircleIcon {...icon} />,
