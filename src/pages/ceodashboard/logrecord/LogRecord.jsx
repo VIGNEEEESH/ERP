@@ -388,7 +388,7 @@ export function LogRecord() {
             <Card>
                 <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
                     <Typography variant="h6" color="white">
-                        User Details
+                        Log Record
                     </Typography>
                     <Input
                         label="Search with the employee name"
