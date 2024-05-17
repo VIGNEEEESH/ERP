@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useContext } from 'react';
 import {
     Card,
@@ -8,10 +7,11 @@ import {
     Button,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
-import { message, Modal, Input, DatePicker } from 'antd';
+import { message, Modal, Input } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
 import { PencilIcon } from '@heroicons/react/24/solid';
-import moment from 'moment';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export function MyLogRecord() {
     const [logs, setLogs] = useState([]);
@@ -60,7 +60,7 @@ export function MyLogRecord() {
                 Header: 'Update',
                 accessor: 'update',
                 Cell: ({ row }) => (
-                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex"onClick={() => showUpdateModal(row.original)}>
+                    <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => showUpdateModal(row.original)}>
                         <PencilIcon className="h-4 w-4 mr-2"/>edit
                     </Typography>
                 ),
@@ -86,9 +86,9 @@ export function MyLogRecord() {
             setLogs(logs.map(l => (l._id === log._id ? updatedLog : l)));
             message.success('Log updated successfully');
             setConfirmUpdateModalVisible(false);
-            setTimeout(()=>{
+            setTimeout(() => {
                 window.location.reload()
-            },[300])
+            }, [300])
         } catch (error) {
             message.error("Error updating log: " + error.message);
         }
@@ -145,9 +145,9 @@ export function MyLogRecord() {
             const newLog = {
                 date: newWorkDate.toISOString().split('T')[0], // Format the date as needed (YYYY-MM-DD)
                 workDone: newWorkDone,
-                userId:auth.userId
+                userId: auth.userId
             };
-console.log(newLog)
+            console.log(newLog)
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/create/work`, {
                 method: 'POST',
                 headers: {
@@ -165,9 +165,9 @@ console.log(newLog)
             setLogs([logData, ...logs]); // Assuming the response contains the added log
             message.success('Log added successfully');
             setAddModalVisible(false);
-            setTimeout(()=>{
+            setTimeout(() => {
                 window.location.reload()
-            },[300])
+            }, [300])
         } catch (error) {
             message.error("Error adding log: " + error.message);
         }
@@ -289,7 +289,7 @@ console.log(newLog)
                     placeholder="Update the work done"
                 />
             </Modal>
-            {/* Add Log Modal */}
+
             <Modal
                 title="Add Log Record"
                 open={addModalVisible}
@@ -297,13 +297,12 @@ console.log(newLog)
                 okType="default"
                 onCancel={() => setAddModalVisible(false)}
             >
-<DatePicker
-    onChange={(date) => date && setNewWorkDate(date)}
-    defaultValue={moment()} // Initialize with current date
-    format="YYYY-MM-DD"
-    style={{ marginBottom: '1rem', width: '100%' }}
-/>
-
+                <ReactDatePicker
+                    selected={newWorkDate}
+                    onChange={(date) => setNewWorkDate(date)}
+                    dateFormat="yyyy-MM-dd"
+                    className="w-full mb-4"
+                />
                 <Input.TextArea
                     value={newWorkDone}
                     onChange={(e) => setNewWorkDone(e.target.value)}
