@@ -10,22 +10,35 @@ const createWork = async (req, res, next) => {
   }
   const { date, workDone, userId } = req.body;
 
-  const createdWork = new Work({
-    date,
-    workDone,
-    userId,
-  });
   try {
+    const existingWork = await Work.findOne({ date: date, userId: userId });
+    if (existingWork) {
+      // Handle duplicate date entry
+      const error = new HttpError(
+        "Work entry for this date already exists, please update instead",
+        409
+      );
+      return next(error);
+    }
+
+    const createdWork = new Work({
+      date,
+      workDone,
+      userId,
+    });
+
     await createdWork.save();
+    res.status(201).json({ createdWork: createdWork });
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Something went wrong while saving the data, please try again",
       500
     );
     return next(error);
   }
-  res.status(201).json({ createdWork: createdWork });
 };
+
 const getAllWorks = async (req, res, next) => {
   let works;
   try {
