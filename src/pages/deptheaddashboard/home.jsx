@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Typography,
   Card,
@@ -26,40 +26,92 @@ import {
   ordersOverviewData,
 } from "@/data";
 import { CalendarDaysIcon, ChartPieIcon, CheckCircleIcon, ClipboardDocumentIcon, ClockIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { AuthContext } from "../auth/Auth-context";
+import { message } from "antd";
 
 export function Home() {
+  const auth=useContext(AuthContext)
+  const [department,setDepartment]=useState([])
+  const [projects,setProjects]=useState([])
+  const [leaves,setLeaves]=useState([])
+  const [tasks,setTasks]=useState([])
+
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+  useEffect(()=>{
+    const fetchData=async()=>{
+      try{
+    const departmentResponse=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/get/department/byuserid/${auth.userId}`,{headers:{Authorization:"Bearer "+auth.token}})
+    const projectResponse=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/projects/byEmail/${auth.email}`,{headers:{Authorization:"Bearer "+auth.token}})
+    const taskResponse=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/get/tasks/byemail/${auth.email}`,{headers:{Authorization:"Bearer "+auth.token}})
+    const leaveResponse=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/leave/get/leave/byemail/${auth.email}`,{headers:{Authorization:"Bearer "+auth.token}})
+    
+
+    if (!departmentResponse.ok || !projectResponse.ok || !leaveResponse.ok|| !taskResponse.ok) {
+      throw new Error(`Failed to fetch data`);
+  }
+  const departmentData = await departmentResponse.json();
+  const projectData = await projectResponse.json();
+  const leaveData = await leaveResponse.json();
+  const taskData = await taskResponse.json();
+
+  
+  setDepartment(departmentData.department);
+  setProjects(projectData.projects);
+  setLeaves(leaveData.leaves);
+  setTasks(taskData.tasks);
+ 
+    }  catch(err){
+      message.error("Error fetching data", err.message);
+    }
+  }
+    fetchData()
+  },[auth.token])
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        <StatisticsCard
-        title="Department head role"
-        icon={<ChartPieIcon className="w-8 h-8"/>}
-        color="gray"
-        value="Technical"
-        />
+      <StatisticsCard
+    title="Department Name"
+    icon={<ChartPieIcon className="w-8 h-8"/>}
+    color="gray"
+    value={department.map(dept => dept.departmentName).join(', ')}
+/>
+
        <StatisticsCard
         title="No of Projects Involved"
         icon={<UserCircleIcon className="w-8 h-8"/>}
         color="gray"
-        value="50"
+        value={projects.length}
         />
         <StatisticsCard
         title="No of pending leaves"
         icon={<CalendarDaysIcon className="w-8 h-8"/>}
         color="gray"
-        value="50"
+        value={leaves.filter(leave => leave.status !="Approved").length}
         />
         <StatisticsCard
-        title="No of Tasks Assigned"
+        title="No of Tasks Pending"
         icon={<ClipboardDocumentIcon className="w-8 h-8"/>}
         color="gray"
-        value="50"
+        value={tasks.filter(task => task.progress !=100).length}
+        />
+        <StatisticsCard
+        title="No of Tasks Completed"
+        icon={<ClipboardDocumentIcon className="w-8 h-8"/>}
+        color="gray"
+        value={tasks.filter(task => task.progress ==100).length}
+        />
+        <StatisticsCard
+        title="No of Projects Pending"
+        icon={<ChartPieIcon className="w-8 h-8"/>}
+        color="gray"
+        value={projects.filter(project => project.progress !=100).length}
         />
         <StatisticsCard
         title="No of Projects Completed"
         icon={<ChartPieIcon className="w-8 h-8"/>}
         color="gray"
-        value="50"
+        value={projects.filter(project => project.progress ==100).length}
         />
       </div>
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">

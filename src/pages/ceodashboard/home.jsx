@@ -108,6 +108,12 @@ export function Home() {
         value={tasks.filter(task => task.progress !== 100).length}
         />
         <StatisticsCard
+        title="Tasks Completed"
+        icon={<ClipboardDocumentListIcon className="w-8 h-8"/>}
+        color="gray"
+        value={tasks.filter(task => task.progress == 100).length}
+        />
+        <StatisticsCard
         title="Total Clients"
         icon={<UserCircleIcon className="w-8 h-8"/>}
         color="gray"
