@@ -71,6 +71,20 @@ const getDepartmentById = async (req, res, next) => {
   }
   res.status(200).json({ department: department });
 };
+const getDepartmentByUserId = async (req, res, next) => {
+  const userId = req.params.userId;
+  let department;
+  try {
+    department = await Department.find({ userId: userId });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong while fetching the data, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(200).json({ department: department });
+};
 const updateDepartmentById = async (req, res, next) => {
   const id = req.params.id;
   let department;
@@ -134,5 +148,6 @@ const deleteDepartmentById = async (req, res, next) => {
 exports.createDepartment = createDepartment;
 exports.getAllDepartments = getAllDepartments;
 exports.getDepartmentById = getDepartmentById;
+exports.getDepartmentByUserId = getDepartmentByUserId;
 exports.updateDepartmentById = updateDepartmentById;
 exports.deleteDepartmentById = deleteDepartmentById;

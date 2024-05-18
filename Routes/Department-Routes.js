@@ -39,6 +39,12 @@ router.get(
   cacheMiddleware,
   departmentControllers.getDepartmentById
 );
+router.get(
+  "/get/department/byuserid/:userId",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
+  departmentControllers.getDepartmentByUserId
+);
 
 router.post(
   "/create/department",

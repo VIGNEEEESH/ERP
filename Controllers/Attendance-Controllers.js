@@ -270,7 +270,7 @@ const scheduleLogout = () => {
   // Calculate the time until 12:00 AM tomorrow (in milliseconds)
   const now = new Date();
   const endOfDay = new Date(now);
-  endOfDay.setHours(11, 0, 0, 0);
+  endOfDay.setHours(24, 0, 0, 0);
   const timeUntilEndOfDay = endOfDay - now;
 
   // Schedule the initial logout function to run at the end of the day
