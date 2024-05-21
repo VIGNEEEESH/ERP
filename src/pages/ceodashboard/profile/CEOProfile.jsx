@@ -131,7 +131,7 @@ const auth=useContext(AuthContext)
       </div>
       <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
         <CardBody className="p-4 space-y-6">
-          <div className="flex items-start justify-between gap-6">
+          <div className="flex items-start justify-start gap-2">
             <Avatar
               src={`http://localhost:4444/${formData.image}`}
               alt="Profile Picture"
@@ -139,7 +139,7 @@ const auth=useContext(AuthContext)
               variant="rounded"
               className="rounded-lg shadow-lg shadow-blue-gray-500/40"
             />
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-2 ml-8">
               <Typography variant="h5" color="blue-gray" className="mb-4 mt-2 gap-4">
                 {isEditing ? (
                   <>
@@ -193,24 +193,6 @@ const auth=useContext(AuthContext)
                   formData.email
                 )}
               </Typography>
-            </div>
-            <div className="w-96">
-              <Tabs value="app">
-                <TabsHeader>
-                  <Tab value="app">
-                    <HomeIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    App
-                  </Tab>
-                  <Tab value="message">
-                    <ChatBubbleLeftEllipsisIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
-                    Message
-                  </Tab>
-                  <Tab value="settings">
-                    <Cog6ToothIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    Settings
-                  </Tab>
-                </TabsHeader>
-              </Tabs>
             </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
