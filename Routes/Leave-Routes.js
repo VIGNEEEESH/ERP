@@ -4,7 +4,11 @@ const router = express.Router();
 const leaveControllers = require("../Controllers/Leave-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const redis = require("redis");
-const client = redis.createClient();
+const client = redis.createClient({
+  password: "nJGerjQelfiQztvkIbyFvUOaXhFLdrTv",
+  host: "redis-12902.c330.asia-south1-1.gce.redns.redis-cloud.com",
+  port: 12902,
+});
 
 client.on("connect", () => {
   console.log("Client connected to redis");

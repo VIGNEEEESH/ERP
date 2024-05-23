@@ -3,6 +3,7 @@
     "DB_USER": "root",
     "DB_PASSWORD": "4444",
     "DB_NAME": "ERP",
-    "JWT_KEY": "ERP_Correct_Steps_Consultancy"
+    "JWT_KEY": "ERP_Correct_Steps_Consultancy",
+    "REDIS_PASSWORD": "4444"
   }
 }
