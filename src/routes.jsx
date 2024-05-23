@@ -151,8 +151,7 @@ const Home = lazy(() => import("@/pages/dashboard/Home"));
 const Profile = lazy(() => import("@/pages/dashboard/Profile"));
 const Tables = lazy(() => import("@/pages/dashboard/Tables"));
 const Notifications = lazy(() => import("@/pages/dashboard/Notifications"));
-const SignIn = lazy(() => import("@/pages/auth/SignIn"));
-const SignUp = lazy(() => import("@/pages/auth/SignUp"));
+
 const CommunicationComponent = lazy(() => import("@/pages/dashboard/Communication"));
 const Logout = lazy(() => import("./pages/dashboard/Logout"));
 const Settings = lazy(() => import("./pages/dashboard/settings/Settings"));
