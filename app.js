@@ -53,7 +53,7 @@ mongoose
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.rw3waqy.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
   )
   .then(() => {
-    const server = app.listen(80, () => {
+    const server = app.listen(3000, () => {
       console.log(`Server is running on port ${server.address().port}`);
     });
   })
