@@ -6,9 +6,9 @@ const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
 const redis = require("redis");
 const client = redis.createClient({
-  password: "nJGerjQelfiQztvkIbyFvUOaXhFLdrTv",
-  host: "redis-12902.c330.asia-south1-1.gce.redns.redis-cloud.com",
-  port: 12902,
+  password: "BqNAC2mcNfO4GnVwVv0jNrRbDYkANFM7",
+  host: "redis-16938.c301.ap-south-1-1.ec2.redns.redis-cloud.com",
+  port: 16938,
 });
 
 client.on("connect", () => {

@@ -184,7 +184,6 @@ const getUsersByRole = async (req, res, next) => {
 };
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email);
   let user;
   try {
     user = await User.findOne({ email: email.toLowerCase() });
@@ -493,17 +492,17 @@ const resetPassword = async (req, res, next) => {
 
   // Create transporter using Outlook mail SMTP server
   const transporter = nodemailer.createTransport({
-    host: "smtp.office365.com",
+    host: "smtp.hostinger.com",
     port: 587,
     secure: false,
     auth: {
-      user: "support@thecorrectsteps.com", // Replace with your Outlook email
+      user: "no-reply_erp@thecorrectsteps.com", // Replace with your Outlook email
       pass: "Sajaljain@390", // Replace with your Outlook password
     },
   });
 
   const mailOptions = {
-    from: "support@thecorrectsteps.com", // Replace with your Outlook email
+    from: "no-reply_erp@thecorrectsteps.com", // Replace with your Outlook email
     to: email,
     subject: "Password Reset request for ERP",
     html: `
