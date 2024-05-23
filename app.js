@@ -43,7 +43,9 @@ app.use("/api/erp/project", projectRoutes);
 app.use("/api/erp/task", taskRoutes);
 app.use("/api/erp/user", userRoutes);
 app.use("/api/erp/work", workRoutes);
-
+app.get("/", (req, res) => {
+  console.log("Working");
+});
 mongoose
   .connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.rw3waqy.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
