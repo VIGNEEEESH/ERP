@@ -80,7 +80,7 @@ const auth=useContext(AuthContext)
       const fetchUser = async () => {
         try {
           const response = await fetch(
-            `http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`,
+            `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
             {
               headers:{
                 Authorization: "Bearer " + auth.token, 
@@ -134,7 +134,7 @@ const auth=useContext(AuthContext)
         <CardBody className="p-4 space-y-6">
           <div className="flex items-start justify-between gap-6">
             <Avatar
-              src={`http://localhost:4444/${formData.image}`}
+              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${formData.image}`}
               alt="Profile Picture"
               size="xxl"
               variant="rounded"

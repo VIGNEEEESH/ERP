@@ -212,7 +212,7 @@ export function MyOffice() {
                                     <tr key={key}>
                                         <td className={className}>
                                             <div className="flex items-center gap-4">
-                                                <Avatar src={`http://localhost:4444/${employee.image}`} alt={employee.name} size="sm" variant="rounded" />
+                                                <Avatar src={`${import.meta.env.REACT_APP_BACKEND_URL}/${employee.image}`} alt={employee.name} size="sm" variant="rounded" />
                                                 <div>
                                                     <Typography variant="small" color="blue-gray" className="font-semibold">
                                                         {employee.firstName}&nbsp;{employee.lastName}

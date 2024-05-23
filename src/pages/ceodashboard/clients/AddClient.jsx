@@ -35,7 +35,7 @@ function AddClient() {
         
         try {
             const response = await fetch(
-                "http://localhost:4444/api/erp/client/create/client",
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/create/client`,
                 {
                     method: "POST",
                     headers: {

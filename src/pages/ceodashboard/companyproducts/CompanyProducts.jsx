@@ -243,7 +243,7 @@ const handleProductSubmit = async () => {
               <Card key={productName} color="transparent" shadow={false}>
                 <div className="mx-0 mt-0 mb-4 h-64 xl:h-40">
                   <img
-                    src={`http://localhost:4444/${image}`}
+                    src={`${import.meta.env.REACT_APP_BACKEND_URL}/${image}`}
                     alt={productName}
                     className="h-full w-full object-cover"
                   />

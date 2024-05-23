@@ -1,6 +1,6 @@
 {
     "env": {
-      "BackendUrl":"http://localhost:4444"
+      "BackendUrl":"http://13.233.212.169:3000/"
     }
   }
   

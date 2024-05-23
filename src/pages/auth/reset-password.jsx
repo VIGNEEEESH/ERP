@@ -50,7 +50,7 @@ const UpdatePassword = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:4444/api/erp/user/update-password", {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -10,7 +10,7 @@ const ProfileImageUpdate = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`,
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
         {
           headers:{
             Authorization: "Bearer " + auth.token, 
@@ -22,7 +22,7 @@ const ProfileImageUpdate = () => {
         const userData = await response.json();
         if (userData) {
           // Prepend base URL to the image path
-          const imageUrl = `http://localhost:4444/${userData.user.image}`;
+          const imageUrl = `${import.meta.env.REACT_APP_BACKEND_URL}/${userData.user.image}`;
           setProfileImg(imageUrl);
         }
       } catch (error) {
@@ -45,7 +45,7 @@ const ProfileImageUpdate = () => {
         const formData = new FormData();
         formData.append('image', newImage);
 
-        const response = await fetch(`http://localhost:4444/api/erp/user/update/image/byid/${auth.userId}`, {
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/image/byid/${auth.userId}`, {
           method: 'PATCH',
           headers: {
             Authorization: "Bearer " + auth.token,
@@ -63,7 +63,7 @@ const ProfileImageUpdate = () => {
 
         // Update the profile image URL after successful upload
         const userData = await response.json();
-        const imageUrl = `http://localhost:4444/${userData.user.image}`;
+        const imageUrl = `${import.meta.env.REACT_APP_BACKEND_URL}/${userData.user.image}`;
         setProfileImg(imageUrl);
 
       } catch (error) {

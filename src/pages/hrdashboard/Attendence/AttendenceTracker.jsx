@@ -82,7 +82,7 @@ const data = useMemo(() => (employees ? employees : []), [employees]);
                 accessor: 'firstName',
                 Cell: ({ row }) => (
                     <div className="flex items-center gap-4">
-                        <Avatar src={`http://localhost:4444/${row.original.image}`} alt={row.original.name} size="sm" variant="rounded" />
+                        <Avatar src={`${import.meta.env.REACT_APP_BACKEND_URL}/${row.original.image}`} alt={row.original.name} size="sm" variant="rounded" />
                         <div>
                             <Typography variant="small" color="blue-gray" className="font-semibold">
                                 {row.original.firstName}&nbsp;{row.original.lastName}

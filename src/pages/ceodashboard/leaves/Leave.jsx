@@ -19,7 +19,7 @@ const auth=useContext(AuthContext)
         const fetchLeaves = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:4444/api/erp/leave/get/all/leaves",{headers:{Authorization:"Bearer "+auth.token}}
+                    `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/leave/get/all/leaves`,{headers:{Authorization:"Bearer "+auth.token}}
                 );
 
                 if (!response.ok) {
@@ -124,7 +124,7 @@ const auth=useContext(AuthContext)
     const handleApprove = async (_id) => {
         try {
             const response = await fetch(
-                `http://localhost:4444/api/erp/leave/update/leavestatus/byid/${_id}`,
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/leave/update/leavestatus/byid/${_id}`,
                 {
                     method: "PATCH",
                     headers: {
@@ -151,7 +151,7 @@ const auth=useContext(AuthContext)
     const handleDecline = async (_id) => {
         try {
             const response = await fetch(
-                `http://localhost:4444/api/erp/leave/update/leavestatus/byid/${_id}`,
+                `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/leave/update/leavestatus/byid/${_id}`,
                 {
                     method: "PATCH",
                     headers: {

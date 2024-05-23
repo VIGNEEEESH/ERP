@@ -27,7 +27,7 @@ export function OurClients() {
         const fetchClients = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:4444/api/erp/client/get/all/clients",{headers:{Authorization: "Bearer " + auth.token,}}
+                    `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/get/all/clients`,{headers:{Authorization: "Bearer " + auth.token,}}
                 );
 
                 if (!response.ok) {
