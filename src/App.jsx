@@ -93,14 +93,21 @@ import ForgotPassword from "./pages/auth/Forgot-Password";
 import UpdatePassword from "./pages/auth/reset-password";
 
 // Lazy-loaded components
-const Dashboard = lazy(() => import("@/layouts/Dashboard"));
-const Auth = lazy(() => import("@/layouts/Auth"));
-const CEODashboard = lazy(() => import("@/layouts/CEODashboard"));
-const DEPTHEADDashboard = lazy(() => import("@/layouts/DEPTHEADDashboard"));
-const HRDashboard = lazy(() => import("@/layouts/HRDashboard"));
-const SignIn = lazy(() => import("./pages/auth/sign-in"));
-const SignUp = lazy(() => import("./pages/auth/sign-up"));
+// const Dashboard = lazy(() => import("@/layouts/Dashboard"));
+// const Auth = lazy(() => import("@/layouts/Auth"));
+// const CEODashboard = lazy(() => import("@/layouts/CEODashboard"));
+// const DEPTHEADDashboard = lazy(() => import("@/layouts/DEPTHEADDashboard"));
+// const HRDashboard = lazy(() => import("@/layouts/HRDashboard"));
+// const SignIn = lazy(() => import("./pages/auth/sign-in"));
+// const SignUp = lazy(() => import("./pages/auth/sign-up"));
 
+import Dashboard from "@/layouts/Dashboard";
+import Auth from "@/layouts/Auth";
+import CEODashboard from "@/layouts/CEODashboard";
+import DEPTHEADDashboard from "@/layouts/DEPTHEADDashboard";
+import HRDashboard from "@/layouts/HRDashboard";
+import SignIn from "./pages/auth/sign-in";
+import SignUp from "./pages/auth/sign-up";
 
 function App() {
   const { login, logout, userId, token, email, role } = useAuth();
