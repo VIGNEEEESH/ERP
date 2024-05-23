@@ -183,6 +183,7 @@ const getUsersByRole = async (req, res, next) => {
   res.status(200).json({ users: users });
 };
 const login = async (req, res, next) => {
+  console.log(email);
   const { email, password } = req.body;
   let user;
   try {
