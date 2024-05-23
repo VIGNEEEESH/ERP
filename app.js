@@ -44,7 +44,9 @@ app.use("/api/erp/task", taskRoutes);
 app.use("/api/erp/user", userRoutes);
 app.use("/api/erp/work", workRoutes);
 app.get("/", (req, res) => {
-  console.log("Working");
+  return res.status(200).json({
+    message: "Hello World",
+  });
 });
 mongoose
   .connect(
