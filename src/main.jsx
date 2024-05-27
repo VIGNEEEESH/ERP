@@ -16,6 +16,7 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@material-tailwind/react";
 import { MaterialTailwindControllerProvider } from "@/context";
 import "../public/css/tailwind.css";
+import { ChakraProvider } from '@chakra-ui/react'
 //import "@heroicons/vue/dist/\@heroicons/vue.css"; // Use the escaped backslash
 
 
@@ -26,7 +27,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <ThemeProvider>
         <MaterialTailwindControllerProvider>
+        <ChakraProvider>
           <App />
+          </ChakraProvider>
         </MaterialTailwindControllerProvider>
       </ThemeProvider>
     </BrowserRouter>
