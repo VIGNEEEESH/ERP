@@ -121,7 +121,7 @@ const handleConfirmDelete = async () => {
       });
 
       if (response.ok) {
-          setProducts(products.filter(product => product._id !== productToDelete._id)); // <-- Here's the filter logic
+          setProducts(products.filter(product => product._id !== productToDelete._id));
 
           setShowDeleteModal(false);
           setProductToDelete(null);
