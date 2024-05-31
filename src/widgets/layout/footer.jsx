@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
-import { HeartIcon } from "@heroicons/react/24/solid";
-import {About, Blog, License} from "@/pages/footer";
+const About = "./pages/Footer/About";
+const Blog = "./pages/Footer/Blog";
+const License = "./pages/Footer/License";
 
 export function Footer({ brandName, brandLink, routes }) {
   const year = new Date().getFullYear();
@@ -42,8 +43,6 @@ export function Footer({ brandName, brandLink, routes }) {
 }
 
 Footer.defaultProps = {
-  brandName: "Creative Tim",
-  brandLink: "https://www.creative-tim.com",
   routes: [
     { name: "About Us", path: About },
     { name: "Blog", path: Blog },
