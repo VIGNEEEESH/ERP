@@ -12,7 +12,6 @@ function AddClient() {
         projects: [""]
     });
     const auth=useContext(AuthContext)
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         if (name === 'projects') {
@@ -33,6 +32,19 @@ function AddClient() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const emptyFields = Object.keys(formData).filter((key) => !formData[key]);
+     
+     
+     
+    if (emptyFields.length > 0 ) {
+        // Create an error message for empty fields and empty userIds
+        const errorMessage =
+            `Please fill in the following fields: ${emptyFields.join(', ')}`
+            
+        message.error(errorMessage);
+        return;
+    }
+        
         try {
             const response = await fetch(
                 `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/create/client`,
@@ -56,7 +68,7 @@ function AddClient() {
             },[500])
           
         } catch (error) {
-            message.error(`Error creating client`)
+            message.error(`Error creating client, incorrect inputs`)
             console.error("Error submitting form:", error.message);
         }
     };

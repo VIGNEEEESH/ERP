@@ -332,7 +332,7 @@ const handleConfirmDelete = async () => {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
+                                <div className='mr-4'>
                                     <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
                                         {"<< "}
                                     </span>
