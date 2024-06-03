@@ -19,6 +19,7 @@ export function AttendenceTracker() {
     const [searchQuery, setSearchQuery] = useState('');
     const [pageSize, setPageSize] = useState(5);
     const [employees, setEmployees] = useState([]);
+<<<<<<< HEAD
     const auth = useContext(AuthContext);
 
     useEffect(() => {
@@ -38,6 +39,31 @@ export function AttendenceTracker() {
         };
         fetchAttendanceAndEmployees();
     }, [auth.token]);
+=======
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
+const auth=useContext(AuthContext)
+
+
+
+    useEffect(() => {
+    const fetchAttendanceAndEmployees = async () => {
+        try {
+            
+            const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
+                Authorization:"Bearer "+auth.token
+            }});
+            if (!employeeResponse.ok) {
+                throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
+            }
+            const employeeData = await employeeResponse.json();
+            
+            setEmployees(employeeData.users);
+        } catch (error) {
+            message.error("Error fetching attendance or employees", error.message);
+        }
+    };
+>>>>>>> 4bf03603fb535fe0c0e14bf16a4510362a83e935
 
     const data = useMemo(() => (employees ? employees : []), [employees]);
 
@@ -82,6 +108,10 @@ export function AttendenceTracker() {
                     </div>
                 ),
             },
+<<<<<<< HEAD
+=======
+           
+>>>>>>> 4bf03603fb535fe0c0e14bf16a4510362a83e935
             {
                 Header: 'View Detail',
                 accessor: 'viewDetail',
@@ -122,10 +152,29 @@ export function AttendenceTracker() {
         setPageSize(newSize);
     };
 
+<<<<<<< HEAD
     const handleViewClick = (employee) => {
         setSelectedEmployee(employee);
         setShowCalendar(true);
     };
+=======
+    const filteredAuthorsTableData = useMemo(() => 
+    data.filter(({ firstName, email }) =>
+        (firstName && firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (email && email.toLowerCase().includes(searchQuery.toLowerCase()))
+    ),
+    [data, searchQuery]
+);
+
+
+const handleViewClick = (employee) => {
+    setSelectedEmployee(employee); // Assuming the userId is stored in employee.userId
+    setShowCalendar(true);
+};
+
+
+   
+>>>>>>> 4bf03603fb535fe0c0e14bf16a4510362a83e935
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -139,11 +188,21 @@ export function AttendenceTracker() {
                                 Attendence Tracker
                             </Typography>
                             <Input
+<<<<<<< HEAD
                                 label="Search with the employee name"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-white text-black"
                             />
+=======
+    
+    placeholder='Search with the employee name'
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    className=" w-full bg-white text-black"
+/>
+
+>>>>>>> 4bf03603fb535fe0c0e14bf16a4510362a83e935
                         </CardHeader>
                         <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                             <table {...getTableProps()} className="w-full min-w-[640px] table-auto">
@@ -199,8 +258,13 @@ export function AttendenceTracker() {
                                         ))}
                                     </select>
                                 </div>
+<<<<<<< HEAD
                                 <div style={{ marginRight: '20px' }}>
                                     <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
+=======
+                                <div className='mr-4'>
+                                    <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+>>>>>>> 4bf03603fb535fe0c0e14bf16a4510362a83e935
                                         {"<< "}
                                     </span>
                                     <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>

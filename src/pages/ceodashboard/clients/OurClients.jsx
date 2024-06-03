@@ -162,27 +162,33 @@ const auth=useContext(AuthContext)
     };
     const handleUpdate = async (client) => {
         try {
+            const emptyFields = Object.keys(client).filter((key) => !client[key]);
+    
+            if (emptyFields.length > 0) {
+                const errorMessage = `Please fill in the following fields: ${emptyFields.join(', ')}`;
+                message.error(errorMessage);
+                return;
+            }
+    
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/update/client/byid/${client._id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json",Authorization: "Bearer " + auth.token, },
-                body: JSON.stringify(client) // Pass the updated client object in the request body
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + auth.token },
+                body: JSON.stringify(client)
             });
     
             if (!response.ok) {
                 throw new Error("Something went wrong, please try again");
             }
-            
-            // Update the client in the local state with the updated data
-            setClients(clients.map(c => (c._id === client._id ? client : c)));
     
+            setClients(clients.map(c => (c._id === client._id ? client : c)));
             message.success("Client updated successfully");
-            
             setShowUpdateModal(false);
             setSelectedClient(null);
         } catch (err) {
             message.error("Something went wrong, please try again");
         }
     };
+    
     const handleUpdateClient = async (updatedClient) => {
         
         setShowUpdateModal(false);

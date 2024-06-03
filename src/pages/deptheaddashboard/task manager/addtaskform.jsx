@@ -83,7 +83,18 @@ const AddTaskForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        const emptyFields = Object.keys(formData).filter((key) => !formData[key]);
+        // Check if any userId is empty
+        const emptyMembers = formData.members.filter((member) => !member);
+        
+       if (emptyFields.length > 0 || emptyMembers.length > 0) {
+           // Create an error message for empty fields and empty userIds
+           const errorMessage = emptyFields.length > 0 
+               ? `Please fill in the following fields: ${emptyFields.join(', ')}`
+               : 'Please assign member';
+           message.error(errorMessage);
+           return;
+       }
         try {
             const formDataToSend = new FormData();
             formDataToSend.append("taskName", formData.taskName);
@@ -164,15 +175,7 @@ const AddTaskForm = () => {
                                 multiple // Allow multiple file selection
                             />
                         </div>
-                        <div>
-                            <Input
-                                type="date"
-                                name="deadline"
-                                value={formData.deadline}
-                                onChange={handleInputChange}
-                                label="Deadline"
-                            />
-                        </div>
+                       
                         <div>
                             <Input
                                 type="date"
@@ -180,6 +183,15 @@ const AddTaskForm = () => {
                                 value={formData.assignedDate}
                                 onChange={handleInputChange}
                                 label="Assigned Date"
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="date"
+                                name="deadline"
+                                value={formData.deadline}
+                                onChange={handleInputChange}
+                                label="Deadline"
                             />
                         </div>
                         <div>
@@ -235,7 +247,7 @@ const AddTaskForm = () => {
                                             onClick={handleAddMember}
                                             className="bg-gray-800   text-white px-10 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
                                         >
-                                            +
+                                            Add
                                         </button></center>
                         </div>
                     </div>

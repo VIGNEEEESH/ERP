@@ -73,7 +73,21 @@ export function AddDepartment() {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+    
+        const emptyFields = Object.keys(formData).filter((key) => !formData[key]);
+
+    // Check if any userId is empty
+    const emptyUserIds = formData.userId.filter((userId) => !userId);
+
+    if (emptyFields.length > 0 || emptyUserIds.length > 0) {
+        // Create an error message for empty fields and empty userIds
+        const errorMessage = emptyFields.length > 0 
+            ? `Please fill in the following fields: ${emptyFields.join(', ')}`
+            : 'Please assign member';
+        message.error(errorMessage);
+        return;
+    }
+    
         try {
             const response = await fetch(
                 `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/department/create/department`,
@@ -81,28 +95,28 @@ export function AddDepartment() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization:"Bearer "+auth.token,
+                        Authorization: "Bearer " + auth.token,
                     },
                     body: JSON.stringify(formData),
                 }
             );
-
+    
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
-            message.success(`Department created successfully`)
+    
+            message.success(`Department created successfully`);
             const responseData = await response.json();
-            
-            setTimeout(()=>{
-                window.location.reload()
-            },[300])
-            
-            
+    
+            setTimeout(() => {
+                window.location.reload();
+            }, 300);
         } catch (error) {
-            message.error(`Error creating department`)
+            message.error(`Error creating department`);
             console.error("Error submitting form:", error.message);
         }
     };
+    
 
     const handleCloseQRCodePopup = () => {
         setShowQRCodePopup(false);
@@ -166,7 +180,7 @@ export function AddDepartment() {
                                             onClick={handleAddUsers}
                                             className="bg-gray-800   text-white px-10 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
                                         >
-                                            +
+                                            Add
                                         </button></center>
                         </div>
                        

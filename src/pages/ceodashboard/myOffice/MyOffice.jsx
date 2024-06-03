@@ -58,7 +58,7 @@ export function MyOffice() {
                 setIsClockedOut(statusData.attendance.loggedOutTime);
                 
             } catch (error) {
-                message.error("Error fetching data, please clock in: " + error.message);
+                message.warning("Please clock in to get information");
             }
         };
 
@@ -171,7 +171,7 @@ export function MyOffice() {
                         <Typography variant="h6" color="white" className="mr-4">
                             My Office
                         </Typography>
-                        <span>Last Logged in at so & so</span>
+                        
                     </div>
                     <div className="ml-auto">
                         <Button

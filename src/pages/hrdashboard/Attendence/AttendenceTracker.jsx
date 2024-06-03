@@ -25,21 +25,13 @@ export function AttendenceTracker() {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
 const auth=useContext(AuthContext)
-// Handler for updating search query
+
 
 
     useEffect(() => {
     const fetchAttendanceAndEmployees = async () => {
         try {
-            // // Fetch attendance data
-            // const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/all/attendance`,{headers:{Authorization:"Bearer "+auth.token}});
-            // if (!attendanceResponse.ok) {
-            //     throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
-            // }
-            // const attendanceData = await attendanceResponse.json();
-           
-
-            // Fetch employee data
+            
             const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
                 Authorization:"Bearer "+auth.token
             }});
@@ -47,7 +39,7 @@ const auth=useContext(AuthContext)
                 throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
             }
             const employeeData = await employeeResponse.json();
-            // setAttendance(attendanceData.attendance);
+            
             setEmployees(employeeData.users);
         } catch (error) {
             message.error("Error fetching attendance or employees", error.message);
@@ -108,18 +100,7 @@ const data = useMemo(() => (employees ? employees : []), [employees]);
                     </div>
                 ),
             },
-            // {
-            //     Header: 'Status',
-            //     accessor: 'workStatus',
-            //     Cell: ({ value }) => (
-            //         <Chip
-            //             variant="gradient"
-            //             // color={value ? "green" : "blue-gray"}
-            //             value={value }
-            //             className="py-0.5 px-2 text-[11px] font-medium w-fit"
-            //         />
-            //     ),
-            // },
+           
             {
                 Header: 'View Detail',
                 accessor: 'viewDetail',
@@ -173,12 +154,7 @@ const handleViewClick = (employee) => {
 };
 
 
-    const mockAttendanceData = {
-        '2024-04-01': 'present',
-        '2024-04-02': 'leave',
-        '2024-04-03': 'absent',
-        // Add more entries as needed
-    };
+   
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -192,7 +168,8 @@ const handleViewClick = (employee) => {
                                 Attendence Tracker
                             </Typography>
                             <Input
-    label="Search with the employee name"
+    
+    placeholder='Search with the employee name'
     value={searchQuery}
     onChange={(e) => setSearchQuery(e.target.value)}
     className=" w-full bg-white text-black"
@@ -253,7 +230,7 @@ const handleViewClick = (employee) => {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
+                                <div className='mr-4'>
                                     <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
                                         {"<< "}
                                     </span>

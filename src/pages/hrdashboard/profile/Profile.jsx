@@ -105,10 +105,10 @@ const auth=useContext(AuthContext)
     const handleProfileUpdate=async()=>{
       try{
         
-        const response=await fetch(import.meta.env.REACT_APP_BACKEND_URL+`/api/erp/user/update/user/byid/${auth.userId}`,
+        const response=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/user/byid/${auth.userId}`,
         {
           method:"PATCH",
-          headers:{"Content-Type":"application/json"},
+          headers:{"Content-Type":"application/json",Authorization: "Bearer " + auth.token,},
           body:JSON.stringify(formData)})
           if(!response.ok){
             return error(`Http error: `,response.message)

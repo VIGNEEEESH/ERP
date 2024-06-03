@@ -92,7 +92,7 @@ window.location.reload()
             <span className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
               
             </span><br/>
-           <center> <Button onClick={handleWorkStatus}>save</Button></center>
+           <center> <Button onClick={handleWorkStatus}>Save</Button></center>
           </div>
         </div>
       </Card>

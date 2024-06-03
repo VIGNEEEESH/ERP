@@ -70,7 +70,7 @@ export function MyLogRecord() {
                 accessor: 'update',
                 Cell: ({ row }) => (
                     <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => showUpdateModal(row.original)}>
-                        <PencilIcon className="h-4 w-4 mr-2"/>edit
+                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
                     </Typography>
                 ),
             },
@@ -208,7 +208,7 @@ export function MyLogRecord() {
                 <Typography variant="h6" color="white">
                     Log Records
                 </Typography>
-                <Button onClick={() => setAddModalVisible(true)} className="text-xs font-semibold">
+                <Button onClick={() => setAddModalVisible(true)} className="bg-white text-gray-900 flex hover:bg-gray-200">
                     Add Log Record
                 </Button>
             </CardHeader>

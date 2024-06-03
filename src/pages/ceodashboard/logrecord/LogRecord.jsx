@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useContext } from 'react';
 import {
     Card,
@@ -142,7 +141,7 @@ export function LogRecord() {
                         Log Record
                     </Typography>
                     <Input
-                        label="Search with the employee name"
+                        placeholder="Search with the employee name"
                         value={searchQuery}
                         onChange={handleSearch}
                         className="w-full bg-white text-black"
@@ -203,9 +202,7 @@ export function LogRecord() {
                             </select>
                         </div>
                         <div className="mt-4 flex justify-between items-center">
-                    <Typography className="text-sm text-blue-gray-600">
-                        Page {pageIndex + 1} of {Math.ceil(employees.length / 5)}
-                    </Typography>
+                  
                     <div className='p-2 mr-4'>
                                 <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"<< "}
