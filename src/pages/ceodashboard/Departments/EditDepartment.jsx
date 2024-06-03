@@ -109,7 +109,7 @@ export function EditDepartment({ departmentData, onClose }) {
             
             
         } catch (error) {
-            message.error(`Error updating employee`)
+            message.error(`Error updating department`)
            
         }
         
@@ -167,7 +167,7 @@ export function EditDepartment({ departmentData, onClose }) {
                                         </button></center>
                         </div>
                     </div>
-                    <Button type="submit" className='mt-4'>Update Employee</Button>
+                    <Button type="submit" className='mt-4'>Update Department</Button>
                     <Button onClick={onClose} className='mt-4 ml-2'>Cancel</Button>
                 </form>
             </CardBody>

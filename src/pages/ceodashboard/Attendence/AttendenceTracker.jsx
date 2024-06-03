@@ -5,12 +5,10 @@ import {
     CardBody,
     Typography,
     Avatar,
-    Chip,
     Button,
     Input,
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
-import { authorsTableData } from "@/data";
 import AttendanceCalendar from "./AttendenceCalender";
 import { message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
@@ -20,54 +18,33 @@ export function AttendenceTracker() {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [pageSize, setPageSize] = useState(5);
-    // const [attendance, setAttendance] = useState([]);
     const [employees, setEmployees] = useState([]);
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split("T")[0];
-const auth=useContext(AuthContext)
-// Handler for updating search query
-
+    const auth = useContext(AuthContext);
 
     useEffect(() => {
-    const fetchAttendanceAndEmployees = async () => {
-        try {
-            // // Fetch attendance data
-            // const attendanceResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/attendance/get/all/attendance`,{headers:{Authorization:"Bearer "+auth.token}});
-            // if (!attendanceResponse.ok) {
-            //     throw new Error(`Failed to fetch attendance data: ${attendanceResponse.status}`);
-            // }
-            // const attendanceData = await attendanceResponse.json();
-           
-
-            // Fetch employee data
-            const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`,{headers:{
-                Authorization:"Bearer "+auth.token
-            }});
-            if (!employeeResponse.ok) {
-                throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
+        const fetchAttendanceAndEmployees = async () => {
+            try {
+                const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users`, {
+                    headers: { Authorization: "Bearer " + auth.token }
+                });
+                if (!employeeResponse.ok) {
+                    throw new Error(`Failed to fetch employee data: ${employeeResponse.status}`);
+                }
+                const employeeData = await employeeResponse.json();
+                setEmployees(employeeData.users);
+            } catch (error) {
+                message.error("Error fetching attendance or employees", error.message);
             }
-            const employeeData = await employeeResponse.json();
-            // setAttendance(attendanceData.attendance);
-            setEmployees(employeeData.users);
-        } catch (error) {
-            message.error("Error fetching attendance or employees", error.message);
-        }
-    };
+        };
+        fetchAttendanceAndEmployees();
+    }, [auth.token]);
 
-    fetchAttendanceAndEmployees();
-}, []);
+    const data = useMemo(() => (employees ? employees : []), [employees]);
 
-    
-    
-const data = useMemo(() => (employees ? employees : []), [employees]);
-    
-
-  
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
     };
-    
-    // Filter data based on search query
+
     const filteredData = useMemo(() => {
         return data.filter(({ firstName, lastName, email }) => {
             const fullName = `${firstName} ${lastName}`.toLowerCase();
@@ -102,24 +79,9 @@ const data = useMemo(() => (employees ? employees : []), [employees]);
                         <Typography className="text-xs font-semibold text-blue-gray-600">
                             {row.original.role}
                         </Typography>
-                        {/* <Typography className="text-xs font-normal text-blue-gray-500">
-                            {row.original.employee.role}
-                        </Typography> */}
                     </div>
                 ),
             },
-            // {
-            //     Header: 'Status',
-            //     accessor: 'workStatus',
-            //     Cell: ({ value }) => (
-            //         <Chip
-            //             variant="gradient"
-            //             // color={value ? "green" : "blue-gray"}
-            //             value={value }
-            //             className="py-0.5 px-2 text-[11px] font-medium w-fit"
-            //         />
-            //     ),
-            // },
             {
                 Header: 'View Detail',
                 accessor: 'viewDetail',
@@ -142,12 +104,14 @@ const data = useMemo(() => (employees ? employees : []), [employees]);
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
     } = useTable(
         {
             columns,
-            data:filteredData,
+            data: filteredData,
             initialState: { pageIndex: 0, pageSize },
         },
         usePagination
@@ -158,26 +122,9 @@ const data = useMemo(() => (employees ? employees : []), [employees]);
         setPageSize(newSize);
     };
 
-    const filteredAuthorsTableData = useMemo(() => 
-    data.filter(({ firstName, email }) =>
-        (firstName && firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (email && email.toLowerCase().includes(searchQuery.toLowerCase()))
-    ),
-    [data, searchQuery]
-);
-
-
-const handleViewClick = (employee) => {
-    setSelectedEmployee(employee); // Assuming the userId is stored in employee.userId
-    setShowCalendar(true);
-};
-
-
-    const mockAttendanceData = {
-        '2024-04-01': 'present',
-        '2024-04-02': 'leave',
-        '2024-04-03': 'absent',
-        // Add more entries as needed
+    const handleViewClick = (employee) => {
+        setSelectedEmployee(employee);
+        setShowCalendar(true);
     };
 
     return (
@@ -192,12 +139,11 @@ const handleViewClick = (employee) => {
                                 Attendence Tracker
                             </Typography>
                             <Input
-    label="Search with the employee name"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    className=" w-full bg-white text-black"
-/>
-
+                                label="Search with the employee name"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-white text-black"
+                            />
                         </CardHeader>
                         <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                             <table {...getTableProps()} className="w-full min-w-[640px] table-auto">
@@ -237,12 +183,12 @@ const handleViewClick = (employee) => {
                                 </tbody>
                             </table>
                             <div className="mt-4 flex justify-between items-center">
-                                <div className='flex items-center'>
+                                <div className='flex items-center' style={{ marginLeft: '10px' }}>
                                     <Typography className="text-sm text-blue-gray-600">
-                                        Page {pageIndex + 1} of {Math.ceil(filteredAuthorsTableData.length / pageSize)}
+                                        Page {pageIndex + 1} of {Math.ceil(filteredData.length / pageSize)}
                                     </Typography>
-                                    <select 
-                                        value={pageSize} 
+                                    <select
+                                        value={pageSize}
                                         onChange={handlePageSizeChange}
                                         className="ml-2 border rounded px-2 py-1"
                                     >
@@ -253,8 +199,8 @@ const handleViewClick = (employee) => {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
-                                    <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                <div style={{ marginRight: '20px' }}>
+                                    <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                         {"<< "}
                                     </span>
                                     <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -263,7 +209,7 @@ const handleViewClick = (employee) => {
                                     <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                         {" >"}
                                     </span>
-                                    <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                    <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                         {" >>"}
                                     </span>
                                 </div>

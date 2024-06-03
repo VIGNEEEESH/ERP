@@ -194,6 +194,8 @@ const data = useMemo(() => {
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
     } = useTable(
@@ -316,9 +318,9 @@ const handleConfirmDelete = async () => {
                                 </tbody>
                             </table>
                             <div className="mt-4 flex justify-between items-center">
-                                <div className='flex items-center'>
+                                <div className='flex items-center' style={{ marginLeft: '10px' }}>
                                     <Typography className="text-sm text-blue-gray-600">
-                                        Page {pageIndex + 1} of {Math.ceil(filteredAuthorsTableData.length / pageSize)}
+                                        Page {pageIndex + 1} of {Math.ceil(data.length / pageSize)}
                                     </Typography>
                                     <select 
                                         value={pageSize} 
@@ -332,7 +334,7 @@ const handleConfirmDelete = async () => {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
+                                <div style={{ marginRight: '20px' }} >
                                     <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
                                         {"<< "}
                                     </span>
