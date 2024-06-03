@@ -1,10 +1,6 @@
 import React from 'react';
 import QRCode from 'qrcode.react';
-<<<<<<< HEAD
-import { XMarkIcon } from '@heroicons/react/24/outline';
-=======
 import { XMarkIcon } from "@heroicons/react/24/solid";
->>>>>>> 4bf03603fb535fe0c0e14bf16a4510362a83e935
 
 const QRCodePopup = ({ qrCodeData, onClose }) => {
   const handleCopyUserId = () => {

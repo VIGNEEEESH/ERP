@@ -182,11 +182,7 @@ export function EditDepartment({ departmentData, onClose }) {
                                         </button></center>
                         </div>
                     </div>
-<<<<<<< HEAD
-                    <Button type="submit" className='mt-4'>Update Department</Button>
-=======
                     <Button type="submit" disabled={!formData.userId} className='mt-4'>Update Employee</Button>
->>>>>>> 4bf03603fb535fe0c0e14bf16a4510362a83e935
                     <Button onClick={onClose} className='mt-4 ml-2'>Cancel</Button>
                 </form>
             </CardBody>
