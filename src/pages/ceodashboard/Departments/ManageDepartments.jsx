@@ -335,7 +335,7 @@ const handleConfirmDelete = async () => {
                                     </select>
                                 </div>
                                 <div style={{ marginRight: '20px' }}>
-                                    <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                    <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                         {"<< "}
                                     </span>
                                     <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -344,7 +344,7 @@ const handleConfirmDelete = async () => {
                                     <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                         {" >"}
                                     </span>
-                                    <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                    <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                         {" >>"}
                                     </span>
                                 </div>
