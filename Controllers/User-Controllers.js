@@ -1,6 +1,9 @@
 const HttpError = require("../Middleware/http-error");
 const { validationResult } = require("express-validator");
 const User = require("../Models/User");
+const Leave = require("../Models/Leave");
+const Attendance = require("../Models/Attendance");
+const Work = require("../Models/Work");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -116,7 +119,6 @@ const createUser = async (req, res, next) => {
   try {
     await user.save();
   } catch (err) {
-    console.log(err);
     const error = new HttpError(
       "Something went wrong while saving the user, please try again",
       500
@@ -262,7 +264,6 @@ const forgotPassword = async (req, res, next) => {
   try {
     isValidPassword = await bcrypt.compare(password, existingUser.password);
   } catch (err) {
-    console.log(err);
     const error = new HttpError(
       "Something went wrong while verifying the password, please try again",
       500
@@ -423,6 +424,9 @@ const deleteUserById = async (req, res, next) => {
   let user;
   try {
     user = await User.findOne({ _id: id });
+    await Attendance.deleteMany({ userId: user._id });
+    await Leave.deleteMany({ email: user.email });
+    await Work.deleteMany({ userId: user._id });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
