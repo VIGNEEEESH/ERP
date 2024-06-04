@@ -316,7 +316,7 @@ const handleConfirmDelete = async () => {
                                 </tbody>
                             </table>
                             <div className="mt-4 flex justify-between items-center">
-                                <div className='flex items-center'>
+                                <div className='flex items-center' style={{ marginLeft: '10px' }}>
                                     <Typography className="text-sm text-blue-gray-600">
                                         Page {pageIndex + 1} of {Math.ceil(filteredAuthorsTableData.length / pageSize)}
                                     </Typography>
