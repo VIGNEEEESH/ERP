@@ -185,7 +185,7 @@ const CompanyProducts = () => {
         <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
       </div>
 
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100 rounded-3xl shadow-xl">
+      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100 rounded-3xl shadow-xl relative">
         <CardBody className="p-4">
           <div className="px-4 pb-4">
             <Typography variant="h6" color="blue-gray" className="mb-2">
@@ -195,15 +195,26 @@ const CompanyProducts = () => {
               Products and services that we are serving
             </Typography>
           </div>
+          <Button
+            color="blue"
+            buttonType="filled"
+            size="lg"
+            rounded={false}
+            block
+            className="mb-4 absolute top-[-30px] right-4"
+            onClick={handleAddProduct}
+          >
+            Add Product
+          </Button>
         </CardBody>
 
         <div className="px-4 pb-4 mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
           {products.map((product) => (
             <Card
-              key={product._id}
+              key={product              .id}
               color="transparent"
               shadow="lg"
-              className="cursor-pointer transform hover:scale-105 transition-transform duration-300"
+              className="cursor-pointer transform hover:scale-105 transition-transform duration-300 relative"
               onClick={() => handleCardClick(product)}
             >
               <div className="mx-0 mt-0 mb-4 h-64 xl:h-40">
@@ -218,6 +229,27 @@ const CompanyProducts = () => {
                 <Typography variant="h5" color="blue-gray" className="mt-1 mb-2">
                   {product.productName}
                 </Typography>
+                <div className="flex">
+                  <Button
+                    color="blue"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateProduct(product);
+                    }}
+                  >
+                    Update
+                  </Button>
+                  <Button
+                    color="red"
+                    className="ml-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProduct(product._id, product.productName);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </CardBody>
             </Card>
           ))}
@@ -331,20 +363,9 @@ const CompanyProducts = () => {
           )}
         </div>
       </Modal>
-
-      <Button
-        color="blue"
-        buttonType="filled"
-        size="lg"
-        rounded={false}
-        block
-        className="mb-4"
-        onClick={handleAddProduct}
-      >
-        Add Product
-      </Button>
     </>
   );
 };
 
 export default CompanyProducts;
+
