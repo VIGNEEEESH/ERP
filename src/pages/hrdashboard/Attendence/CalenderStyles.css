@@ -9,3 +9,33 @@
   color: white;
   border-radius: 50%;
 }
+
+.react-calendar {
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.legend .flex {
+  display: flex;
+  align-items: center;
+}
+
+.legend .w-4 {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+}
+
+.legend .mr-2 {
+  margin-right: 0.5rem;
+}
+
+.legend .mr-4 {
+  margin-right: 1rem;
+}
