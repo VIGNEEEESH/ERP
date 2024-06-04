@@ -5,19 +5,11 @@ import {
   CardFooter,
   Avatar,
   Typography,
-  Tabs,
-  TabsHeader,
-  Tab,
   Tooltip,
   Button,
   Input,
 } from "@material-tailwind/react";
-import {
-  HomeIcon,
-  ChatBubbleLeftEllipsisIcon,
-  Cog6ToothIcon,
-  PencilIcon,
-} from "@heroicons/react/24/solid";
+import { PencilIcon } from "@heroicons/react/24/solid";
 import { AuthContext } from '@/pages/auth/Auth-context';
 import { message } from 'antd';
 
@@ -39,21 +31,10 @@ export function CEOProfile() {
     aadhar: '1234 5678 9012',
   };
 
-  const [formData,setFormData]=useState({
-    firstName:"",
-    lastName:"",
-    role:"",
-    address:"",
-    state:"",
-    pincode:"",
-    country:"",
-    salary:"",
-    pan:"",
-    aadhar:""
-  })
+  const [formData, setFormData] = useState(initialProfile);
   const [isEditing, setIsEditing] = useState(false);
-  const [userprofile, setProfile] = useState(initialProfile);
-const auth=useContext(AuthContext)
+  const auth = useContext(AuthContext);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -67,69 +48,75 @@ const auth=useContext(AuthContext)
   };
 
   const handleSaveClick = () => {
-   handleProfileUpdate()
+    handleProfileUpdate();
     setIsEditing(false);
   };
 
   const handleCancelClick = () => {
     setIsEditing(false);
-    setProfile(initialProfile); // Reset to initial userprofile data
+    setFormData(initialProfile);
   };
-  
+
   useEffect(() => {
-      const fetchUser = async () => {
-        try {
-          const response = await fetch(
-            `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
           {
-            headers:{
-              Authorization: "Bearer " + auth.token, 
-            }
-          });
-  
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            headers: {
+              Authorization: "Bearer " + auth.token,
+            },
           }
-  
-          const data = await response.json();
-          
-          setFormData(data.user);
-          
-        } catch (err) {
-          message.error("Error fetching clients:", err.message);
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      };
-      fetchUser();
-    }, []);
-    const handleProfileUpdate=async()=>{
-      try{
-        
-        const response=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/user/byid/${auth.userId}`,
-        {
-          method:"PATCH",
-          headers:{"Content-Type":"application/json",Authorization: "Bearer " + auth.token},
-          body:JSON.stringify(formData)})
-          if(!response.ok){
-            return error(`Http error: `,response.message)
-          }
-          message.success("Profile updated successfully")
-          setTimeout(()=>{
-    window.location.reload()
-          },[300]
-    
-          )
-      }catch(err){
-        message.error("Something went wrong, please try again")
+
+        const data = await response.json();
+        setFormData(data.user);
+
+      } catch (err) {
+        message.error("Error fetching clients:", err.message);
       }
+    };
+    fetchUser();
+  }, [auth.token, auth.userId]);
+
+  const handleProfileUpdate = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/user/byid/${auth.userId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.statusText}`);
+      }
+
+      message.success("Profile updated successfully");
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+
+    } catch (err) {
+      message.error("Something went wrong, please try again");
     }
-  
+  };
 
   return (
     <>
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover bg-center">
         <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
       </div>
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
+      <Card className="mx-3 mb-6 lg:mx-4 border border-blue-gray-100 mt-[-14rem]">
         <CardBody className="p-4 space-y-6">
           <div className="flex items-start justify-start gap-2">
             <Avatar
@@ -140,7 +127,7 @@ const auth=useContext(AuthContext)
               className="rounded-lg shadow-lg shadow-blue-gray-500/40"
             />
             <div className="flex flex-col space-y-2 ml-8">
-              <Typography variant="h5" color="blue-gray" className="mb-4 mt-2 gap-4">
+              <Typography variant="h4" color="blue-gray" className="mb-4 mt-2 gap-4">
                 {isEditing ? (
                   <>
                     <Input
@@ -165,7 +152,7 @@ const auth=useContext(AuthContext)
                   `${formData.firstName} ${formData.lastName}`
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -179,7 +166,7 @@ const auth=useContext(AuthContext)
                   formData.role
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="email"
@@ -197,7 +184,7 @@ const auth=useContext(AuthContext)
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="flex flex-col space-y-4">
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -211,7 +198,7 @@ const auth=useContext(AuthContext)
                   formData.address
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -225,7 +212,7 @@ const auth=useContext(AuthContext)
                   formData.pincode
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -241,7 +228,7 @@ const auth=useContext(AuthContext)
               </Typography>
             </div>
             <div className="flex flex-col space-y-4">
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -255,7 +242,7 @@ const auth=useContext(AuthContext)
                   formData.country
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -270,7 +257,7 @@ const auth=useContext(AuthContext)
                   `Salary: ${formData.salary}`
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -287,7 +274,7 @@ const auth=useContext(AuthContext)
             </div>
           </div>
           <div className="flex flex-col space-y-4">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
+            <Typography variant="h6" className="font-normal text-blue-gray-600">
               {isEditing ? (
                 <Input
                   type="text"
@@ -305,7 +292,7 @@ const auth=useContext(AuthContext)
           <CardFooter className="flex justify-end p-4">
             {isEditing ? (
               <>
-                <Button  onClick={handleSaveClick}>
+                <Button onClick={handleSaveClick}>
                   Save
                 </Button>
                 <Button variant="outlined" onClick={handleCancelClick} className="ml-2">
@@ -315,7 +302,7 @@ const auth=useContext(AuthContext)
             ) : (
               <Tooltip content="Edit Profile">
                 <PencilIcon
-                  className="h-4 w-4 cursor-pointer text-blue-gray-500"
+                  className="h-6 w-6 cursor-pointer text-blue-gray-500"
                   onClick={handleEditClick}
                 />
               </Tooltip>
