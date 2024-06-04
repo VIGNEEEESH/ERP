@@ -15,7 +15,7 @@ const createTask = async (req, res, next) => {
     members,
     deadline,
     assignedDate,
-    progress,
+
     department,
   } = req.body;
   let existingTask;
@@ -43,7 +43,7 @@ const createTask = async (req, res, next) => {
     members,
     deadline,
     assignedDate,
-    progress,
+    progress: "0",
     department,
     files: filePaths,
   });

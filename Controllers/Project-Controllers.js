@@ -15,7 +15,6 @@ const createProject = async (req, res, next) => {
     members,
     deadline,
     assignedDate,
-    progress,
 
     department,
   } = req.body;
@@ -45,7 +44,7 @@ const createProject = async (req, res, next) => {
     members,
     deadline,
     assignedDate,
-    progress,
+    progress: "0",
     department,
     files: filePaths,
   });
