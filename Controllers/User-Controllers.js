@@ -14,7 +14,8 @@ const inviteUser = async (req, res, next) => {
       errors: errors.array(),
     });
   }
-  const { email, role } = req.body;
+  const { email, role, salary } = req.body;
+
   let user;
 
   try {
@@ -34,6 +35,7 @@ const inviteUser = async (req, res, next) => {
   const createdUser = new User({
     email: email.toLowerCase(),
     role,
+    salary,
   });
   try {
     await createdUser.save();
