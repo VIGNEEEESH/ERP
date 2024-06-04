@@ -138,6 +138,8 @@ const auth=useContext(AuthContext)
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
         setPageSize: setTablePageSize,
@@ -279,7 +281,7 @@ const auth=useContext(AuthContext)
                                 </select>
                             </div>
                             <div className='mr-4'>
-                                <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"<< "}
                                 </span>
                                 <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -288,7 +290,7 @@ const auth=useContext(AuthContext)
                                 <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >"}
                                 </span>
-                                <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >>"}
                                 </span>
                             </div>
