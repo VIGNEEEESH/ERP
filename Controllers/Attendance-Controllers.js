@@ -52,7 +52,7 @@ const createAttendance = async (req, res, next) => {
       attendanceStatus,
       date: formattedDate,
       loggedInTime: currentTime,
-      workStatus: "Working",
+      workStatus: "Available",
       userId,
       email,
     });
@@ -205,6 +205,7 @@ const addLoggedOutTime = async (req, res, next) => {
   }
 
   attendance.loggedOutTime = currentTime;
+  attendance.workStatus = "Logged Out";
 
   try {
     await attendance.save();
