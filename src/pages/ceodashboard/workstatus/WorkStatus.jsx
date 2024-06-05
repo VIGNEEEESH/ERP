@@ -88,6 +88,8 @@ window.location.reload()
               <option value="Available">Available</option>
               <option value="In a Meeting">In a Meeting</option>
               <option value="Busy in Work">Busy in Work</option>
+              <option value="Logout">Logout</option>
+
             </select>
             <span className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
               

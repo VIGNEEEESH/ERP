@@ -11,11 +11,11 @@ const ProfileImageUpdate = () => {
     const fetchUserData = async () => {
       try {
         const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
-        {
-          headers:{
-            Authorization: "Bearer " + auth.token, 
-          }
-        });
+          {
+            headers: {
+              Authorization: "Bearer " + auth.token,
+            }
+          });
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -78,7 +78,9 @@ const ProfileImageUpdate = () => {
     <div className='p-4'>
       <Card>
         <CardBody>
-          {profileImg && <img src={profileImg} alt="Current Profile" style={{ marginBottom: '1rem', maxWidth: '100%' }} />}
+          <div style={{ width: '200px', height: '180px', overflow: 'hidden' }}>
+            {profileImg && <img src={profileImg} alt="Current Profile"/>}
+          </div>
           <form onSubmit={handleSubmit}>
             <input
               type="file"

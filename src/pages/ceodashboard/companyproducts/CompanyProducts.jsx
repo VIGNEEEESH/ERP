@@ -11,7 +11,7 @@ import { message } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import { AuthContext } from "@/pages/auth/Auth-context";
 
-export function CompanyProducts() {
+const CompanyProducts = () => {
   const [products, setProducts] = useState([]);
   const [showAddProducts, setShowAddProducts] = useState(false);
   const [showUpdateProduct, setShowUpdateProduct] = useState(false);
@@ -19,16 +19,18 @@ export function CompanyProducts() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const auth = useContext(AuthContext);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [showDescription, setShowDescription] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
           `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/get/all/products`,
-          { headers: { Authorization: "Bearer " + auth.token } }
+          { headers: { Authorization: `Bearer ${auth.token}` } }
         );
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.status}`);
@@ -36,28 +38,17 @@ export function CompanyProducts() {
         const data = await response.json();
         setProducts(data.products);
       } catch (error) {
-        message.error("Error fetching products: " + error.message);
+        message.error(`Error fetching products: ${error.message}`);
       }
     };
-
     fetchProducts();
   }, [auth.token]);
 
-  const handleAddProduct = () => {
-    setShowAddProducts(true);
-  };
-
-  const handleGoBack = () => {
-    setShowAddProducts(false);
-  };
+  const handleAddProduct = () => setShowAddProducts(true);
+  const handleGoBack = () => setShowAddProducts(false);
 
   const handleUpdateProduct = (product) => {
-    setCurrentProduct({
-      productName: product.productName,
-      productDescription: product.productDescription,
-      image: product.image,
-      _id: product._id
-    });
+    setCurrentProduct(product);
     setShowUpdateProduct(true);
   };
 
@@ -66,29 +57,15 @@ export function CompanyProducts() {
     setCurrentProduct(null);
   };
 
-  const handleProductNameChange = (e) => {
-    setCurrentProduct({
-      ...currentProduct,
-      productName: e.target.value
-    });
-  };
-
-  const handleProductDescriptionChange = (e) => {
-    setCurrentProduct({
-      ...currentProduct,
-      productDescription: e.target.value
-    });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-  };
+  const handleProductNameChange = (e) =>
+    setCurrentProduct({ ...currentProduct, productName: e.target.value });
+  const handleProductDescriptionChange = (e) =>
+    setCurrentProduct({ ...currentProduct, productDescription: e.target.value });
+  const handleImageChange = (e) => setImage(e.target.files[0]);
 
   const handleDeleteProduct = (_id, productName) => {
     setShowDeleteModal(true);
-    const product = { _id, productName };
-    setProductToDelete(product);
+    setProductToDelete({ _id, productName });
   };
 
   const handleCloseDeleteModal = () => {
@@ -104,7 +81,7 @@ export function CompanyProducts() {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + auth.token
+            Authorization: `Bearer ${auth.token}`
           }
         }
       );
@@ -118,92 +95,88 @@ export function CompanyProducts() {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
     } catch (error) {
-      message.error("Error deleting product: " + error.message);
+      message.error(`Error deleting product: ${error.message}`);
     }
   };
 
   const handleProductSubmit = async () => {
+    if (!productName || !productDescription || !image) {
+      message.error("Please fill in all fields");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("productName", productName);
+    formData.append("productDescription", productDescription);
+    formData.append("image", image);
+
     try {
-      const formData = new FormData();
-      const emptyFields = [];
-      if (!productName) emptyFields.push("productName");
-      if (!productDescription) emptyFields.push("productDescription");
-      if (!image) emptyFields.push("image");
-
-      if (emptyFields.length > 0) {
-        const errorMessage = `Please fill in the following fields: ${emptyFields.join(", ")}`;
-        message.error(errorMessage);
-        return;
-      }
-
-      formData.append("productName", productName);
-      formData.append("productDescription", productDescription);
-      formData.append("image", image);
-
       const response = await fetch(
         `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/create/product`,
         {
           method: "POST",
-          headers: { Authorization: "Bearer " + auth.token },
+          headers: { Authorization: `Bearer ${auth.token}` },
           body: formData
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to create product");
-      }
+      if (!response.ok) throw new Error("Failed to create product");
 
       message.success("Product created successfully");
-      setProductDescription("");
       setProductName("");
+      setProductDescription("");
+      setImage(null);
       setShowAddProducts(false);
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      setProducts([...products, await response.json()]);
     } catch (error) {
       message.error(`Failed to create product: ${error.message}`);
     }
   };
 
   const handleUpdateSubmit = async () => {
+    if (!currentProduct.productName || !currentProduct.productDescription) {
+      message.error("Please fill in all fields");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("productName", currentProduct.productName);
+    formData.append("productDescription", currentProduct.productDescription);
+    if (image) formData.append("image", image);
+
     try {
-      const formData = new FormData();
-      const emptyFields = [];
-      if (!currentProduct.productName) emptyFields.push("productName");
-      if (!currentProduct.productDescription) emptyFields.push("productDescription");
-      if (image && !image.name) emptyFields.push("image");
-
-      if (emptyFields.length > 0) {
-        const errorMessage = `Please fill in the following fields: ${emptyFields.join(", ")}`;
-        message.error(errorMessage);
-        return;
-      }
-
-      formData.append("productName", currentProduct.productName);
-      formData.append("productDescription", currentProduct.productDescription);
-      if (image) formData.append("image", image);
-
       const response = await fetch(
         `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/update/product/byid/${currentProduct._id}`,
         {
           method: "PATCH",
-          headers: { Authorization: "Bearer " + auth.token },
+          headers: { Authorization: `Bearer ${auth.token}` },
           body: formData
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update product");
-      }
+      if (!response.ok) throw new Error("Failed to update product");
 
       message.success("Product updated successfully");
       setShowUpdateProduct(false);
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      setCurrentProduct(null);
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product._id === currentProduct._id ? currentProduct : product
+        )
+      );
     } catch (error) {
       message.error(`Failed to update product: ${error.message}`);
     }
+  };
+
+  const handleCardClick = (product) => {
+    setSelectedProduct(product);
+    setShowDescription(true);
+  };
+
+  const handleCloseDescription = () => {
+    setShowDescription(false);
+    setSelectedProduct(null);
   };
 
   return (
@@ -212,7 +185,7 @@ export function CompanyProducts() {
         <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
       </div>
 
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
+      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100 rounded-3xl shadow-xl relative">
         <CardBody className="p-4">
           <div className="px-4 pb-4">
             <Typography variant="h6" color="blue-gray" className="mb-2">
@@ -221,40 +194,59 @@ export function CompanyProducts() {
             <Typography variant="small" className="font-normal text-blue-gray-500">
               Products and services that we are serving
             </Typography>
-            <div className=" flex justify-between items-center">
-              <div></div>
-              <Button onClick={handleAddProduct}>Add Product</Button>
-            </div>
           </div>
+          <Button
+            color="blue"
+            buttonType="filled"
+            size="lg"
+            rounded={false}
+            block
+            className="mb-4 absolute top-[-30px] right-4"
+            onClick={handleAddProduct}
+          >
+            Add Product
+          </Button>
         </CardBody>
 
         <div className="px-4 pb-4 mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
-          {products.map(({ image, productName, productDescription, _id }) => (
-            <Card key={productName} color="transparent" shadow={false}>
+          {products.map((product) => (
+            <Card
+              key={product              .id}
+              color="transparent"
+              shadow="lg"
+              className="cursor-pointer transform hover:scale-105 transition-transform duration-300 relative"
+              onClick={() => handleCardClick(product)}
+            >
               <div className="mx-0 mt-0 mb-4 h-64 xl:h-40">
                 <img
-                  src={`${import.meta.env.REACT_APP_BACKEND_URL}/${image}`}
-                  alt={productName}
-                  className="h-full w-full object-cover"
+                  src={`${import.meta.env.REACT_APP_BACKEND_URL}/${product.image}`}
+                  alt={product.productName}
+                  className="h-full w-full object-cover rounded-t-3xl"
+                  style={{ maxHeight: "200px" }}
                 />
               </div>
               <CardBody className="py-0 px-1 flex flex-col items-center justify-between">
                 <Typography variant="h5" color="blue-gray" className="mt-1 mb-2">
-                  {productName}
+                  {product.productName}
                 </Typography>
-                <Typography variant="small" className="font-normal text-blue-gray-500">
-                  {productDescription}
-                </Typography>
-                <div className="flex mt-4">
+                <div className="flex">
                   <Button
-                    className="mr-4"
-                    onClick={() =>
-                      handleUpdateProduct({ productName, productDescription, image, _id })
-                    }
+                    color="blue"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateProduct(product);
+                    }}
                   >
                     Update
                   </Button>
-                  <Button onClick={() => handleDeleteProduct(_id, productName)}>
+                  <Button
+                    color="red"
+                    className="ml-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProduct(product._id, product.productName);
+                    }}
+                  >
                     Delete
                   </Button>
                 </div>
@@ -263,6 +255,7 @@ export function CompanyProducts() {
           ))}
         </div>
       </Card>
+
       <Modal
         title="Delete Product"
         open={showDeleteModal}
@@ -271,19 +264,10 @@ export function CompanyProducts() {
         okButtonProps={{ style: { backgroundColor: "black" } }}
       >
         <p>Are you sure you want to delete this product?</p>
-        {productToDelete && (
-          <div>
-            <p>Product Name: {productToDelete.productName}</p>
-          </div>
-        )}
+        {productToDelete && <p>Product Name: {productToDelete.productName}</p>}
       </Modal>
-      {/* Modal for adding product */}
-      <Modal
-        title="Add Product"
-        visible={showAddProducts}
-        onCancel={handleGoBack}
-        footer={null}
-      >
+
+      <Modal title="Add Product" visible={showAddProducts} onCancel={handleGoBack} footer={null}>
         <div className="p-4">
           <Input
             type="text"
@@ -308,16 +292,18 @@ export function CompanyProducts() {
           <Input
             type="file"
             name="image"
-            className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            label="Upload product image"
             onChange={handleImageChange}
           />
         </div>
-        <div className="p-4 flex justify-end">
-          <Button onClick={handleProductSubmit}>Add Product</Button>
+        <div className="flex justify-end p-4">
+          <Button color="blue" onClick={handleProductSubmit}>
+            Add Product
+          </Button>
         </div>
       </Modal>
 
-      {/* Modal for updating product */}
       <Modal
         title="Update Product"
         visible={showUpdateProduct}
@@ -327,9 +313,10 @@ export function CompanyProducts() {
         <div className="p-4">
           <Input
             type="text"
+            name="productName"
             className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             label="Enter product name"
-            value={currentProduct ? currentProduct.productName : ""}
+            value={currentProduct?.productName || ""}
             onChange={handleProductNameChange}
           />
         </div>
@@ -337,8 +324,9 @@ export function CompanyProducts() {
           <Textarea
             className="form-textarea mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             rows={3}
+            name="productDescription"
             label="Enter product description"
-            value={currentProduct ? currentProduct.productDescription : ""}
+            value={currentProduct?.productDescription || ""}
             onChange={handleProductDescriptionChange}
           />
         </div>
@@ -346,16 +334,38 @@ export function CompanyProducts() {
           <Input
             type="file"
             name="image"
-            className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            label="Update product image"
             onChange={handleImageChange}
           />
         </div>
-        <div className="p-4 flex justify-end">
-          <Button onClick={handleUpdateSubmit}>Update Product</Button>
+        <div className="flex justify-end p-4">
+          <Button color="blue" onClick={handleUpdateSubmit}>
+            Update Product
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        title="Product Description"
+        visible={showDescription}
+        onCancel={handleCloseDescription}
+        footer={null}
+      >
+        <div className="p-4">
+          {selectedProduct && (
+            <>
+              <Typography variant="h5" color="blue-gray" className="mt-1 mb-2">
+                {selectedProduct.productName}
+              </Typography>
+              <p>{selectedProduct.productDescription}</p>
+            </>
+          )}
         </div>
       </Modal>
     </>
   );
-}
+};
 
 export default CompanyProducts;
+

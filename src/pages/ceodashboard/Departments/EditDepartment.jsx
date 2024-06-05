@@ -115,7 +115,7 @@ export function EditDepartment({ departmentData, onClose }) {
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
-            message.success(`Employee updated successfully`)
+            message.success(`Department updated successfully`)
             const responseData = await response.json();
             setTimeout(()=>{
                 window.location.reload()
@@ -124,7 +124,7 @@ export function EditDepartment({ departmentData, onClose }) {
             
             
         } catch (error) {
-            message.error(`Error updating employee`)
+            message.error(`Error updating department`)
            
         }
         
@@ -184,7 +184,7 @@ export function EditDepartment({ departmentData, onClose }) {
                                         </button></center>
                         </div>
                     </div>
-                    <Button type="submit" disabled={!formData.userId} className='mt-4'>Update Employee</Button>
+                    <Button type="submit" disabled={!formData.userId} className='mt-4'>Update Department</Button>
                     <Button onClick={onClose} className='mt-4 ml-2'>Cancel</Button>
                 </form>
             </CardBody>

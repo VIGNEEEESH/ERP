@@ -98,7 +98,6 @@ export function LogRecord() {
     );
 
     const handleView = (id) => {
-        
         setSelectedEmployeeId(id);
     };
 
@@ -111,6 +110,8 @@ export function LogRecord() {
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
     } = useTable(
@@ -126,8 +127,6 @@ export function LogRecord() {
         const newSize = Number(e.target.value);
         setPageSize(newSize);
     };
-
-    
 
     if (selectedEmployeeId) {
         return <EmployeeLog employeeId={selectedEmployeeId} onBack={() => setSelectedEmployeeId(null)} />;
@@ -185,14 +184,14 @@ export function LogRecord() {
                         </tbody>
                     </table>
                     <div className="mt-4 flex justify-between items-center">
-                        <div className='flex items-center'>
+                        <div className='flex items-center' style={{ marginLeft: '10px' }}>
                             <Typography className="text-sm text-blue-gray-600">
                                 Page {pageIndex + 1} of {Math.ceil(filteredData.length / pageSize)}
                             </Typography>
                             <select 
                                 value={pageSize} 
                                 onChange={handlePageSizeChange}
-                                className="ml-2 border rounded px-2 py-1"
+                                className="ml-2 border rounded px-2 py-1" 
                             >
                                 {[5, 10, 15].map((size) => (
                                     <option key={size} value={size}>
@@ -202,9 +201,8 @@ export function LogRecord() {
                             </select>
                         </div>
                         <div className="mt-4 flex justify-between items-center">
-                  
-                    <div className='p-2 mr-4'>
-                                <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                            <div className='p-2 mr-4'>
+                                <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"<< "}
                                 </span>
                                 <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -213,16 +211,16 @@ export function LogRecord() {
                                 <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >"}
                                 </span>
-                                <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >>"}
                                 </span>
                             </div>
-                </div>
-                    </div>
-                </CardBody>
-            </Card>
-        </div>
-    );
+</div>
+</div>
+</CardBody>
+</Card>
+</div>
+);
 }
 
 export default LogRecord;

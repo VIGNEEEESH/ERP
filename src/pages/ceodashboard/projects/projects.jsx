@@ -50,10 +50,20 @@ const auth=useContext(AuthContext)
             {
                 Header: 'Project Name',
                 accessor: 'projectName',
+                Cell: ({ row }) => (
+                    <div className="whitespace-pre-wrap" style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <Typography className="font-semibold">{row.original.projectName}</Typography>
+                    </div>
+                ),
             },
             {
                 Header: 'Project Description',
-                accessor: 'projectDescription'
+                accessor: 'projectDescription',
+                Cell: ({ row }) => (
+                    <div className="whitespace-pre-wrap" style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <Typography className="font-semibold">{row.original.projectDescription}</Typography>
+                    </div>
+                ),
             },
             {
                 Header: 'Members',
@@ -228,7 +238,7 @@ const auth=useContext(AuthContext)
                                     <tr {...headerGroup.getHeaderGroupProps()}>
                                         {headerGroup.headers.map(column => (
                                             <th {...column.getHeaderProps()} className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                                <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                                                <Typography variant="small" className="text-[14px] font-bold uppercase text-blue-gray-400">
                                                     {column.render('Header')}
                                                 </Typography>
                                             </th>
