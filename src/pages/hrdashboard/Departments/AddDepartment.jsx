@@ -151,9 +151,11 @@ export function AddDepartment() {
                                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                                     >
                                         <option value="">Select User</option>
-                                        {users.map(userItem => (
-                                            <option key={userItem._id} value={userItem._id}>{userItem.firstName} {userItem.lastName}</option>
-                                        ))}
+                                        {users.filter(userItem => userItem.firstName).map(userItem => (
+  <option key={userItem._id} value={userItem._id}>
+    {userItem.firstName} {userItem.lastName}
+  </option>
+))}
                                     </select>
                                     
                                     <button
