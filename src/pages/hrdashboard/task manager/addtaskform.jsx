@@ -220,9 +220,11 @@ const AddTaskForm = () => {
                                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                                     >
                                         <option value="">Select Member</option>
-                                        {members.map(memberItem => (
-                                            <option key={memberItem._id} value={memberItem.email}>{memberItem.firstName} {memberItem.lastName}</option>
-                                        ))}
+                                        {members.filter(memberItem => memberItem.firstName).map(memberItem => (
+  <option key={memberItem._id} value={memberItem.email}>
+    {memberItem.firstName} {memberItem.lastName}
+  </option>
+))}
                                     </select>
                                     <button
                                         type="button"
