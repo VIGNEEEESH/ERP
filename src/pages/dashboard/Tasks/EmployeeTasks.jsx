@@ -11,15 +11,16 @@ function EmployeeTasks() {
     const fetchTasks = async () => {
       try {
         // Fetch tasks data
-        const tasksResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/get/tasks/byemail/${auth.email}`,{headers:{Authorization:"Bearer "+auth.token}});
+        const tasksResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/get/tasks/byemail/${auth.email}`, {
+          headers: { Authorization: "Bearer " + auth.token }
+        });
         if (!tasksResponse.ok) {
           throw new Error(`Failed to fetch tasks data: ${tasksResponse.status}`);
         }
         const tasksData = await tasksResponse.json();
         setTasks(tasksData.tasks);
-        
       } catch (error) {
-        message.error("Error fetching tasks data", error.message);
+        message.error("Error fetching tasks data: " + error.message);
       }
     };
 
@@ -38,33 +39,33 @@ function EmployeeTasks() {
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
-                    task Initials
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
+                    Task Title
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Start Date
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Deadline
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-2/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Description
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Team
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Progress
                   </Typography>
                 </th>
@@ -73,32 +74,32 @@ function EmployeeTasks() {
             <tbody>
               {tasks.map((task) => (
                 <tr key={task.id}>
-                  <td className="py-3 px-5">
+                  <td className="py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {task.taskName}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
+                  <td className="py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {task.assignedDate}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
+                  <td className="py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {task.deadline}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
+                  <td className="py-3 px-5 truncate w-48">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {task.taskDescription}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
-  <Typography className="text-xs font-normal text-blue-gray-500">
-    {task.members.join(", ")}
-  </Typography>
-</td>
-<td className="py-3 px-5">
+                  <td className="py-3 px-5 truncate w-48">
+                    <Typography className="text-xs font-normal text-blue-gray-500">
+                      {task.members.join(", ")}
+                    </Typography>
+                  </td>
+                  <td className="py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {task.progress}
                     </Typography>

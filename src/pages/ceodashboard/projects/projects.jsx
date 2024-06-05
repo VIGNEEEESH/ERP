@@ -8,8 +8,6 @@ import UpdateProject from './UpdateProjects';
 import { Modal, message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
 
-
-
 export function Projects({ onAddProject }) {
     const [pageSize, setPageSize] = useState(5);
     const [projects, setProjects] = useState([]);
@@ -19,25 +17,27 @@ export function Projects({ onAddProject }) {
     const [editProjectData, setEditProjectData] = useState(null);
     const [showEditProject, setShowEditProject] = useState(false);
     const [projectToDelete, setProjectToDelete] = useState(null); 
-const auth=useContext(AuthContext)
+    const auth = useContext(AuthContext);
+
     useEffect(() => {
         const fetchProjects = async () => {
-          try {
-            const response = await fetch(
-              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`,{headers:{Authorization: "Bearer " + auth.token,}}
-            );
-            if (!response.ok) {
-              throw new Error(`Failed to fetch attendance data: ${response.status}`);
+            try {
+                const response = await fetch(
+                    `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`, 
+                    { headers: { Authorization: "Bearer " + auth.token } }
+                );
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch projects data: ${response.status}`);
+                }
+                const data = await response.json();
+                setProjects(data.projects);
+            } catch (error) {
+                message.error("Error fetching projects: " + error.message);
             }
-            const data = await response.json();
-            setProjects(data.projects);
-          } catch (error) {
-            message.error("Error fetching projects ", error.message);
-          }
         };
-    
+
         fetchProjects();
-      }, []);
+    }, [auth.token]);
 
     const data = useMemo(() => (projects ? projects : []), [projects]);
 
@@ -60,7 +60,7 @@ const auth=useContext(AuthContext)
                 Header: 'Project Description',
                 accessor: 'projectDescription',
                 Cell: ({ row }) => (
-                    <div className="whitespace-pre-wrap" style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div className="whitespace-pre-wrap" style={{ width: '300px', height: '100px', overflow: 'auto' }}>
                         <Typography className="font-semibold">{row.original.projectDescription}</Typography>
                     </div>
                 ),
@@ -74,7 +74,6 @@ const auth=useContext(AuthContext)
                     </Typography>
                 ),
             },
-            
             {
                 Header: 'Deadline',
                 accessor: 'deadline',
@@ -111,8 +110,8 @@ const auth=useContext(AuthContext)
                 Header: '',
                 accessor: 'edit',
                 Cell: ({ row }) => (
-                    <Typography onClick={() => handleEditClick(row)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
-                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
+                    <Typography onClick={() => handleEditClick(row)} as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex">
+                        <PencilIcon className="h-4 w-4 mr-2" />Edit
                     </Typography>
                 ),
             },
@@ -165,12 +164,10 @@ const auth=useContext(AuthContext)
         setShowDeleteModal(false);
         setProjectToDelete(null);
     };
+
     const handleEditClick = (rowData) => {
-        
         setEditProjectData(rowData.original);
         setShowEditProject(true);
-        
-        
     };
 
     const handleCloseEdit = () => {
@@ -180,7 +177,6 @@ const auth=useContext(AuthContext)
 
     const handleConfirmDelete = async () => {
         try {
-            
             // Make a delete request to your backend API using fetch
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/delete/project/byid/${projectToDelete._id}`, {
                 method: 'DELETE',
@@ -189,29 +185,25 @@ const auth=useContext(AuthContext)
                     Authorization: "Bearer " + auth.token,
                 },
             });
-    
+
             // Check if the request was successful (status code 200-299)
             if (response.ok) {
-                
-                // If the request is successful, remove the deleted employee from the local state
+                // If the request is successful, remove the deleted project from the local state
                 setProjects(projects.filter(project => project._id !== projectToDelete._id));
-    
+
                 // Close the modal
                 setShowDeleteModal(false);
                 setProjectToDelete(null);
-                message.success("Project Sucessfully Deleted");
+                message.success("Project successfully deleted");
             } else {
                 // If the request failed, throw an error
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
         } catch (error) {
-            message.success("Something went wrong while deleting the project, please try again");
+            message.error("Something went wrong while deleting the project, please try again");
             console.error('Error deleting project:', error);
-            // You can show an error message to the user here
         }
     };
-    
-
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -314,7 +306,7 @@ const auth=useContext(AuthContext)
                 onCancel={handleCloseDeleteModal}
                 okButtonProps={{ style: { backgroundColor: 'black' } }}
             >
-                <p>Are you sure you want to delete this Project?</p>
+                <p>Are you sure you want to delete this project?</p>
                 {projectToDelete && (
                     <p>Name: {projectToDelete.projectName}</p>
                 )}
