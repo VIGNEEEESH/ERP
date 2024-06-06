@@ -33,6 +33,24 @@ const Logout = lazy(() => import('./pages/ceodashboard/logout'));
 const LogRecord = lazy(() => import('./pages/ceodashboard/logrecord/LogRecord'));
 const MyLogRecord = lazy(() => import('./pages/ceodashboard/mylogrecord/MylogRecord'));
 
+// import Home from './pages/ceodashboard/home';
+// import ManageEmployees from './pages/ceodashboard/manage-employees/manageEmployees';
+// import AttendenceTracker from './pages/ceodashboard/Attendence/AttendenceTracker';
+// import ManageDepartments from './pages/ceodashboard/Departments/ManageDepartments';
+// import MyOffice from './pages/ceodashboard/myOffice/MyOffice';
+// import Communication from './pages/ceodashboard/communication/communication';
+// import WorkStatus from './pages/ceodashboard/workstatus/WorkStatus';
+// import TaskManager from './pages/ceodashboard/task manager/taskmanager';
+// import Projects from './pages/ceodashboard/projects/Projects';
+// import CompanyProducts from './pages/ceodashboard/companyproducts/CompanyProducts';
+// import OurClients from './pages/ceodashboard/clients/OurClients';
+// import Leave from './pages/ceodashboard/leaves/Leave';
+// import CEOProfile from './pages/ceodashboard/profile/CEOProfile';
+// import Settings from './pages/ceodashboard/settings/Settings';
+// import Logout from './pages/ceodashboard/logout';
+// import LogRecord from './pages/ceodashboard/logrecord/LogRecord';
+// import MyLogRecord from './pages/ceodashboard/mylogrecord/MylogRecord';
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };

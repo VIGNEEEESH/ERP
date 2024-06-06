@@ -80,7 +80,7 @@ const auth=useContext(AuthContext)
       const fetchUser = async () => {
         try {
           const response = await fetch(
-            `http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`,
+            `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
             {
               headers:{
                 Authorization: "Bearer " + auth.token, 
@@ -130,18 +130,18 @@ const auth=useContext(AuthContext)
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover bg-center">
         <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
       </div>
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
+      <Card className="mx-3 mb-6 lg:mx-4 border border-blue-gray-100 mt-[-14rem]">
         <CardBody className="p-4 space-y-6">
           <div className="flex items-start justify-start gap-6">
             <Avatar
-              src={`http://localhost:4444/${formData.image}`}
+              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${formData.image}`}
               alt="Profile Picture"
               size="xxl"
               variant="rounded"
               className="rounded-lg shadow-lg shadow-blue-gray-500/40"
             />
             <div className="flex flex-col space-y-4 ml-8">
-              <Typography variant="h5" color="blue-gray" className="mb-4 mt-2 gap-4">
+              <Typography variant="h4" color="blue-gray" className="mb-4 mt-2 gap-4">
                 {isEditing ? (
                   <>
                     <Input
@@ -166,7 +166,7 @@ const auth=useContext(AuthContext)
                   `${formData.firstName} ${formData.lastName}`
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -180,7 +180,7 @@ const auth=useContext(AuthContext)
                   formData.role
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="email"
@@ -198,7 +198,7 @@ const auth=useContext(AuthContext)
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="flex flex-col space-y-4">
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -212,7 +212,7 @@ const auth=useContext(AuthContext)
                   formData.address
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -226,7 +226,7 @@ const auth=useContext(AuthContext)
                   formData.pincode
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -240,7 +240,7 @@ const auth=useContext(AuthContext)
                   formData.state
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
               {isEditing ? (
                 <Input
                   type="text"
@@ -256,7 +256,7 @@ const auth=useContext(AuthContext)
             </Typography>
             </div>
             <div className="flex flex-col space-y-4">
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -270,7 +270,7 @@ const auth=useContext(AuthContext)
                   formData.country
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -285,7 +285,7 @@ const auth=useContext(AuthContext)
                   `Salary: ${formData.salary}`
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
                 {isEditing ? (
                   <Input
                     type="text"
@@ -299,7 +299,7 @@ const auth=useContext(AuthContext)
                   `PAN: ${formData.pan}`
                 )}
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="h6" className="font-normal text-blue-gray-600">
               {isEditing ? (
                 <Input
                   type="text"

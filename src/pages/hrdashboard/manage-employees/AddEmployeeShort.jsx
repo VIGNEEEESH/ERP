@@ -30,6 +30,15 @@ export function AddEmployeeShort() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+         // Check for empty fields
+         const emptyFields = Object.keys(formData).filter((key) => !formData[key]);
+    
+         if (emptyFields.length > 0) {
+             // Create an error message for empty fields
+             const errorMessage = `Please fill in the following fields: ${emptyFields.join(', ')}`;
+             message.error(errorMessage);
+             return;
+         }
         
         try {
             const response = await fetch(
@@ -99,6 +108,7 @@ export function AddEmployeeShort() {
                                 className="mt-1 block w-full py-2 px-3 border border-blue-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             >
                                 <option value="">Select Role</option>
+                                
                                 <option value="HR">HR</option>
                                 <option value="DeptHead">DeptHead</option>
                                 <option value="Employee">Employee</option>

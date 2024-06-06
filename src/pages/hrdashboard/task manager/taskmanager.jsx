@@ -23,28 +23,28 @@ const TaskManager = () => {
     const [tasks, setTasks] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState(null); 
-    const auth=useContext(AuthContext)
+    const auth = useContext(AuthContext);
+
     useEffect(() => {
         const fetchTasks = async () => {
-            
-          try {
-            const response = await fetch(
-                import.meta.env.REACT_APP_BACKEND_URL+ `/api/erp/task/get/all/tasks`,{headers:{Authorization:"Bearer "+auth.token}}
-            );
-    
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
+            try {
+                const response = await fetch(
+                    import.meta.env.REACT_APP_BACKEND_URL + `/api/erp/task/get/all/tasks`,
+                    { headers: { Authorization: "Bearer " + auth.token } }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setTasks(data.tasks);
+            } catch (err) {
+                message.error("Error fetching tasks", err.message);
             }
-    
-            const data = await response.json();
-            setTasks(data.tasks);
-            
-          } catch (err) {
-            message.error("Error fetching tasks", err.message);
-          }
         };
-        fetchTasks()
-      }, []);
+        fetchTasks();
+    }, []);
 
     const data = useMemo(() => (tasks ? tasks : []), [tasks]);
 
@@ -54,7 +54,7 @@ const TaskManager = () => {
                 Header: 'Task Name',
                 accessor: 'taskName',
                 Cell: ({ row }) => (
-                    <div>
+                    <div className="whitespace-pre-wrap" style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         <Typography className="font-semibold">{row.original.taskName}</Typography>
                     </div>
                 ),
@@ -63,7 +63,7 @@ const TaskManager = () => {
                 Header: 'Description',
                 accessor: 'taskDescription',
                 Cell: ({ row }) => (
-                    <div>
+                    <div className="whitespace-pre-wrap" style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
                         <Typography className="font-semibold">{row.original.taskDescription}</Typography>
                     </div>
                 ),
@@ -101,7 +101,7 @@ const TaskManager = () => {
                             {value}%
                         </Typography>
                         <Progress
-                            value={value}
+                            value={Math.min(100, Math.max(0, value))}
                             variant="gradient"
                             color={value === 100 ? "green" : "gray"}
                             className="h-1"
@@ -118,7 +118,6 @@ const TaskManager = () => {
                     </Typography>
                 ),
             },
-            
             {
                 Header: 'Action',
                 accessor: 'Delete',
@@ -141,6 +140,8 @@ const TaskManager = () => {
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
         setPageSize: setTablePageSize,
@@ -160,19 +161,16 @@ const TaskManager = () => {
     };
 
     const handleEditClick = (rowData) => {
-        
         setEditTaskData(rowData.original);
         setShowEditTask(true);
-        
-        
     };
 
     const handleCloseEdit = () => {
         setShowEditTask(false);
         setEditTaskData(null);
     };
+
     const handleDeleteClick = (rowData) => {
-        
         setTaskToDelete(rowData.original);
         setShowDeleteModal(true);
     };
@@ -182,40 +180,29 @@ const TaskManager = () => {
         setTaskToDelete(null);
     };
 
+    const handleConfirmDelete = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/delete/task/byid/${taskToDelete._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: "Bearer " + auth.token,
+                },
+            });
 
-
-
-const handleConfirmDelete = async () => {
-    try {
-        
-       
-        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/delete/task/byid/${taskToDelete._id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: "Bearer " + auth.token,
-            },
-        });
-
-        
-        if (response.ok) {
-            
-            setTasks(tasks.filter(task => task._id !== taskToDelete._id));
-
-            
-            setShowDeleteModal(false);
-            setTaskToDelete(null);
-            message.success("Task deleted successfully");
-        } else {
-            
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            if (response.ok) {
+                setTasks(tasks.filter(task => task._id !== taskToDelete._id));
+                setShowDeleteModal(false);
+                setTaskToDelete(null);
+                message.success("Task deleted successfully");
+            } else {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        } catch (error) {
+            message.error("Something went wrong while deleting the task, please try again");
+            console.error('Error deleting task:', error);
         }
-    } catch (error) {
-        message.error("Something went wrong while deleting the task, please try again")
-        console.error('Error deleting task:', error);
-       
-    }
-};
+    };
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -244,7 +231,7 @@ const handleConfirmDelete = async () => {
                                     <tr {...headerGroup.getHeaderGroupProps()}>
                                         {headerGroup.headers.map(column => (
                                             <th {...column.getHeaderProps()} className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                                <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                                                <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                                                     {column.render('Header')}
                                                 </Typography>
                                             </th>
@@ -258,7 +245,7 @@ const handleConfirmDelete = async () => {
                                     return (
                                         <tr {...row.getRowProps()}>
                                             {row.cells.map(cell => (
-                                                <td {...cell.getCellProps()} className="py-3 px-5">
+                                                <td {...cell.getCellProps()} className="text-[14px] py-3 px-5">
                                                     {cell.render('Cell')}
                                                 </td>
                                             ))}
@@ -268,7 +255,7 @@ const handleConfirmDelete = async () => {
                             </tbody>
                         </table>
                         <div className="mt-4 ml-2 flex justify-between items-center">
-                            <div className='flex items-center'>
+                            <div className='flex items-center' style={{ marginLeft: '10px' }}>
                                 <Typography className="text-sm text-blue-gray-600">
                                     Page {pageIndex + 1} of {Math.ceil(data.length / pageSize)}
                                 </Typography>
@@ -284,8 +271,8 @@ const handleConfirmDelete = async () => {
                                     ))}
                                 </select>
                             </div>
-                            <div className='mr-4'>
-                                <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                            <div style={{ marginRight: '20px' }}>
+                                <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"<< "}
                                 </span>
                                 <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -294,7 +281,7 @@ const handleConfirmDelete = async () => {
                                 <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >"}
                                 </span>
-                                <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >>"}
                                 </span>
                             </div>
@@ -302,18 +289,17 @@ const handleConfirmDelete = async () => {
                     </CardBody>
                 )}
                 <Modal
-
-title="Delete task"
-open={showDeleteModal}
-onOk={handleConfirmDelete}
-onCancel={handleCloseDeleteModal}
-okButtonProps={{ style: { backgroundColor: 'black' } }}
->
-<p>Are you sure you want to delete this task?</p>
-{taskToDelete && (
-    <p>Name: {taskToDelete.taskName}</p>
-)}
-</Modal>
+                    title="Delete task"
+                    open={showDeleteModal}
+                    onOk={handleConfirmDelete}
+                    onCancel={handleCloseDeleteModal}
+                    okButtonProps={{ style: { backgroundColor: 'black' } }}
+                >
+                    <p>Are you sure you want to delete this task?</p>
+                    {taskToDelete && (
+                        <p>Name: {taskToDelete.taskName}</p>
+                    )}
+                </Modal>
             </Card>
         </div>
     );

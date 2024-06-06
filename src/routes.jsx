@@ -151,8 +151,6 @@ const Home = lazy(() => import("@/pages/dashboard/Home"));
 const Profile = lazy(() => import("@/pages/dashboard/Profile"));
 const Tables = lazy(() => import("@/pages/dashboard/Tables"));
 const Notifications = lazy(() => import("@/pages/dashboard/Notifications"));
-const SignIn = lazy(() => import("@/pages/auth/SignIn"));
-const SignUp = lazy(() => import("@/pages/auth/SignUp"));
 const CommunicationComponent = lazy(() => import("@/pages/dashboard/Communication"));
 const Logout = lazy(() => import("./pages/dashboard/Logout"));
 const Settings = lazy(() => import("./pages/dashboard/settings/Settings"));
@@ -164,6 +162,23 @@ const CompanyProducts = lazy(() => import("./pages/dashboard/companyproducts/Com
 const Employee = lazy(() => import("./pages/dashboard/profile/Employee"));
 const WorkStatus = lazy(() => import("./pages/dashboard/workstatus/WorkStatus"));
 const MyLogRecord = lazy(() => import("./pages/dashboard/mylogrecord/MylogRecord"));
+// import Home from "@/pages/dashboard/Home";
+// import Profile from "@/pages/dashboard/Profile";
+// import Tables from "@/pages/dashboard/Tables";
+// import Notifications from "@/pages/dashboard/Notifications";
+// import CommunicationComponent from "@/pages/dashboard/Communication";
+// import Logout from "./pages/dashboard/Logout";
+// import Settings from "./pages/dashboard/settings/Settings";
+// import LeaveForm from "./pages/dashboard/leavereq/LeaveForm";
+// import MyOffice from "./pages/dashboard/myOffice/MyOffice";
+// import EmployeeProjects from "./pages/dashboard/myProjects/EmployeeProjects";
+// import EmployeeTasks from "./pages/dashboard/Tasks/EmployeeTasks";
+// import CompanyProducts from "./pages/dashboard/companyproducts/CompanyProducts";
+// import Employee from "./pages/dashboard/profile/Employee";
+// import WorkStatus from "./pages/dashboard/workstatus/WorkStatus";
+// import MyLogRecord from "./pages/dashboard/mylogrecord/MylogRecord";
+
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };

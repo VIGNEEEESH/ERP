@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Card, CardHeader, CardBody, Typography, Avatar, Button } from "@material-tailwind/react";
+import { Card, CardHeader, CardBody, Typography, Button } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
 import { Progress } from "@material-tailwind/react";
 import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/solid';
@@ -8,36 +8,36 @@ import UpdateProject from './UpdateProjects';
 import { Modal, message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
 
-
-
 export function Projects({ onAddProject }) {
     const [pageSize, setPageSize] = useState(5);
     const [projects, setProjects] = useState([]);
     const [showAddProject, setShowAddProject] = useState(false);
-    const [selectedProject, setSelectedProject] = useState(null); // State to keep track of selected project for update
+    const [selectedProject, setSelectedProject] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editProjectData, setEditProjectData] = useState(null);
     const [showEditProject, setShowEditProject] = useState(false);
     const [projectToDelete, setProjectToDelete] = useState(null); 
-const auth=useContext(AuthContext)
+    const auth = useContext(AuthContext);
+
     useEffect(() => {
         const fetchProjects = async () => {
-          try {
-            const response = await fetch(
-              `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`,{headers:{Authorization: "Bearer " + auth.token,}}
-            );
-            if (!response.ok) {
-              throw new Error(`Failed to fetch attendance data: ${response.status}`);
+            try {
+                const response = await fetch(
+                    `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/all/projects`, 
+                    { headers: { Authorization: "Bearer " + auth.token } }
+                );
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch projects data: ${response.status}`);
+                }
+                const data = await response.json();
+                setProjects(data.projects);
+            } catch (error) {
+                message.error("Error fetching projects: " + error.message);
             }
-            const data = await response.json();
-            setProjects(data.projects);
-          } catch (error) {
-            message.error("Error fetching projects ", error.message);
-          }
         };
-    
+
         fetchProjects();
-      }, []);
+    }, [auth.token]);
 
     const data = useMemo(() => (projects ? projects : []), [projects]);
 
@@ -50,10 +50,20 @@ const auth=useContext(AuthContext)
             {
                 Header: 'Project Name',
                 accessor: 'projectName',
+                Cell: ({ row }) => (
+                    <div className="whitespace-pre-wrap" style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <Typography className="font-semibold">{row.original.projectName}</Typography>
+                    </div>
+                ),
             },
             {
                 Header: 'Project Description',
-                accessor: 'projectDescription'
+                accessor: 'projectDescription',
+                Cell: ({ row }) => (
+                    <div className="whitespace-pre-wrap" style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
+                        <Typography className="font-semibold">{row.original.projectDescription}</Typography>
+                    </div>
+                ),
             },
             {
                 Header: 'Members',
@@ -64,7 +74,6 @@ const auth=useContext(AuthContext)
                     </Typography>
                 ),
             },
-            
             {
                 Header: 'Deadline',
                 accessor: 'deadline',
@@ -101,8 +110,8 @@ const auth=useContext(AuthContext)
                 Header: '',
                 accessor: 'edit',
                 Cell: ({ row }) => (
-                    <Typography onClick={() => handleEditClick(row)}  as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" >
-                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
+                    <Typography onClick={() => handleEditClick(row)} as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex">
+                        <PencilIcon className="h-4 w-4 mr-2" />Edit
                     </Typography>
                 ),
             },
@@ -128,6 +137,8 @@ const auth=useContext(AuthContext)
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
         setPageSize: setTablePageSize,
@@ -155,12 +166,10 @@ const auth=useContext(AuthContext)
         setShowDeleteModal(false);
         setProjectToDelete(null);
     };
+
     const handleEditClick = (rowData) => {
-        
         setEditProjectData(rowData.original);
         setShowEditProject(true);
-        
-        
     };
 
     const handleCloseEdit = () => {
@@ -170,7 +179,6 @@ const auth=useContext(AuthContext)
 
     const handleConfirmDelete = async () => {
         try {
-            
             // Make a delete request to your backend API using fetch
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/delete/project/byid/${projectToDelete._id}`, {
                 method: 'DELETE',
@@ -179,29 +187,25 @@ const auth=useContext(AuthContext)
                     Authorization: "Bearer " + auth.token,
                 },
             });
-    
+
             // Check if the request was successful (status code 200-299)
             if (response.ok) {
-                
-                // If the request is successful, remove the deleted employee from the local state
+                // If the request is successful, remove the deleted project from the local state
                 setProjects(projects.filter(project => project._id !== projectToDelete._id));
-    
+
                 // Close the modal
                 setShowDeleteModal(false);
                 setProjectToDelete(null);
-                message.success("Project Sucessfully Deleted");
+                message.success("Project successfully deleted");
             } else {
                 // If the request failed, throw an error
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
         } catch (error) {
-            message.success("Something went wrong while deleting the project, please try again");
+            message.error("Something went wrong while deleting the project, please try again");
             console.error('Error deleting project:', error);
-            // You can show an error message to the user here
         }
     };
-    
-
 
     return (
         <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -228,7 +232,7 @@ const auth=useContext(AuthContext)
                                     <tr {...headerGroup.getHeaderGroupProps()}>
                                         {headerGroup.headers.map(column => (
                                             <th {...column.getHeaderProps()} className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                                <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                                                <Typography variant="small" className="text-[14px] font-bold uppercase text-blue-gray-400">
                                                     {column.render('Header')}
                                                 </Typography>
                                             </th>
@@ -269,7 +273,7 @@ const auth=useContext(AuthContext)
                                 </select>
                             </div>
                             <div className='mr-4'>
-                                <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"<< "}
                                 </span>
                                 <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -278,7 +282,7 @@ const auth=useContext(AuthContext)
                                 <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >"}
                                 </span>
-                                <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >>"}
                                 </span>
                             </div>
@@ -304,7 +308,7 @@ const auth=useContext(AuthContext)
                 onCancel={handleCloseDeleteModal}
                 okButtonProps={{ style: { backgroundColor: 'black' } }}
             >
-                <p>Are you sure you want to delete this Project?</p>
+                <p>Are you sure you want to delete this project?</p>
                 {projectToDelete && (
                     <p>Name: {projectToDelete.projectName}</p>
                 )}

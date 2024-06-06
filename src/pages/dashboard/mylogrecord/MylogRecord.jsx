@@ -20,6 +20,7 @@ export function MyLogRecord() {
     const [confirmModalVisible, setConfirmModalVisible] = useState(false);
     const [confirmUpdateModalVisible, setConfirmUpdateModalVisible] = useState(false);
     const [addModalVisible, setAddModalVisible] = useState(false);
+    const [pageSize, setPageSize] = useState(5);
     const [selectedLog, setSelectedLog] = useState(null);
     const [updateInput, setUpdateInput] = useState("");
     const [newWorkDate, setNewWorkDate] = useState(new Date());
@@ -70,7 +71,7 @@ export function MyLogRecord() {
                 accessor: 'update',
                 Cell: ({ row }) => (
                     <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => showUpdateModal(row.original)}>
-                        <PencilIcon className="h-4 w-4 mr-2"/>edit
+                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
                     </Typography>
                 ),
             },
@@ -202,13 +203,18 @@ export function MyLogRecord() {
         usePagination
     );
 
+    const handlePageSizeChange = (e) => {
+        const newSize = Number(e.target.value);
+        setPageSize(newSize);
+    };
+
     return (
         <Card className='mt-12 mb-8 flex flex-col gap-12'>
             <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
                 <Typography variant="h6" color="white">
                     Log Records
                 </Typography>
-                <Button onClick={() => setAddModalVisible(true)} className="text-xs font-semibold">
+                <Button onClick={() => setAddModalVisible(true)} className="bg-white text-gray-900 flex hover:bg-gray-200">
                     Add Log Record
                 </Button>
             </CardHeader>
@@ -250,9 +256,23 @@ export function MyLogRecord() {
                     </tbody>
                 </table>
                 <div className="mt-4 flex justify-between items-center">
-                    <Typography className="text-sm text-blue-gray-600">
-                        Page {pageIndex + 1} of {Math.ceil(logs.length / 5)}
-                    </Typography>
+                <div className='flex items-center' style={{ marginLeft: '10px' }}>
+
+                <Typography className="text-sm text-blue-gray-600">
+                                        Page {pageIndex + 1} of {Math.ceil(logs.length / pageSize)}
+                                    </Typography>
+                                    <select 
+                                        value={pageSize} 
+                                        onChange={handlePageSizeChange}
+                                        className="ml-2 border rounded px-2 py-1"
+                                    >
+                                        {[5, 10, 15].map((size) => (
+                                            <option key={size} value={size}>
+                                                Show {size}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    </div>
                     <div className='p-2 mr-4'>
                         <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
                             {"<< "}

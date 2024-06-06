@@ -11,15 +11,16 @@ function EmployeeProjects() {
     const fetchProjects = async () => {
       try {
         // Fetch projects data
-        const projectsResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/projects/byemail/${auth.email}`,{headers:{Authorization:"Bearer "+auth.token}});
+        const projectsResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/project/get/projects/byemail/${auth.email}`, { 
+          headers: { Authorization: "Bearer " + auth.token } 
+        });
         if (!projectsResponse.ok) {
           throw new Error(`Failed to fetch projects data: ${projectsResponse.status}`);
         }
         const projectsData = await projectsResponse.json();
         setProjects(projectsData.projects);
-        
       } catch (error) {
-        message.error("Error fetching projects data", error.message);
+        message.error("Error fetching projects data: " + error.message);
       }
     };
 
@@ -38,33 +39,33 @@ function EmployeeProjects() {
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
-                    Project Initials
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
+                    Project Title
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Start Date
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Deadline
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-2/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400" >
                     Description
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Team
                   </Typography>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-1/12">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
                     Progress
                   </Typography>
                 </th>
@@ -73,32 +74,32 @@ function EmployeeProjects() {
             <tbody>
               {projects.map((project) => (
                 <tr key={project.id}>
-                  <td className="py-3 px-5">
+                  <td className="text-[12px] py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {project.projectName}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
+                  <td className="text-[12px] py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {project.assignedDate}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
+                  <td className="text-[12px] py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {project.deadline}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
-                    <Typography className="text-xs font-normal text-blue-gray-500">
+                  <td className="text-[12px] py-3 px-5 truncate w-48">
+                    <Typography className="text-xs font-normal text-blue-gray-500" style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
                       {project.projectDescription}
                     </Typography>
                   </td>
-                  <td className="py-3 px-5">
-  <Typography className="text-xs font-normal text-blue-gray-500">
-    {project.members.join(", ")}
-  </Typography>
-</td>
-<td className="py-3 px-5">
+                  <td className="text-[12px] py-3 px-5 truncate w-48">
+                    <Typography className="text-xs font-normal text-blue-gray-500">
+                      {project.members.join(", ")}
+                    </Typography>
+                  </td>
+                  <td className="text-[12px] py-3 px-5 truncate">
                     <Typography className="text-xs font-normal text-blue-gray-500">
                       {project.progress}
                     </Typography>

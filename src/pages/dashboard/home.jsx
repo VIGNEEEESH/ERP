@@ -87,37 +87,37 @@ export function Home() {
           />
         ))} */}
         <StatisticsCard
-        title="No of Projects Involved"
+        title="Projects Involved"
         icon={<UserCircleIcon className="w-8 h-8"/>}
         color="gray"
         value={projects.length}
         />
         <StatisticsCard
-        title="No of pending leaves"
+        title="Pending Leaves"
         icon={<CalendarDaysIcon className="w-8 h-8"/>}
         color="gray"
         value={leaves.filter(leave => leave.status !="Approved").length}
         />
         <StatisticsCard
-        title="No of Tasks Pending"
+        title="Tasks Pending"
         icon={<ClipboardDocumentIcon className="w-8 h-8"/>}
         color="gray"
         value={tasks.filter(task => task.progress !=100).length}
         />
         <StatisticsCard
-        title="No of Tasks Completed"
+        title="Tasks Completed"
         icon={<ClipboardDocumentIcon className="w-8 h-8"/>}
         color="gray"
         value={tasks.filter(task => task.progress ==100).length}
         />
         <StatisticsCard
-        title="No of Projects Pending"
+        title="Projects Pending"
         icon={<ChartPieIcon className="w-8 h-8"/>}
         color="gray"
         value={projects.filter(projects => projects.progress !=100).length}
         />
         <StatisticsCard
-        title="No of Projects Completed"
+        title="Projects Completed"
         icon={<ChartPieIcon className="w-8 h-8"/>}
         color="gray"
         value={projects.filter(projects => projects.progress ==100).length}

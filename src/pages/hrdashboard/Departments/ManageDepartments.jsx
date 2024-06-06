@@ -128,18 +128,19 @@ const data = useMemo(() => {
                 ),
             },
             {
-                Header: 'Department Head',
-                accessor: 'users',
-                Cell: ({ row }) => (
-                    <div>
-                        {row.original.users.map(user => (
-                            <Typography key={user._id} className="text-xs font-semibold text-blue-gray-600">
-                                {user.firstName}&nbsp;{user.lastName} {/* - {user.role} */}
-                            </Typography>
-                        ))}
-                    </div>
-                ),
-            },
+    Header: 'Department Head',
+    accessor: 'users',
+    Cell: ({ row }) => (
+        <div>
+            {row.original.users.map(user => (
+                <Typography key={user._id} className="text-xs font-semibold text-blue-gray-600">
+                    {user && user.firstName ? `${user.firstName} ${user.lastName}` : 'Unknown User'}
+                </Typography>
+            ))}
+        </div>
+    ),
+},
+
             {
                 Header: '',
                 accessor: 'edit',
@@ -193,6 +194,8 @@ const data = useMemo(() => {
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
     } = useTable(
@@ -315,7 +318,7 @@ const handleConfirmDelete = async () => {
                                 </tbody>
                             </table>
                             <div className="mt-4 flex justify-between items-center">
-                                <div className='flex items-center'>
+                                <div className='flex items-center' style={{ marginLeft: '10px' }}>
                                     <Typography className="text-sm text-blue-gray-600">
                                         Page {pageIndex + 1} of {Math.ceil(filteredAuthorsTableData.length / pageSize)}
                                     </Typography>
@@ -331,8 +334,8 @@ const handleConfirmDelete = async () => {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
-                                    <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                <div className='mr-4'>
+                                    <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                         {"<< "}
                                     </span>
                                     <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -341,7 +344,7 @@ const handleConfirmDelete = async () => {
                                     <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                         {" >"}
                                     </span>
-                                    <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                    <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                         {" >>"}
                                     </span>
                                 </div>

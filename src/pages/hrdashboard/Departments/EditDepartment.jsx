@@ -74,6 +74,21 @@ export function EditDepartment({ departmentData, onClose }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+         // Check for empty fields
+         
+    const emptyFields = Object.keys(formData).filter((key) => !formData[key]);
+
+    // Check if any userId is empty
+    const emptyUserIds = formData.userId.filter((userId) => !userId);
+
+    if (emptyFields.length > 0 || emptyUserIds.length > 0) {
+        // Create an error message for empty fields and empty userIds
+        const errorMessage = emptyFields.length > 0 
+            ? `Please fill in the following fields: ${emptyFields.join(', ')}`
+            : 'Please assign member';
+        message.error(errorMessage);
+        return;
+    }
 
         const formDataToSend = new FormData();
         
@@ -100,7 +115,7 @@ export function EditDepartment({ departmentData, onClose }) {
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
-            message.success(`Employee updated successfully`)
+            message.success(`Department updated successfully`)
             const responseData = await response.json();
             setTimeout(()=>{
                 window.location.reload()
@@ -109,7 +124,7 @@ export function EditDepartment({ departmentData, onClose }) {
             
             
         } catch (error) {
-            message.error(`Error updating employee`)
+            message.error(`Error updating Department`)
            
         }
         
@@ -142,9 +157,11 @@ export function EditDepartment({ departmentData, onClose }) {
                                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
                                     >
                                         <option value="">Select User</option>
-                                        {users.map(userItem => (
-                                            <option key={userItem._id} value={userItem._id}>{userItem.firstName} {userItem.lastName}</option>
-                                        ))}
+                                        {users.filter(userItem => userItem.firstName).map(userItem => (
+  <option key={userItem._id} value={userItem._id}>
+    {userItem.firstName} {userItem.lastName}
+  </option>
+))}
                                     </select>
                                     <button
                                         type="button"
@@ -163,11 +180,11 @@ export function EditDepartment({ departmentData, onClose }) {
                                             onClick={handleAddUsers}
                                             className="bg-gray-800   text-white px-10 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
                                         >
-                                            +
+                                            Add
                                         </button></center>
                         </div>
                     </div>
-                    <Button type="submit" className='mt-4'>Update Employee</Button>
+                    <Button type="submit" disabled={!formData.userId} className='mt-4'>Update Department</Button>
                     <Button onClick={onClose} className='mt-4 ml-2'>Cancel</Button>
                 </form>
             </CardBody>

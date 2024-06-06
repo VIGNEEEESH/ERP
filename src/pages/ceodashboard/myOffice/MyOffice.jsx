@@ -58,7 +58,7 @@ export function MyOffice() {
                 setIsClockedOut(statusData.attendance.loggedOutTime);
                 
             } catch (error) {
-                message.error("Error fetching data, please clock in: " + error.message);
+                message.warning("Please clock in to get information");
             }
         };
 
@@ -171,7 +171,7 @@ export function MyOffice() {
                         <Typography variant="h6" color="white" className="mr-4">
                             My Office
                         </Typography>
-                        <span>Last Logged in at so & so</span>
+                        
                     </div>
                     <div className="ml-auto">
                         <Button
@@ -212,7 +212,7 @@ export function MyOffice() {
                                     <tr key={key}>
                                         <td className={className}>
                                             <div className="flex items-center gap-4">
-                                                <Avatar src={`http://localhost:4444/${employee.image}`} alt={employee.name} size="sm" variant="rounded" />
+                                                <Avatar src={`${import.meta.env.REACT_APP_BACKEND_URL}/${employee.image}`} alt={employee.name} size="sm" variant="rounded" />
                                                 <div>
                                                     <Typography variant="small" color="blue-gray" className="font-semibold">
                                                         {employee.firstName}&nbsp;{employee.lastName}

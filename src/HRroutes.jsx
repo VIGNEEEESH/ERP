@@ -36,6 +36,25 @@ const TaskManager = lazy(() => import("./pages/hrdashboard/task manager/taskmana
 const LogRecord = lazy(() => import("./pages/hrdashboard/logrecord/LogRecord"));
 const MyLogRecord = lazy(() => import("./pages/hrdashboard/mylogrecord/MylogRecord"));
 const ManageDepartments = lazy(() => import("./pages/hrdashboard/Departments/ManageDepartments"));
+// import Home from "./pages/hrdashboard/home";
+// import Tables from "./pages/hrdashboard/tables";
+// import Notifications from "./pages/hrdashboard/notifications";
+// import ManageEmployees from "./pages/hrdashboard/manage-employees/manageEmployees";
+// import AttendenceTracker from "./pages/hrdashboard/Attendence/AttendenceTracker";
+// import MyOffice from "./pages/hrdashboard/myOffice/MyOffice";
+// import WorkStatus from "./pages/hrdashboard/workstatus/WorkStatus";
+// import CompanyProducts from "./pages/hrdashboard/companyproducts/CompanyProducts";
+// import OurClients from "./pages/hrdashboard/clients/OurClients";
+// import Leave from "./pages/hrdashboard/leaves/Leave";
+// import Settings from "./pages/hrdashboard/settings/Settings";
+// import Communication from "./pages/hrdashboard/communication/communication";
+// import Projects from "./pages/hrdashboard/projects/projects";
+// import Logout from "./pages/hrdashboard/logout";
+// import Profile from "./pages/hrdashboard/profile/Profile";
+// import TaskManager from "./pages/hrdashboard/task manager/taskmanager";
+// import LogRecord from "./pages/hrdashboard/logrecord/LogRecord";
+// import MyLogRecord from "./pages/hrdashboard/mylogrecord/MylogRecord";
+// import ManageDepartments from "./pages/hrdashboard/Departments/ManageDepartments";
 
 const icon = {
   className: "w-5 h-5 text-inherit",

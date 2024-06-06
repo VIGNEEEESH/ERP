@@ -29,6 +29,19 @@ const Communication = lazy(() => import('./pages/deptheaddashboard/communication
 const Projects = lazy(() => import('./pages/deptheaddashboard/projects/projects'));
 const WorkStatus = lazy(() => import('./pages/deptheaddashboard/workstatus/WorkStatus'));
 const MyLogRecord = lazy(() => import("./pages/deptheaddashboard/mylogrecord/MylogRecord"));
+// import Home from '@/pages/deptheaddashboard/Home';
+// import Notifications from '@/pages/dashboard/Notifications';
+// import LeaveRequests from './pages/deptheaddashboard/leaverequest';
+// import Logout from './pages/deptheaddashboard/logout';
+// import CompanyProducts from './pages/deptheaddashboard/companyproducts/CompanyProducts';
+// import Profile from './pages/deptheaddashboard/profile';
+// import MyOffice from './pages/deptheaddashboard/myoffice';
+// import Settings from './pages/deptheaddashboard/settings/Settings';
+// import TaskManager from './pages/deptheaddashboard/task manager/taskmanager';
+// import Communication from './pages/deptheaddashboard/communication/communication';
+// import Projects from './pages/deptheaddashboard/projects/projects';
+// import WorkStatus from './pages/deptheaddashboard/workstatus/WorkStatus';
+// import MyLogRecord from './pages/deptheaddashboard/mylogrecord/MylogRecord';
 const icon = {
   className: "w-5 h-5 text-inherit",
 };

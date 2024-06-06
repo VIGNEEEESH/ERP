@@ -27,7 +27,7 @@ export function Sidenav({ brandName, routes }) {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`,
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
         {
           headers:{
             Authorization: "Bearer " + auth.token, 
@@ -39,7 +39,7 @@ export function Sidenav({ brandName, routes }) {
         const userData = await response.json();
         if (userData) {
           // Prepend base URL to the image path
-          const imageUrl = `http://localhost:4444/${userData.user.image}`;
+          const imageUrl = `${import.meta.env.REACT_APP_BACKEND_URL}/${userData.user.image}`;
           setProfileImg(imageUrl);
           setFirstName(userData.user.firstName);
         }

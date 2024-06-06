@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect, useState } from "react";
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   Textarea
 } from "@material-tailwind/react";
 import { message } from "antd";
-import { TrashIcon } from "@heroicons/react/24/solid";
 import Modal from "antd/lib/modal/Modal";
 import { AuthContext } from "@/pages/auth/Auth-context";
 
@@ -22,27 +20,28 @@ export function CompanyProducts() {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [image, setImage] = useState("");
-  const auth=useContext(AuthContext)
- const [productToDelete,setProductToDelete]=useState(null)
- const [productToUpdate,setProductToUpdate]=useState(null)
+  const auth = useContext(AuthContext);
+  const [productToDelete, setProductToDelete] = useState(null);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/get/all/products`,{headers:{Authorization:"Bearer "+auth.token}}
+          `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/get/all/products`,
+          { headers: { Authorization: "Bearer " + auth.token } }
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch attendance data: ${response.status}`);
+          throw new Error(`Failed to fetch products: ${response.status}`);
         }
         const data = await response.json();
         setProducts(data.products);
       } catch (error) {
-        message.error("Error fetching products ", error.message);
+        message.error("Error fetching products: " + error.message);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [auth.token]);
 
   const handleAddProduct = () => {
     setShowAddProducts(true);
@@ -61,12 +60,10 @@ export function CompanyProducts() {
     });
     setShowUpdateProduct(true);
   };
-  
 
   const handleUpdateCancel = () => {
     setShowUpdateProduct(false);
-    setProductDescription("")
-    setProductName("")
+    setCurrentProduct(null);
   };
 
   const handleProductNameChange = (e) => {
@@ -74,143 +71,139 @@ export function CompanyProducts() {
       ...currentProduct,
       productName: e.target.value
     });
-    setProductName(e.target.value);
   };
-  
+
   const handleProductDescriptionChange = (e) => {
     setCurrentProduct({
       ...currentProduct,
       productDescription: e.target.value
     });
-    setProductDescription(e.target.value);
   };
-  
 
   const handleImageChange = (e) => {
-    // Assuming you're only allowing single file uploads
     const file = e.target.files[0];
     setImage(file);
   };
+
   const handleDeleteProduct = (_id, productName) => {
     setShowDeleteModal(true);
-    const product = { _id, productName }; // Creating a product object with _id and productName
+    const product = { _id, productName };
     setProductToDelete(product);
-    
-    
   };
-  
-  
 
-const handleCloseDeleteModal = () => {
+  const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setProductToDelete(null);
+  };
 
-};
-
-    
-
-const handleConfirmDelete = async () => {
-  try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/delete/product/byid/${productToDelete._id}`, {
-          method: 'DELETE',
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/delete/product/byid/${productToDelete._id}`,
+        {
+          method: "DELETE",
           headers: {
-              'Content-Type': 'application/json',
-              Authorization: "Bearer " + auth.token
-          },
-      });
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token
+          }
+        }
+      );
 
       if (response.ok) {
-          setProducts(products.filter(product => product._id !== productToDelete._id)); // <-- Here's the filter logic
-
-          setShowDeleteModal(false);
-          setProductToDelete(null);
-          message.success("Project Sucessfully Deleted");
+        setProducts(products.filter((product) => product._id !== productToDelete._id));
+        setShowDeleteModal(false);
+        setProductToDelete(null);
+        message.success("Product successfully deleted");
       } else {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  } catch (error) {
-      console.error('Error deleting project:', error);
-  }
-};
-
-
-
-  
-
-const handleProductSubmit = async () => {
-  try {
-    const formData = new FormData();
-    
-    // Assuming you have variables `productName`, `productDescription`, and `productImage` containing the respective data
-    
-    formData.append('productName', productName);
-    formData.append('productDescription', productDescription);
-    formData.append('image', image); // Assuming productImage is the File object of the image
-    const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/create/product`, {
-      method: "POST",
-      headers:{ Authorization: "Bearer " + auth.token},
-      body: formData 
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to create product");
+    } catch (error) {
+      message.error("Error deleting product: " + error.message);
     }
+  };
 
-    // Assuming the product creation was successful, you might want to handle this accordingly
-    message.success("Product created successfully");
+  const handleProductSubmit = async () => {
+    try {
+      const formData = new FormData();
+      const emptyFields = [];
+      if (!productName) emptyFields.push("productName");
+      if (!productDescription) emptyFields.push("productDescription");
+      if (!image) emptyFields.push("image");
 
-    // Close the modal and reset form data
-    setProductDescription("")
-    setProductName("")
-    setShowAddProducts(false);
-     setTimeout(()=>{
-      window.location.reload()
-     },[100])
-  } catch (error) {
-    message.error(`Failed to create product: ${error.message}`);
-  }
-};
+      if (emptyFields.length > 0) {
+        const errorMessage = `Please fill in the following fields: ${emptyFields.join(", ")}`;
+        message.error(errorMessage);
+        return;
+      }
 
+      formData.append("productName", productName);
+      formData.append("productDescription", productDescription);
+      formData.append("image", image);
 
+      const response = await fetch(
+        `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/create/product`,
+        {
+          method: "POST",
+          headers: { Authorization: "Bearer " + auth.token },
+          body: formData
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error("Failed to create product");
+      }
 
-
-
-  
-
-  const handleUpdateSubmit = async() => {
-    try{
-    const formData = new FormData();
-    
-    // Assuming you have variables `productName`, `productDescription`, and `productImage` containing the respective data
-    
-    formData.append('productName', currentProduct.productName);
-    formData.append('productDescription', currentProduct.productDescription);
-    formData.append('image', image); // Assuming productImage is the File object of the image
-    
-    const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/update/product/byid/${currentProduct._id}`, {
-      method: "PATCH",
-      headers:{ Authorization: "Bearer " + auth.token},
-      body: formData 
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to create product");
+      message.success("Product created successfully");
+      setProductDescription("");
+      setProductName("");
+      setShowAddProducts(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (error) {
+      message.error(`Failed to create product: ${error.message}`);
     }
+  };
 
-    // Assuming the product creation was successful, you might want to handle this accordingly
-    message.success("Product created successfully");
+  const handleUpdateSubmit = async () => {
+    try {
+      const formData = new FormData();
+      const emptyFields = [];
+      if (!currentProduct.productName) emptyFields.push("productName");
+      if (!currentProduct.productDescription) emptyFields.push("productDescription");
+      if (image && !image.name) emptyFields.push("image");
 
-    // Close the modal and reset form data
-    setShowAddProducts(false);
-     setTimeout(()=>{
-      window.location.reload()
-     },[100])
-  } catch (error) {
-    message.error(`Failed to create product: ${error.message}`);
-  }
-    setShowUpdateProduct(false);
-    // Perform update operation with productName, productDescription, and productImage
+      if (emptyFields.length > 0) {
+        const errorMessage = `Please fill in the following fields: ${emptyFields.join(", ")}`;
+        message.error(errorMessage);
+        return;
+      }
+
+      formData.append("productName", currentProduct.productName);
+      formData.append("productDescription", currentProduct.productDescription);
+      if (image) formData.append("image", image);
+
+      const response = await fetch(
+        `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/product/update/product/byid/${currentProduct._id}`,
+        {
+          method: "PATCH",
+          headers: { Authorization: "Bearer " + auth.token },
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update product");
+      }
+
+      message.success("Product updated successfully");
+      setShowUpdateProduct(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (error) {
+      message.error(`Failed to update product: ${error.message}`);
+    }
   };
 
   return (
@@ -235,53 +228,55 @@ const handleProductSubmit = async () => {
           </div>
         </CardBody>
 
-        <div className=" px-4 pb-4 mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
-          {products.map(
-            ({ image, productName, productDescription,_id }) => (
-              <Card key={productName} color="transparent" shadow={false}>
-                <div className="mx-0 mt-0 mb-4 h-64 xl:h-40">
-                  <img
-                    src={`http://localhost:4444/${image}`}
-                    alt={productName}
-                    className="h-full w-full object-cover"
-                  />
+        <div className="px-4 pb-4 mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
+          {products.map(({ image, productName, productDescription, _id }) => (
+            <Card key={productName} color="transparent" shadow={false}>
+              <div className="mx-0 mt-0 mb-4 h-64 xl:h-40">
+                <img
+                  src={`${import.meta.env.REACT_APP_BACKEND_URL}/${image}`}
+                  alt={productName}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <CardBody className="py-0 px-1 flex flex-col items-center justify-between">
+                <Typography variant="h5" color="blue-gray" className="mt-1 mb-2">
+                  {productName}
+                </Typography>
+                <Typography variant="small" className="font-normal text-blue-gray-500">
+                  {productDescription}
+                </Typography>
+                <div className="flex mt-4">
+                  <Button
+                    className="mr-4"
+                    onClick={() =>
+                      handleUpdateProduct({ productName, productDescription, image, _id })
+                    }
+                  >
+                    Update
+                  </Button>
+                  <Button onClick={() => handleDeleteProduct(_id, productName)}>
+                    Delete
+                  </Button>
                 </div>
-                <CardBody className="py-0 px-1 flex flex-col items-center justify-between">
-                  <Typography variant="h5" color="blue-gray" className="mt-1 mb-2">
-                    {productName}
-                  </Typography>
-                  <Typography variant="small" className="font-normal text-blue-gray-500">
-                    {productDescription}
-                  </Typography>
-                  <div className="flex mt-4">
-                    <Button className="mr-4" onClick={() => handleUpdateProduct({ productName, productDescription, image,_id })}>Update</Button>
-                    <Button>
-  <TrashIcon onClick={() => handleDeleteProduct(_id, productName)} className="w-4 h-4" />
-</Button>
-
-                  </div>
-                </CardBody>
-              </Card>
-            )
-          )}
+              </CardBody>
+            </Card>
+          ))}
         </div>
       </Card>
       <Modal
-                title="Delete Product"
-                open={showDeleteModal}
-                onOk={handleConfirmDelete}
-                onCancel={handleCloseDeleteModal}
-                okButtonProps={{ style: { backgroundColor: 'black' } }}
-
-            >
-                <p>Are you sure you want to delete this Product?</p>
-                {productToDelete && (
-                    <div>
-                        <p>Product Name: {productToDelete.productName}</p>
-                        
-                    </div>
-                )}
-            </Modal>
+        title="Delete Product"
+        open={showDeleteModal}
+        onOk={handleConfirmDelete}
+        onCancel={handleCloseDeleteModal}
+        okButtonProps={{ style: { backgroundColor: "black" } }}
+      >
+        <p>Are you sure you want to delete this product?</p>
+        {productToDelete && (
+          <div>
+            <p>Product Name: {productToDelete.productName}</p>
+          </div>
+        )}
+      </Modal>
       {/* Modal for adding product */}
       <Modal
         title="Add Product"
@@ -296,8 +291,7 @@ const handleProductSubmit = async () => {
             className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             label="Enter product name"
             value={productName}
-            onChange={handleProductNameChange}
-            
+            onChange={(e) => setProductName(e.target.value)}
           />
         </div>
         <div className="p-4">
@@ -307,7 +301,7 @@ const handleProductSubmit = async () => {
             name="productDescription"
             label="Enter product description"
             value={productDescription}
-            onChange={handleProductDescriptionChange}
+            onChange={(e) => setProductDescription(e.target.value)}
           />
         </div>
         <div className="p-4">
@@ -319,9 +313,7 @@ const handleProductSubmit = async () => {
           />
         </div>
         <div className="p-4 flex justify-end">
-          <Button onClick={handleProductSubmit}>
-            Add Product
-          </Button>
+          <Button onClick={handleProductSubmit}>Add Product</Button>
         </div>
       </Modal>
 
@@ -359,9 +351,7 @@ const handleProductSubmit = async () => {
           />
         </div>
         <div className="p-4 flex justify-end">
-          <Button onClick={handleUpdateSubmit}>
-            Update Product
-          </Button>
+          <Button onClick={handleUpdateSubmit}>Update Product</Button>
         </div>
       </Modal>
     </>

@@ -2,18 +2,16 @@ import { useLocation, Link } from "react-router-dom";
 import {
   Navbar,
   Typography,
-  Button,
   IconButton,
   Breadcrumbs,
-  Input,
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
   Avatar,
+  Tooltip,
 } from "@material-tailwind/react";
 import {
-  UserCircleIcon,
   Cog6ToothIcon,
   BellIcon,
   ClockIcon,
@@ -72,9 +70,9 @@ export function DashboardNavbar() {
           </Typography>
         </div>
         <div className="flex items-center">
-          <div className="mr-auto md:mr-4 md:w-56">
+          {/* <div className="mr-auto md:mr-4 md:w-56">
             <Input label="Search" />
-          </div>
+          </div> */}
           <IconButton
             variant="text"
             color="blue-gray"
@@ -85,9 +83,11 @@ export function DashboardNavbar() {
           </IconButton>
           <Menu>
             <MenuHandler>
-              <IconButton variant="text" color="blue-gray">
-                <BellIcon className="h-5 w-5 text-blue-gray-500" />
-              </IconButton>
+              <Tooltip content="Notifications" className="text-xs py-1 px-2">
+                <IconButton variant="text" color="blue-gray">
+                  <BellIcon className="h-5 w-5 text-blue-gray-500" />
+                </IconButton>
+              </Tooltip>
             </MenuHandler>
             <MenuList className="w-max border-0">
               <MenuItem className="flex items-center gap-3">

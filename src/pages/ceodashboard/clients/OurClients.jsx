@@ -4,15 +4,13 @@ import {
     CardHeader,
     CardBody,
     Typography,
-    Avatar,
-    Button,Input
+    Button, Input
 } from "@material-tailwind/react";
 import { ArrowLeftIcon, UserPlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { useTable, usePagination } from 'react-table';
 import AddClient from './AddClient';
 import { Modal, message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
-
 
 export function OurClients() {
     const [showAddClient, setShowAddClient] = useState(false);
@@ -21,12 +19,13 @@ export function OurClients() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [clientToDelete, setClientToDelete] = useState(null);
-const auth=useContext(AuthContext)
+    const auth = useContext(AuthContext);
+
     useEffect(() => {
         const fetchClients = async () => {
             try {
                 const response = await fetch(
-                    `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/get/all/clients`,{headers:{Authorization: "Bearer " + auth.token,}}
+                    `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/get/all/clients`, { headers: { Authorization: "Bearer " + auth.token } }
                 );
 
                 if (!response.ok) {
@@ -35,40 +34,28 @@ const auth=useContext(AuthContext)
 
                 const data = await response.json();
                 setClients(data.clients);
-
             } catch (err) {
                 message.error("Error fetching clients:", err.message);
             }
         };
         fetchClients();
-    }, []);
+    }, [auth.token]);
 
     const columns = useMemo(
         () => [
-
-            {
-                Header: 'Company Name',
-                accessor: 'companyName',
-            },
-            {
-                Header: 'Client Name',
-                accessor: 'clientName',
-            },
-            {
-                Header: 'Mobile',
-                accessor: 'mobile',
-            },
-            {
-                Header: 'Email',
-                accessor: 'email',
-            },
+            { Header: 'Company Name', accessor: 'companyName' },
+            { Header: 'Client Name', accessor: 'clientName' },
+            { Header: 'Mobile', accessor: 'mobile' },
+            { Header: 'Email', accessor: 'email' },
             {
                 Header: 'Projects',
                 accessor: 'projects',
                 Cell: ({ value }) => (
-                    <Typography className="text-xs font-semibold text-blue-gray-600">
-                        {value.join(', ')}
-                    </Typography>
+                    <ul className="text-xs font-semibold text-blue-gray-600 list-disc pl-4">
+                        {value.map((project, index) => (
+                            <li key={index}>{project}</li>
+                        ))}
+                    </ul>
                 ),
             },
             {
@@ -76,7 +63,7 @@ const auth=useContext(AuthContext)
                 accessor: 'edit',
                 Cell: ({ row }) => (
                     <Typography as="a" href="#" className="text-xs font-semibold text-blue-gray-600 flex" onClick={() => handleUpdateClick(row.original)}>
-                        <PencilIcon className="h-4 w-4 mr-2"/>Edit
+                        <PencilIcon className="h-4 w-4 mr-2" />Edit
                     </Typography>
                 ),
             },
@@ -102,6 +89,8 @@ const auth=useContext(AuthContext)
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex, pageSize },
         prepareRow,
         setPageSize
@@ -128,12 +117,9 @@ const auth=useContext(AuthContext)
         setShowDeleteModal(false);
         setClientToDelete(null);
     };
-   
-        
 
     const handleConfirmDelete = async () => {
         try {
-            
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/delete/client/byid/${clientToDelete._id}`, {
                 method: 'DELETE',
                 headers: {
@@ -141,19 +127,17 @@ const auth=useContext(AuthContext)
                     Authorization: "Bearer " + auth.token,
                 },
             });
-    
+
             if (response.ok) {
-                
                 setClients(clients.filter(client => client._id !== clientToDelete._id));
-    
                 setShowDeleteModal(false);
                 setClientToDelete(null);
-                message.success("Project Sucessfully Deleted");
+                message.success("Client successfully deleted");
             } else {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
         } catch (error) {
-            console.error('Error deleting project:', error);
+            console.error('Error deleting client:', error);
         }
     };
 
@@ -161,33 +145,34 @@ const auth=useContext(AuthContext)
         setShowUpdateModal(false);
         setSelectedClient(null);
     };
+
     const handleUpdate = async (client) => {
         try {
+            const emptyFields = Object.keys(client).filter((key) => !client[key]);
+
+            if (emptyFields.length > 0) {
+                const errorMessage = `Please fill in the following fields: ${emptyFields.join(', ')}`;
+                message.error(errorMessage);
+                return;
+            }
+
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/client/update/client/byid/${client._id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json",Authorization: "Bearer " + auth.token, },
-                body: JSON.stringify(client) // Pass the updated client object in the request body
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + auth.token },
+                body: JSON.stringify(client)
             });
-    
+
             if (!response.ok) {
                 throw new Error("Something went wrong, please try again");
             }
-            
-            // Update the client in the local state with the updated data
+
             setClients(clients.map(c => (c._id === client._id ? client : c)));
-    
             message.success("Client updated successfully");
-            
             setShowUpdateModal(false);
             setSelectedClient(null);
         } catch (err) {
             message.error("Something went wrong, please try again");
         }
-    };
-    const handleUpdateClient = async (updatedClient) => {
-        
-        setShowUpdateModal(false);
-        setSelectedClient(null);
     };
 
     return (
@@ -236,7 +221,7 @@ const auth=useContext(AuthContext)
                             </tbody>
                         </table>
                         <div className="mt-4 flex justify-between items-center">
-                            <div className='flex items-center'>
+                            <div className='flex items-center' style={{ marginLeft: '10px' }}>
                                 <Typography className="text-sm text-blue-gray-600">
                                     Page {pageIndex + 1} of {Math.ceil(clients.length / pageSize)}
                                 </Typography>
@@ -252,17 +237,17 @@ const auth=useContext(AuthContext)
                                     ))}
                                 </select>
                             </div>
-                            <div className='p-2 mr-4'>
-                                <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                            <div style={{ marginRight: '20px' }}>
+                                <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"<< "}
                                 </span>
-                                <span onClick={previousPage} disabled={!canPreviousPage} className='cursor-pointer'>
+                                <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"< "}
                                 </span>
-                                <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                                <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >"}
                                 </span>
-                                <span onClick={nextPage} disabled={!canNextPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >>"}
                                 </span>
                             </div>
@@ -276,7 +261,6 @@ const auth=useContext(AuthContext)
                 onOk={handleConfirmDelete}
                 onCancel={handleCloseDeleteModal}
                 okButtonProps={{ style: { backgroundColor: 'black' } }}
-
             >
                 <p>Are you sure you want to delete this Client?</p>
                 {clientToDelete && (
@@ -340,11 +324,9 @@ function UpdateClientForm({ client, onUpdate }) {
         }));
     };
 
-   
-    
     const handleSubmit = (e) => {
         e.preventDefault();
-        onUpdate(updatedClientData); 
+        onUpdate(updatedClientData);
     };
 
     return (
@@ -377,6 +359,5 @@ function UpdateClientForm({ client, onUpdate }) {
         </form>
     );
 }
-
 
 export default OurClients;

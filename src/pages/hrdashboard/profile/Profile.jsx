@@ -80,7 +80,7 @@ const auth=useContext(AuthContext)
       const fetchUser = async () => {
         try {
           const response = await fetch(
-            `http://localhost:4444/api/erp/user/get/user/byid/${auth.userId}`,
+            `${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`,
             {
               headers:{
                 Authorization: "Bearer " + auth.token, 
@@ -105,10 +105,10 @@ const auth=useContext(AuthContext)
     const handleProfileUpdate=async()=>{
       try{
         
-        const response=await fetch(import.meta.env.REACT_APP_BACKEND_URL+`/api/erp/user/update/user/byid/${auth.userId}`,
+        const response=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/update/user/byid/${auth.userId}`,
         {
           method:"PATCH",
-          headers:{"Content-Type":"application/json"},
+          headers:{"Content-Type":"application/json",Authorization: "Bearer " + auth.token,},
           body:JSON.stringify(formData)})
           if(!response.ok){
             return error(`Http error: `,response.message)
@@ -130,18 +130,18 @@ const auth=useContext(AuthContext)
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover bg-center">
         <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
       </div>
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
+      <Card className="mx-3 mb-6 lg:mx-4 border border-blue-gray-100 mt-[-14rem]">
         <CardBody className="p-4 space-y-6">
           <div className="flex items-start justify-start gap-6">
             <Avatar
-              src={`http://localhost:4444/${formData.image}`}
+              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${formData.image}`}
               alt="Profile Picture"
               size="xxl"
               variant="rounded"
               className="rounded-lg shadow-lg shadow-blue-gray-500/40"
             />
-            <div className="flex flex-col space-y-4 ml-8">
-              <Typography variant="h5" color="blue-gray" className="mb-4 mt-2 gap-4">
+            <div className="flex flex-col space-y-2 ml-8">
+              <Typography variant="h4" color="blue-gray" className="mb-4 mt-2 gap-4">
                 {isEditing ? (
                   <>
                     <Input

@@ -89,7 +89,7 @@ export function Home() {
         value={employees.length}
         />
         <StatisticsCard
-        title="Employees Clocked In"
+        title="Employees Clock In"
         icon={<UsersIcon className="w-8 h-8"/>}
         color="gray"
         value={attendance.filter(attendance => !attendance.loggedOutTime  ).length}
