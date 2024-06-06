@@ -55,7 +55,7 @@ function EmployeeProjects() {
                   </Typography>
                 </th>
                 <th className="border-b border-blue-gray-50 py-3 px-5 text-left w-2/12">
-                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400">
+                  <Typography variant="small" className="text-[12px] font-bold uppercase text-blue-gray-400" >
                     Description
                   </Typography>
                 </th>
@@ -90,7 +90,7 @@ function EmployeeProjects() {
                     </Typography>
                   </td>
                   <td className="text-[12px] py-3 px-5 truncate w-48">
-                    <Typography className="text-xs font-normal text-blue-gray-500">
+                    <Typography className="text-xs font-normal text-blue-gray-500" style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
                       {project.projectDescription}
                     </Typography>
                   </td>

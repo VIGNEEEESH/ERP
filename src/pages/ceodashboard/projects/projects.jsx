@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Card, CardHeader, CardBody, Typography, Avatar, Button } from "@material-tailwind/react";
+import { Card, CardHeader, CardBody, Typography, Button } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
 import { Progress } from "@material-tailwind/react";
 import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/solid';
@@ -12,7 +12,7 @@ export function Projects({ onAddProject }) {
     const [pageSize, setPageSize] = useState(5);
     const [projects, setProjects] = useState([]);
     const [showAddProject, setShowAddProject] = useState(false);
-    const [selectedProject, setSelectedProject] = useState(null); // State to keep track of selected project for update
+    const [selectedProject, setSelectedProject] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editProjectData, setEditProjectData] = useState(null);
     const [showEditProject, setShowEditProject] = useState(false);
@@ -60,7 +60,7 @@ export function Projects({ onAddProject }) {
                 Header: 'Project Description',
                 accessor: 'projectDescription',
                 Cell: ({ row }) => (
-                    <div className="whitespace-pre-wrap" style={{ width: '300px', height: '100px', overflow: 'auto' }}>
+                    <div className="whitespace-pre-wrap" style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
                         <Typography className="font-semibold">{row.original.projectDescription}</Typography>
                     </div>
                 ),
@@ -137,6 +137,8 @@ export function Projects({ onAddProject }) {
         previousPage,
         canNextPage,
         canPreviousPage,
+        gotoPage,
+        pageCount,
         state: { pageIndex },
         prepareRow,
         setPageSize: setTablePageSize,
@@ -271,7 +273,7 @@ export function Projects({ onAddProject }) {
                                 </select>
                             </div>
                             <div className='mr-4'>
-                                <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
                                     {"<< "}
                                 </span>
                                 <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
@@ -280,7 +282,7 @@ export function Projects({ onAddProject }) {
                                 <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >"}
                                 </span>
-                                <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
+                                <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
                                     {" >>"}
                                 </span>
                             </div>

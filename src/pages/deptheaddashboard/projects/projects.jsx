@@ -63,7 +63,7 @@ useEffect(() => {
                   Header: 'Project Description',
                   accessor: 'projectDescription',
                   Cell: ({ row }) => (
-                      <div className="whitespace-pre-wrap" style={{ width: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div className="whitespace-pre-wrap"style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
                           <Typography className="font-semibold">{row.original.projectDescription}</Typography>
                       </div>
                   ),

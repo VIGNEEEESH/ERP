@@ -63,7 +63,7 @@ const TaskManager = () => {
                 Header: 'Description',
                 accessor: 'taskDescription',
                 Cell: ({ row }) => (
-                    <div className="whitespace-pre-wrap" style={{ width: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div className="whitespace-pre-wrap" style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
                         <Typography className="font-semibold">{row.original.taskDescription}</Typography>
                     </div>
                 ),

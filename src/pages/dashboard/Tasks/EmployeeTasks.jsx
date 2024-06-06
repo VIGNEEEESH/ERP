@@ -90,7 +90,7 @@ function EmployeeTasks() {
                     </Typography>
                   </td>
                   <td className="py-3 px-5 truncate w-48">
-                    <Typography className="text-xs font-normal text-blue-gray-500">
+                    <Typography className="text-xs font-normal text-blue-gray-500" style={{ maxWidth: '300px', maxHeight: '50px', overflowY: 'auto', overflowX: 'hidden', wordWrap: 'break-word' }}>
                       {task.taskDescription}
                     </Typography>
                   </td>
