@@ -13,6 +13,8 @@ const projectRoutes = require("./Routes/Project-Routes");
 const taskRoutes = require("./Routes/Task-Routes");
 const userRoutes = require("./Routes/User-Routes");
 const workRoutes = require("./Routes/Work-Routes");
+const messageRoutes = require("./Routes/Message-Routes");
+const chatRoutes = require("./Routes/Chat-Routes");
 const path = require("path");
 app.use(bodyParser.json());
 app.use(cors());
@@ -43,6 +45,8 @@ app.use("/api/erp/project", projectRoutes);
 app.use("/api/erp/task", taskRoutes);
 app.use("/api/erp/user", userRoutes);
 app.use("/api/erp/work", workRoutes);
+app.use("/api/erp/message", messageRoutes);
+app.use("/api/erp/chat", chatRoutes);
 app.get("/", (req, res) => {
   return res.status(200).json({
     message: "Hello World",
