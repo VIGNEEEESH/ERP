@@ -1,0 +1,20 @@
+/* Add to your global CSS file */
+
+:root {
+    --dark-bg: #1a202c;
+    --dark-text: #cbd5e0;
+    --dark-nav: #2d3748;
+  }
+  
+  .dark .bg-dark-bg {
+    background-color: var(--dark-bg);
+  }
+  
+  .dark .text-dark-text {
+    color: var(--dark-text);
+  }
+  
+  .dark .bg-dark-nav {
+    background-color: var(--dark-nav);
+  }
+  

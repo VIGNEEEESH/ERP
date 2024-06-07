@@ -5,7 +5,7 @@ import { AuthContext } from "./pages/auth/Auth-context";
 import { useAuth } from "./pages/auth/auth-hook";
 import ForgotPassword from "./pages/auth/Forgot-Password";
 import UpdatePassword from "./pages/auth/reset-password";
-
+import "./App.css"
 // Lazy-loaded components
 const Dashboard = lazy(() => import("@/layouts/Dashboard"));
 const Auth = lazy(() => import("@/layouts/Auth"));

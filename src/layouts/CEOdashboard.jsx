@@ -24,6 +24,7 @@ export function CEODashboard() {
       />
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
+        <Configurator />
         <Routes>
           {CEOroutes.map(
             ({ layout, pages }) =>

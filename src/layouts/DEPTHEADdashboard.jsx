@@ -25,7 +25,8 @@ export function DEPTHEADDashboard() {
       />
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
-        
+        <Configurator />
+
         <Routes>
           {DEPTHEADroutes.map(
             ({ layout, pages }) =>
