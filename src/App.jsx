@@ -28,14 +28,12 @@ function App() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // Check if authentication information is available
     if (role === null) {
       setLoading(false);
     }
   }, [role]);
 
   if (loading) {
-    // Display a loading spinner while authentication is in progress
     return (
       <div
         style={{
@@ -125,4 +123,3 @@ function App() {
 
 export default App;
 
-//Testing

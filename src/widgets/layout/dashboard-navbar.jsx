@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
   Navbar,
@@ -17,6 +18,8 @@ import {
   ClockIcon,
   CreditCardIcon,
   Bars3Icon,
+  SunIcon,
+  MoonIcon,
 } from "@heroicons/react/24/solid";
 import {
   useMaterialTailwindController,
@@ -29,6 +32,16 @@ export function DashboardNavbar() {
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
 
   return (
     <Navbar
@@ -37,7 +50,7 @@ export function DashboardNavbar() {
         fixedNavbar
           ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
           : "px-0 py-1"
-      }`}
+      } ${darkMode ? "bg-dark-nav text-dark-text" : ""}`}
       fullWidth
       blurred={fixedNavbar}
     >
@@ -52,7 +65,9 @@ export function DashboardNavbar() {
               <Typography
                 variant="small"
                 color="blue-gray"
-                className="font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100"
+                className={`font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100 ${
+                  darkMode ? "text-dark-text" : ""
+                }`}
               >
                 {layout}
               </Typography>
@@ -60,19 +75,16 @@ export function DashboardNavbar() {
             <Typography
               variant="small"
               color="blue-gray"
-              className="font-normal"
+              className={`font-normal ${darkMode ? "text-dark-text" : ""}`}
             >
               {page}
             </Typography>
           </Breadcrumbs>
-          <Typography variant="h6" color="blue-gray">
+          <Typography variant="h6" color="blue-gray" className={darkMode ? "text-dark-text" : ""}>
             {page}
           </Typography>
         </div>
         <div className="flex items-center">
-          {/* <div className="mr-auto md:mr-4 md:w-56">
-            <Input label="Search" />
-          </div> */}
           <IconButton
             variant="text"
             color="blue-gray"
@@ -80,6 +92,17 @@ export function DashboardNavbar() {
             onClick={() => setOpenSidenav(dispatch, !openSidenav)}
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
+          </IconButton>
+          <IconButton
+            variant="text"
+            color="blue-gray"
+            onClick={() => setDarkMode(!darkMode)}
+          >
+            {darkMode ? (
+              <SunIcon className="h-5 w-5 text-yellow-500" />
+            ) : (
+              <MoonIcon className="h-5 w-5 text-blue-gray-500" />
+            )}
           </IconButton>
           <Menu>
             <MenuHandler>
