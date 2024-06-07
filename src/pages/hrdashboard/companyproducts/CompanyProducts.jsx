@@ -1,25 +1,28 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   Card,
+  CardHeader,
   CardBody,
   Typography,
   Button,
   Input,
-  Textarea
+  Textarea,
 } from "@material-tailwind/react";
 import { message } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import { AuthContext } from "@/pages/auth/Auth-context";
 
-export function CompanyProducts() {
+const CompanyProducts = () => {
   const [products, setProducts] = useState([]);
   const [showAddProducts, setShowAddProducts] = useState(false);
   const [showUpdateProduct, setShowUpdateProduct] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showProductDetails, setShowProductDetails] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const auth = useContext(AuthContext);
   const [productToDelete, setProductToDelete] = useState(null);
 
@@ -56,7 +59,7 @@ export function CompanyProducts() {
       productName: product.productName,
       productDescription: product.productDescription,
       image: product.image,
-      _id: product._id
+      _id: product._id,
     });
     setShowUpdateProduct(true);
   };
@@ -69,14 +72,14 @@ export function CompanyProducts() {
   const handleProductNameChange = (e) => {
     setCurrentProduct({
       ...currentProduct,
-      productName: e.target.value
+      productName: e.target.value,
     });
   };
 
   const handleProductDescriptionChange = (e) => {
     setCurrentProduct({
       ...currentProduct,
-      productDescription: e.target.value
+      productDescription: e.target.value,
     });
   };
 
@@ -104,8 +107,8 @@ export function CompanyProducts() {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + auth.token
-          }
+            Authorization: "Bearer " + auth.token,
+          },
         }
       );
 
@@ -125,14 +128,8 @@ export function CompanyProducts() {
   const handleProductSubmit = async () => {
     try {
       const formData = new FormData();
-      const emptyFields = [];
-      if (!productName) emptyFields.push("productName");
-      if (!productDescription) emptyFields.push("productDescription");
-      if (!image) emptyFields.push("image");
-
-      if (emptyFields.length > 0) {
-        const errorMessage = `Please fill in the following fields: ${emptyFields.join(", ")}`;
-        message.error(errorMessage);
+      if (!productName || !productDescription || !image) {
+        message.error("Please fill in all fields and upload an image.");
         return;
       }
 
@@ -145,7 +142,7 @@ export function CompanyProducts() {
         {
           method: "POST",
           headers: { Authorization: "Bearer " + auth.token },
-          body: formData
+          body: formData,
         }
       );
 
@@ -168,14 +165,8 @@ export function CompanyProducts() {
   const handleUpdateSubmit = async () => {
     try {
       const formData = new FormData();
-      const emptyFields = [];
-      if (!currentProduct.productName) emptyFields.push("productName");
-      if (!currentProduct.productDescription) emptyFields.push("productDescription");
-      if (image && !image.name) emptyFields.push("image");
-
-      if (emptyFields.length > 0) {
-        const errorMessage = `Please fill in the following fields: ${emptyFields.join(", ")}`;
-        message.error(errorMessage);
+      if (!currentProduct.productName || !currentProduct.productDescription) {
+        message.error("Please fill in all fields.");
         return;
       }
 
@@ -188,7 +179,7 @@ export function CompanyProducts() {
         {
           method: "PATCH",
           headers: { Authorization: "Bearer " + auth.token },
-          body: formData
+          body: formData,
         }
       );
 
@@ -206,55 +197,80 @@ export function CompanyProducts() {
     }
   };
 
-  return (
-    <>
-      <div className="relative mt-8 h-32 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover bg-center">
-        <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
-      </div>
+  const handleCardClick = (product) => {
+    setSelectedProduct(product);
+    setShowProductDetails(true);
+  };
 
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
-        <CardBody className="p-4">
-          <div className="px-4 pb-4">
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Our Products
-            </Typography>
-            <Typography variant="small" className="font-normal text-blue-gray-500">
-              Products and services that we are serving
-            </Typography>
-            <div className=" flex justify-between items-center">
-              <div></div>
-              <Button onClick={handleAddProduct}>Add Product</Button>
-            </div>
+  const handleCloseProductDetails = () => {
+    setShowProductDetails(false);
+    setSelectedProduct(null);
+  };
+
+  return (
+    <div className="mt-12 mb-8 flex flex-col gap-12 ml-4">
+      <Card>
+        <CardHeader
+          variant="gradient"
+          color="gray"
+          className="mb-8 p-6 flex justify-between items-center"
+        >
+          <Typography variant="h6" color="white">
+            Manage Products
+          </Typography>
+          <div className="flex justify-between items-center">
+            <div></div>
+            <Button
+              onClick={handleAddProduct}
+              className="border border-white bg-black text-white hover:bg-blue-700"
+            >
+              Add Product
+            </Button>
           </div>
-        </CardBody>
+        </CardHeader>
 
         <div className="px-4 pb-4 mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
-          {products.map(({ image, productName, productDescription, _id }) => (
-            <Card key={productName} color="transparent" shadow={false}>
+          {products.map((product) => (
+            <Card
+              key={product.productName}
+              color="transparent"
+              shadow={true}
+              className="relative transition-transform transform hover:scale-105 hover:shadow-xl rounded-lg"
+              style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
+              onClick={() => handleCardClick(product)}
+            >
               <div className="mx-0 mt-0 mb-4 h-64 xl:h-40">
                 <img
-                  src={`${import.meta.env.REACT_APP_BACKEND_URL}/${image}`}
-                  alt={productName}
-                  className="h-full w-full object-cover"
+                  src={`${import.meta.env.REACT_APP_BACKEND_URL}/${product.image}`}
+                  alt={product.productName}
+                  className="h-full w-full object-cover rounded-t-lg"
                 />
               </div>
               <CardBody className="py-0 px-1 flex flex-col items-center justify-between">
-                <Typography variant="h5" color="blue-gray" className="mt-1 mb-2">
-                  {productName}
+                <Typography
+                  variant="h5"
+                  color="blue-gray"
+                  className="mt-1 mb-2"
+                >
+                  {product.productName}
                 </Typography>
-                <Typography variant="small" className="font-normal text-blue-gray-500">
-                  {productDescription}
-                </Typography>
-                <div className="flex mt-4">
+                <div className="flex mt-2 mb-4"> {/* Adjust the margin here */}
                   <Button
-                    className="mr-4"
-                    onClick={() =>
-                      handleUpdateProduct({ productName, productDescription, image, _id })
-                    }
+                    className="mr-4 py-1 px-2.5 text-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateProduct(product);
+                    }}
                   >
                     Update
                   </Button>
-                  <Button onClick={() => handleDeleteProduct(_id, productName)}>
+                  <Button
+                    className="py-1 px-2.5 text-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProduct(product._id, product.productName);
+                    }}
+                  >
                     Delete
                   </Button>
                 </div>
@@ -273,11 +289,11 @@ export function CompanyProducts() {
         <p>Are you sure you want to delete this product?</p>
         {productToDelete && (
           <div>
-            <p>Product Name: {productToDelete.productName}</p>
+            <p>Product: {productToDelete.productName}</p>
           </div>
         )}
       </Modal>
-      {/* Modal for adding product */}
+
       <Modal
         title="Add Product"
         visible={showAddProducts}
@@ -354,8 +370,31 @@ export function CompanyProducts() {
           <Button onClick={handleUpdateSubmit}>Update Product</Button>
         </div>
       </Modal>
-    </>
+
+      <Modal
+        title=""
+        visible={showProductDetails}
+        onCancel={handleCloseProductDetails}
+        footer={null}
+      >
+        {selectedProduct && (
+          <div>
+            <Typography variant="h5" color="blue-gray" className="mb-2">
+              {selectedProduct.productName}
+            </Typography>
+            <Typography variant="body1" className="mb-4">
+              {selectedProduct.productDescription}
+            </Typography>
+            <img
+              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${selectedProduct.image}`}
+              alt={selectedProduct.productName}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        )}
+      </Modal>
+    </div>
   );
-}
+};
 
 export default CompanyProducts;
