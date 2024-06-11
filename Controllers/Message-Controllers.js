@@ -30,7 +30,7 @@ const sendMessage = async (req, res) => {
 
     await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
 
-    res.json(message);
+    res.json({ message: message });
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
@@ -41,7 +41,7 @@ const allMessages = async (req, res) => {
     const messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "firstName lastName image email")
       .populate("chat");
-    res.json(messages);
+    res.json({ messages: messages });
   } catch (error) {
     res.status(400);
     throw new Error(error.message);

@@ -42,15 +42,11 @@ router.post(
 );
 router.post(
   "/create/groupchat",
-  [
-    check("chatName").isLength({ min: 2 }),
-    check("groupAdmin").isLength({ min: 2 }),
-    check("users").isLength({ min: 2 }),
-  ],
+  [check("chatName").isLength({ min: 2 }), check("users").isLength({ min: 2 })],
   chatControllers.createGroupChat
 );
 router.get(
-  "/get/chat",
+  "/get/chat/:loggedInUser",
   [check("loggedInUser").isLength({ min: 2 })],
   chatControllers.fetchChats
 );

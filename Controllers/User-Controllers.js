@@ -51,6 +51,21 @@ const inviteUser = async (req, res, next) => {
   }
   res.status(201).json({ userId: createdUser.id });
 };
+const allUsers = async (req, res) => {
+  const { loggedInUser } = req.params;
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const users = await User.find(keyword).find({ _id: { $ne: loggedInUser } });
+
+  res.json({ users: users });
+};
 const createUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -170,6 +185,7 @@ const getUserById = async (req, res, next) => {
     );
     return next(error);
   }
+
   res.status(200).json({ user: user });
 };
 const getUsersByRole = async (req, res, next) => {
@@ -593,6 +609,7 @@ const updatePassword = async (req, res, next) => {
 
 exports.updatePassword = updatePassword;
 exports.resetPassword = resetPassword;
+exports.allUsers = allUsers;
 exports.inviteUser = inviteUser;
 exports.createUser = createUser;
 exports.getAllUsers = getAllUsers;
