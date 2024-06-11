@@ -1,3 +1,4 @@
+
 import {
     Modal,
     ModalOverlay,
@@ -13,33 +14,24 @@ import {
     useToast,
     Box,
   } from "@chakra-ui/react";
-  import { useState } from "react";
+  import { useContext, useState } from "react";
   import UserBadgeItem from "../userAvatar/UserBadgeItem";
   import UserListItem from "../userAvatar/UserListItem";
   import { Card,CardHeader,Typography } from '@material-tailwind/react';
+import { ChatState } from "./ChatProvider";
+import { AuthContext } from "@/pages/auth/Auth-context";
   
   const GroupChatModal = ({ children }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [groupChatName, setGroupChatName] = useState("");
+    const [groupChatName, setGroupChatName] = useState();
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
     const [loading, setLoading] = useState(false);
     const toast = useToast();
+    const auth=useContext(AuthContext)
   
-    const user = {
-      _id: "1",
-      name: "Rishabh",
-      token: "sampleToken",
-    };
-  
-    const [chats, setChats] = useState([]);
-    const allUsers = [
-      { _id: "2", name: "Priyanka Manwani", email: "priyanka@example.com" },
-      { _id: "3", name: "Sajal Sir", email: "sajal@example.com" },
-      { _id: "4", name: "Rishabh", email: "piyush@example.com" },
-      { _id: "5", name: "correct stpes", email: "CSC@example.com" },
-    ];
+    const { user, chats, setChats } = ChatState();
   
     const handleGroup = (userToAdd) => {
       if (selectedUsers.includes(userToAdd)) {
@@ -56,31 +48,43 @@ import {
       setSelectedUsers([...selectedUsers, userToAdd]);
     };
   
-    const handleSearch = (query) => {
+    const handleSearch = async (query) => {
       setSearch(query);
       if (!query) {
-        setSearchResult([]);
         return;
       }
   
-      setLoading(true);
-      setTimeout(() => {
-        const results = allUsers.filter((u) =>
-          u.name.toLowerCase().includes(query.toLowerCase())
-        );
-        setSearchResult(results);
+      try {
+        setLoading(true);
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users/search/${auth.userId}?search=${search}`, {
+          headers: {
+            Authorization: "Bearer " + auth.token,
+          },
+        });
+        const data = await response.json();
+        
         setLoading(false);
-      }, 500);
+        setSearchResult(data.users);
+      } catch (error) {
+        toast({
+          title: "Error Occured!",
+          description: "Failed to Load the Search Results",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      }
     };
   
     const handleDelete = (delUser) => {
       setSelectedUsers(selectedUsers.filter((sel) => sel._id !== delUser._id));
     };
   
-    const handleSubmit = () => {
-      if (!groupChatName || !selectedUsers.length) {
+    const handleSubmit = async () => {
+      if (!groupChatName || !selectedUsers) {
         toast({
-          title: "Please fill all the fields",
+          title: "Please fill all the feilds",
           status: "warning",
           duration: 5000,
           isClosable: true,
@@ -89,26 +93,37 @@ import {
         return;
       }
   
-      const newGroupChat = {
-        _id: `${chats.length + 1}`,
-        chatName: groupChatName,
-        isGroupChat: true,
-        users: selectedUsers,
-        latestMessage: {
-          sender: user,
-          content: "New group chat created!",
-        },
-      };
-  
-      setChats([newGroupChat, ...chats]);
-      onClose();
-      toast({
-        title: "New Group Chat Created!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+      try {
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/create/groupchat`, {
+          method:"POST",
+          headers: {
+            Authorization: "Bearer " + auth.token,
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({chatName:groupChatName,loggedInUser:auth.userId,users:selectedUsers.map((u) => u._id)})
+        });
+        
+       
+        const data = await response.json();
+        setChats([data, ...chats]);
+        onClose();
+        toast({
+          title: "New Group Chat Created!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      } catch (error) {
+        toast({
+          title: "Failed to Create the Chat!",
+          description: error.response.data,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
     };
   
     return (
@@ -124,12 +139,10 @@ import {
               display="flex"
               justifyContent="center"
             >
-               <Typography variant="large" color="blue-gray" className="font-bold">
-             Create Group Chat
-            </Typography>
+              Create Group Chat
             </ModalHeader>
             <ModalCloseButton />
-            <ModalBody display="flex" flexDirection="column" alignItems="center">
+            <ModalBody display="flex" flexDir="column" alignItems="center">
               <FormControl>
                 <Input
                   placeholder="Chat Name"
@@ -144,7 +157,7 @@ import {
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </FormControl>
-              <Box width="100%" display="flex" flexWrap="wrap">
+              <Box w="100%" display="flex" flexWrap="wrap">
                 {selectedUsers.map((u) => (
                   <UserBadgeItem
                     key={u._id}
@@ -154,10 +167,11 @@ import {
                 ))}
               </Box>
               {loading ? (
+                // <ChatLoading />
                 <div>Loading...</div>
               ) : (
                 searchResult
-                  .slice(0, 4)
+                  ?.slice(0, 4)
                   .map((user) => (
                     <UserListItem
                       key={user._id}
@@ -179,4 +193,3 @@ import {
   };
   
   export default GroupChatModal;
-  

@@ -12,7 +12,7 @@ const UserListItem = ({ user, handleFunction }) => {
         color: "white",
       }}
       w="100%"
-      d="flex"
+      display="flex"
       alignItems="center"
       color="black"
       px={3}
@@ -24,11 +24,11 @@ const UserListItem = ({ user, handleFunction }) => {
         mr={2}
         size="sm"
         cursor="pointer"
-        name={user.name}
-        src={user.pic}
+        name={user.firstName}
+        src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` || "https://via.placeholder.com/150"}
       />
       <Box>
-        <Text>{user.name}</Text>
+        <Text>{user.firstName} {user.lastName}</Text>
         <Text fontSize="xs">
           <b>Email: </b>
           {user.email}

@@ -1,72 +1,69 @@
+
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Stack, Text, Button, Heading } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { Card,CardHeader,Typography } from '@material-tailwind/react';
+import { AuthContext } from "@/pages/auth/Auth-context";
+import { ChatState } from "./miscellaneous/ChatProvider";
 
-const Mychat = ({ fetchAgain }) => {
-  const [loggedUser, setLoggedUser] = useState({
-    _id: "3",  // Assuming logged user's ID
-    name: "Rishabh",
-    email: "rishabh@example.com",
-    pic: "https://cdn.britannica.com/72/232772-050-4E3D86CC/mind-blown-emoji-head-exploding-emoticon.jpg",
-  });
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [chats, setChats] = useState([]);
+const MyChats = ({ fetchAgain }) => {
+  const [loggedUser, setLoggedUser] = useState([]);
+  const auth=useContext(AuthContext)
+
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
   const toast = useToast();
 
   const getSender = (loggedUser, users) => {
-    return users[0]._id === loggedUser._id ? users[1].name : users[0].name;
+    return users[0]._id === loggedUser._id ? users[1].firstName+" "+users[1].lastName : users[0].firstName+" "+users[0].lastName;
   };
-
-  const fetchChats = () => {
+  const fetchUserDetails = async () => {
     try {
-      // Sample data to simulate chat data
-      const data = [
-        {
-          _id: "1",
-          chatName: "Chat 1",
-          isGroupChat: false,
-          users: [
-            { _id: "2", name: "Priyanka", email: "john@example.com" },
-            { _id: "3", name: "Rishabh", email: "rishabh@example.com" },
-          ],
-          latestMessage: {
-            sender: { name: "Rishabh Sharma" },
-            content: "Hello, how are you?",
-          },
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`, {
+        headers: {
+          Authorization: "Bearer " + auth.token,
         },
-        {
-          _id: "2",
-          chatName: "Tech Team",
-          isGroupChat: true,
-          users: [
-            { _id: "2", name: "John Doe", email: "john@example.com" },
-            { _id: "3", name: "Rishabh", email: "rishabh@example.com" },
-          ],
-          latestMessage: {
-            sender: { name: "Priyanka" },
-            content: "Let's keep a meet at 5.",
-          },
+      });
+      const data = await response.json();
+      setLoggedUser({
+        _id: data.user._id,
+        name: `${data.user.firstName} ${data.user.lastName}`,
+        email: data.user.email,
+        pic: `${import.meta.env.REACT_APP_BACKEND_URL}/${data.user.image}` || "https://cdn.britannica.com/72/232772-050-4E3D86CC/mind-blown-emoji-head-exploding-emoticon.jpg",
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Error Occurred!",
+        description: "Failed to load user details",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
+  const fetchChats =async () => {
+    try {
+     
+      
+      const response=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/get/chat/${auth.userId}`, {
+        
+        headers: {
+            
+            Authorization: "Bearer " + auth.token,
         },
-        {
-          _id: "3",
-          chatName: "CSC DEVELOPERS",
-          isGroupChat: true,
-          users: [
-            { _id: "2", name: "John Doe", email: "john@example.com" },
-            { _id: "3", name: "Rishabh", email: "rishabh@example.com" },
-          ],
-          latestMessage: {
-            sender: { name: "Sajal Sir" },
-            content: "Hello everyone.",
-          },
-        },
-      ];
-      setChats(data);
+        
+    }
+  
+)
+const data = await response.json();
+
+setChats(data.chats)
+
     } catch (error) {
       toast({
         title: "Error Occurred!",
@@ -81,20 +78,17 @@ const Mychat = ({ fetchAgain }) => {
 
   useEffect(() => {
     fetchChats();
+    
+    fetchUserDetails();
   }, [fetchAgain]);
-
-  // Divide chats into direct and group chats
-  const directChats = chats.filter(chat => !chat.isGroupChat);
-  const groupChats = chats.filter(chat => chat.isGroupChat);
-
   return (
     <Box
       display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
-      flexDirection="column"
+      flexDir="column"
       alignItems="center"
       p={3}
       bg="white"
-      width={{ base: "100%", md: "31%" }}
+      w={{ base: "100%", md: "31%" }}
       borderRadius="lg"
       borderWidth="1px"
     >
@@ -103,100 +97,60 @@ const Mychat = ({ fetchAgain }) => {
         px={3}
         fontSize={{ base: "28px", md: "30px" }}
         fontFamily="Work sans"
-        display="flex"
-        width="100%"
+        displayd="flex"
+        w="100%"
         justifyContent="space-between"
         alignItems="center"
       >
-        <Typography variant="large" color="blue-gray" className="font-semibold">
-              My Chats
-            </Typography>
+        My Chats
         <GroupChatModal>
           <Button
             display="flex"
             fontSize={{ base: "17px", md: "10px", lg: "17px" }}
             rightIcon={<AddIcon />}
           >
-             <Typography variant="large" color="blue-gray" className="font-semibold">
-              New Group Chats
-            </Typography>
+            New Group Chat
           </Button>
         </GroupChatModal>
       </Box>
       <Box
-        display="flex"
-        flexDirection="column"
+        displayd="flex"
+        flexDir="column"
         p={3}
         bg="#F8F8F8"
-        width="100%"
-        height="100%"
+        w="100%"
+        h="100%"
         borderRadius="lg"
         overflowY="hidden"
       >
-        {chats.length > 0 ? (
+        {chats ? (
           <Stack overflowY="scroll">
-            {directChats.length > 0 && (
-              <>
-                 <Typography variant="large" color="blue-gray" className="font-bold">
-             #DIRECT CHATS
-            </Typography>
-                {directChats.map((chat) => (
-                  <Box
-                    key={chat._id}
-                    onClick={() => setSelectedChat(chat)}
-                    cursor="pointer"
-                    bg={selectedChat === chat ? "#000000" : "#E8E8E8"}
-                    color={selectedChat === chat ? "white" : "black"}
-                    px={3}
-                    py={2}
-                    borderRadius="lg"
-                  >
-                    <Text>
-                      {getSender(loggedUser, chat.users)}
-                    </Text>
-                    {chat.latestMessage && (
-                      <Text fontSize="xs">
-                        <b>{chat.latestMessage.sender.name} : </b>
-                        {chat.latestMessage.content.length > 50
-                          ? chat.latestMessage.content.substring(0, 51) + "..."
-                          : chat.latestMessage.content}
-                      </Text>
-                    )}
-                  </Box>
-                ))}
-              </>
-            )}
-            {groupChats.length > 0 && (
-              <>
-                 <Typography variant="large" color="blue-gray" className="font-bold">
-              #GROUP CHATS
-            </Typography>
-                {groupChats.map((chat) => (
-                  <Box
-                    key={chat._id}
-                    onClick={() => setSelectedChat(chat)}
-                    cursor="pointer"
-                    bg={selectedChat === chat ? "#000000" : "#E8E8E8"}
-                    color={selectedChat === chat ? "white" : "black"}
-                    px={3}
-                    py={2}
-                    borderRadius="lg"
-                  >
-                    <Text>
-                      {chat.chatName}
-                    </Text>
-                    {chat.latestMessage && (
-                      <Text fontSize="xs">
-                        <b>{chat.latestMessage.sender.name} : </b>
-                        {chat.latestMessage.content.length > 50
-                          ? chat.latestMessage.content.substring(0, 51) + "..."
-                          : chat.latestMessage.content}
-                      </Text>
-                    )}
-                  </Box>
-                ))}
-              </>
-            )}
+            {chats.map((chat) => (
+              <Box
+                onClick={() => setSelectedChat(chat)}
+                cursor="pointer"
+                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
+                color={selectedChat === chat ? "white" : "black"}
+                px={3}
+                py={2}
+                borderRadius="lg"
+                key={chat._id}
+              >
+                <Text>
+                  {!chat.isGroupChat
+                    ? getSender(loggedUser, chat.users)
+                    : chat.chatName}
+                </Text>
+                {chat.latestMessage && (
+                  <Text fontSize="xs">
+                    <b>{chat.latestMessage.sender.firstName+ " "+chat.latestMessage.sender.lastName } : </b>
+                    {chat.latestMessage.content.length > 50
+                      ? chat.latestMessage.content.substring(0, 51) + "..."
+                      : chat.latestMessage.content}
+                  </Text>
+                )}
+              </Box>
+            ))}
           </Stack>
         ) : (
           <ChatLoading />
@@ -206,4 +160,4 @@ const Mychat = ({ fetchAgain }) => {
   );
 };
 
-export default Mychat;
+export default MyChats;

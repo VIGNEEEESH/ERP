@@ -5,6 +5,7 @@ import { AuthContext } from "./pages/auth/Auth-context";
 import { useAuth } from "./pages/auth/auth-hook";
 import ForgotPassword from "./pages/auth/Forgot-Password";
 import UpdatePassword from "./pages/auth/reset-password";
+import ChatProvider from "./pages/dashboard/chat/component/miscellaneous/ChatProvider";
 
 // Lazy-loaded components
 const Dashboard = lazy(() => import("@/layouts/Dashboard"));
@@ -103,6 +104,7 @@ function App() {
         role: role,
       }}
     >
+      <ChatProvider>
       <Suspense
         fallback={
           <div
@@ -118,7 +120,7 @@ function App() {
         }
       >
         <main>{routes}</main>
-      </Suspense>
+      </Suspense></ChatProvider>
     </AuthContext.Provider>
   );
 }

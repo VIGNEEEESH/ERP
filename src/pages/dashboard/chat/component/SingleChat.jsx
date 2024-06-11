@@ -3,27 +3,26 @@ import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import { IconButton, Spinner, useToast } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import ScrollableChat from "./ScrollableChat";
 import Lottie from "react-lottie";
 import animationData from "../animations/typing.json";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
+import { AuthContext } from "@/pages/auth/Auth-context";
+import { ChatState } from "./miscellaneous/ChatProvider";
+import "./styles.css"
 
-const SingleChat = ({ selectedChat, setSelectedChat }) => {
+const SingleChat = ({ fetchAgain,setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
   const toast = useToast();
-
-  const loggedUser = {
-    _id: "3",
-    name: "Rishabh",
-    email: "rishabh@example.com",
-    pic: "https://cdn.britannica.com/72/232772-050-4E3D86CC/mind-blown-emoji-head-exploding-emoticon.jpg",
-  };
+  const [loggedUser, setLoggedUser] = useState([]);
+const auth=useContext(AuthContext)
+  
 
   const defaultOptions = {
     loop: true,
@@ -33,26 +32,104 @@ const SingleChat = ({ selectedChat, setSelectedChat }) => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
+  const { selectedChat, setSelectedChat, user, notification, setNotification } =
+    ChatState();
+    
+  const fetchUserDetails = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`, {
+        headers: {
+          Authorization: "Bearer " + auth.token,
+        },
+      });
+      const data = await response.json();
+      setLoggedUser({
+        _id: data.user._id,
+        name: `${data.user.firstName} ${data.user.lastName}`,
+        email: data.user.email,
+        pic: `${import.meta.env.REACT_APP_BACKEND_URL}/${data.user.image}` || "https://cdn.britannica.com/72/232772-050-4E3D86CC/mind-blown-emoji-head-exploding-emoticon.jpg",
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Error Occurred!",
+        description: "Failed to load user details",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
 
+    try {
+     
+
+      setLoading(true);
+
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/message/get/all/messages/byid/${selectedChat._id}`, {
+        headers: {
+          Authorization: "Bearer " + auth.token,
+        },
+      });
+      const data = await response.json();
+      setMessages(data.messages);
+      console.log(data.messages)
+      setLoading(false);
+
+      
+    } catch (error) {
+      console.log(error)
+      toast({
+        title: "Error Occured!",
+        description: "Failed to Load the Messages",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
   useEffect(() => {
+    fetchUserDetails()
     if (selectedChat) {
       setLoading(true);
-      // Sample messages to simulate fetching messages
-      setTimeout(() => {
-        setMessages([
-          { sender: { name: "Rishabh" }, content: "Hello everyone!" },
-          { sender: { name: "John Doe" }, content: "Hi Rishabh!" },
-        ]);
-        setLoading(false);
-      }, 1000);
+      
+      fetchMessages()
+      
     }
   }, [selectedChat]);
 
-  const sendMessage = (event) => {
+  const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
-      const newMsg = { sender: { name: loggedUser.name }, content: newMessage };
-      setMessages([...messages, newMsg]);
-      setNewMessage("");
+      
+      try {
+        
+        setNewMessage("");
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/message/send/message`, {
+          method:"POST",
+          headers: {
+            Authorization: "Bearer " + auth.token,
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({content:newMessage,chatId:selectedChat._id,sender:auth.userId})
+        });
+        const data=await response.json()
+        console.log(data.message)
+        setMessages([...messages, data.message]);
+      } catch (error) {
+        console.log(error)
+        toast({
+          title: "Error Occured!",
+          description: "Failed to send the Message",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
     }
   };
 
@@ -76,12 +153,12 @@ const SingleChat = ({ selectedChat, setSelectedChat }) => {
             px={2}
             w="100%"
             fontFamily="Work sans"
-            d="flex"
+            display="flex"
             justifyContent={{ base: "space-between" }}
             alignItems="center"
           >
             <IconButton
-              d={{ base: "flex", md: "none" }}
+              display={{ base: "flex", md: "none" }}
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat(null)}
             />
@@ -106,7 +183,7 @@ const SingleChat = ({ selectedChat, setSelectedChat }) => {
             )}
           </Text>
           <Box
-            d="flex"
+            display="flex"
             flexDir="column"
             justifyContent="flex-end"
             p={3}
@@ -151,7 +228,7 @@ const SingleChat = ({ selectedChat, setSelectedChat }) => {
           </Box>
         </>
       ) : (
-        <Box d="flex" alignItems="center" justifyContent="center" h="100%">
+        <Box display="flex" alignItems="center" justifyContent="center" h="100%">
           <Text fontSize="3xl" pb={3} fontFamily="Work sans">
             Click on a user to start chatting
           </Text>

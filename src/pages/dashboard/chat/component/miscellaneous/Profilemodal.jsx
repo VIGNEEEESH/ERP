@@ -26,13 +26,13 @@ const Profilemodal = ({ user = {}, children }) => {
       {children ? (
         <span onClick={onOpen}>{children}</span>
       ) : (
-        <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+        <IconButton display={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
       )}
       <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
         <ModalContent h="auto" maxW="400px">
           <ModalHeader fontSize="2xl" textAlign="center">
-            {user.name || <Typography variant="large" color="blue-gray" className="font-bold">
+            {user.firstName+" "+user.lastName || <Typography variant="large" color="blue-gray" className="font-bold">
            User Name
             </Typography>}
           </ModalHeader>
@@ -41,7 +41,7 @@ const Profilemodal = ({ user = {}, children }) => {
             <Image
               borderRadius="full"
               boxSize="150px"
-              src={user.pic || "https://via.placeholder.com/150"}
+              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` || "https://via.placeholder.com/150"}
               alt={user.name || "User"}
               mb={4}
               ml={20}

@@ -16,70 +16,98 @@ import {
   IconButton,
   Spinner,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
+import { ChatState } from "./ChatProvider";
+import { AuthContext } from "@/pages/auth/Auth-context";
 
-const UpdateGroupChatModal = ({ selectedChat, setSelectedChat, fetchAgain, setFetchAgain }) => {
+const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [groupChatName, setGroupChatName] = useState(selectedChat.chatName);
+  
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [renameloading, setRenameLoading] = useState(false);
   const toast = useToast();
+  const { selectedChat, setSelectedChat, user } = ChatState();
+  const [groupChatName, setGroupChatName] = useState(selectedChat.chatName);
+ const auth=useContext(AuthContext)
 
-  const user = {
-    _id: "1",
-    name: "Rishabh",
-    token: "sampleToken",
-  };
+ 
 
-  const allUsers = [
-    { _id: "2", name: "Priyanka Manwani", email: "priyanka@example.com" },
-    { _id: "3", name: "Sajal Sir", email: "sajal@example.com" },
-    { _id: "4", name: "Rishabh", email: "piyush@example.com" },
-    { _id: "5", name: "correct stpes", email: "CSC@example.com" },
-  ];
-
-  const handleSearch = (query) => {
+  const handleSearch = async (query) => {
     setSearch(query);
     if (!query) {
-      setSearchResult([]);
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      const results = allUsers.filter((u) =>
-        u.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setSearchResult(results);
+    try {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users/search/${auth.userId}?search=${search}`, {
+        headers: {
+          Authorization: "Bearer " + auth.token,
+        },
+      });
+      const data = await response.json();
+      
       setLoading(false);
-    }, 500);
+      setSearchResult(data.users);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to Load the Search Results",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
   };
 
-  const handleRename = () => {
+  const handleRename = async () => {
     if (!groupChatName) return;
 
-    setRenameLoading(true);
-    setTimeout(() => {
-      const updatedChat = { ...selectedChat, chatName: groupChatName };
-      setSelectedChat(updatedChat);
-      setFetchAgain(!fetchAgain);
+    try {
+      setRenameLoading(true);
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/rename/group`, {
+        method:"PUT",
+        headers: {
+          Authorization: "Bearer " + auth.token,
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({chatName:groupChatName,chatId:selectedChat._id})
+      });
+      
+      if (!response.ok) {
+        // Handle the error response
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to rename the chat');
+      }
+      const data = await response.json();
+
+      
+      // setSelectedChat("");
+      setSelectedChat(data.updatedChat);
       setRenameLoading(false);
+      setFetchAgain(!fetchAgain);
+      
+    } catch (error) {
       toast({
-        title: "Group Name Updated!",
-        status: "success",
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
         duration: 5000,
         isClosable: true,
         position: "bottom",
       });
-    }, 1000);
+      setRenameLoading(false);
+    }
+    setGroupChatName("");
   };
 
-  const handleAddUser = (userToAdd) => {
-    if (selectedChat.users.find((u) => u._id === userToAdd._id)) {
+  const handleAddUser = async (user1) => {
+    if (selectedChat.users.find((u) => u._id === user1._id)) {
       toast({
         title: "User Already in group!",
         status: "error",
@@ -90,20 +118,51 @@ const UpdateGroupChatModal = ({ selectedChat, setSelectedChat, fetchAgain, setFe
       return;
     }
 
-    const updatedChat = { ...selectedChat, users: [...selectedChat.users, userToAdd] };
-    setSelectedChat(updatedChat);
-    setFetchAgain(!fetchAgain);
-    toast({
-      title: "User Added!",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: "bottom",
-    });
+    if (selectedChat.groupAdmin._id !== user._id) {
+      toast({
+        title: "Only admins can add someone!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/add/togroup`, {
+        method:"PUT",
+        headers: {
+          Authorization: "Bearer " + auth.token,
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({chatId:selectedChat._id,userId:user1._id,requesterId:auth.userId})
+      });
+      
+     
+      const data = await response.json();
+
+      setSelectedChat(data);
+      setLoading(false);
+      setFetchAgain(!fetchAgain);
+      
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+    setGroupChatName("");
   };
 
-  const handleRemove = (userToRemove) => {
-    if (selectedChat.groupAdmin._id !== user._id && userToRemove._id !== user._id) {
+  const handleRemove = async (user1) => {
+    if (selectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
       toast({
         title: "Only admins can remove someone!",
         status: "error",
@@ -114,24 +173,47 @@ const UpdateGroupChatModal = ({ selectedChat, setSelectedChat, fetchAgain, setFe
       return;
     }
 
-    const updatedChat = {
-      ...selectedChat,
-      users: selectedChat.users.filter((u) => u._id !== userToRemove._id),
-    };
-    setSelectedChat(updatedChat);
-    setFetchAgain(!fetchAgain);
-    toast({
-      title: userToRemove._id === user._id ? "You Left the Group" : "User Removed!",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: "bottom",
-    });
+    try {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/remove/fromgroup`, {
+        method:"PUT",
+        headers: {
+          Authorization: "Bearer " + auth.token,
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({chatId:selectedChat._id,userId:user1._id,requesterId:auth.userId})
+      });
+      if (!response.ok) {
+        // Handle the error response
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to rename the chat');
+      }
+     
+      const data = await response.json();
+
+      user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
+      setLoading(false);
+      fetchMessages();
+      setFetchAgain(!fetchAgain);
+      
+      
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+    setGroupChatName("");
   };
 
   return (
     <>
-      <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+      <IconButton display={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
 
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
@@ -139,15 +221,15 @@ const UpdateGroupChatModal = ({ selectedChat, setSelectedChat, fetchAgain, setFe
           <ModalHeader
             fontSize="35px"
             fontFamily="Work sans"
-            d="flex"
+            display="flex"
             justifyContent="center"
           >
             {selectedChat.chatName}
           </ModalHeader>
 
           <ModalCloseButton />
-          <ModalBody d="flex" flexDir="column" alignItems="center">
-            <Box w="100%" d="flex" flexWrap="wrap" pb={3}>
+          <ModalBody displayd="flex" flexDir="column" alignItems="center">
+            <Box w="100%" display="flex" flexWrap="wrap" pb={3}>
               {selectedChat.users.map((u) => (
                 <UserBadgeItem
                   key={u._id}
@@ -157,7 +239,7 @@ const UpdateGroupChatModal = ({ selectedChat, setSelectedChat, fetchAgain, setFe
                 />
               ))}
             </Box>
-            <FormControl d="flex">
+            <FormControl display="flex">
               <Input
                 placeholder="Chat Name"
                 mb={3}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Box, Text, Button, Avatar, Tooltip, useToast } from "@chakra-ui/react";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -16,62 +16,76 @@ import {
 import ProfileModal from "./ProfileModal"; // Ensure this component is defined and imported correctly
 import ChatLoading from "../ChatLoading";
 import UserListItem from "../userAvatar/UserListItem";
-import { Card,CardHeader,Typography } from '@material-tailwind/react';
+import { Card, CardHeader, Typography } from "@material-tailwind/react";
 
-const Input = ({ placeholder, value, onChange, mr }) => (
-  <input
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    style={{ marginRight: mr }}
-  />
-);
-
-const Sidebar = () => {
+import { AuthContext } from "@/pages/auth/Auth-context";
+import { Input } from "antd";
+import { ChatState } from "./ChatProvider";
+// import { ChatState } from "../../Context/ChatProvider";
+function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
-  const [chats, setChats] = useState([]);
-  const [selectedChat, setSelectedChat] = useState(null);
+const auth=useContext(AuthContext)
+const { setSelectedChat, notification, setNotification, chats, setChats } = ChatState();
 
-  const user = { name: "Rishabh", token: "sampleToken" }; // Sample user data
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  
 
-  const handleSearch = () => {
+    const [user, setUser] = useState({});
+    useEffect(() => {
+          const fetchUser = async () => {
+            try {
+              const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`, {
+                headers: {
+                  Authorization: "Bearer " + auth.token,
+                },
+              });
+              const userData = await userResponse.json();
+              setUser(userData.user);
+            } catch (error) {
+              toast({
+                title: "Error Occurred!",
+                description: "Failed to Load User Data",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom-left",
+              });
+            }
+          };
+      
+          fetchUser();
+        }, [auth.token, auth.userId, toast]);
+  const handleSearch = async () => {
+    if (!search) {
+      toast({
+        title: "Please Enter something in search",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top-left",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
-
-      // Sample data to simulate API response
-      const data = [
-        {
-          id: 1,
-          name: "Rishabh",
-          email: "rishabh@example.com",
-          pic: "https://i.redd.it/5v5ofi4qa3991.jpg"
-        },
-        {
-          id: 2,
-          name: "John Doe",
-          email: "john@example.com",
-          pic: "https://imgix.bustle.com/uploads/image/2018/1/27/9cc74bec-c54e-412d-8a35-2a20b7dda25e-bitmoji-deluxe-starts-with-a-selfie.jpg?w=374&h=377&fit=crop&crop=faces&q=50&dpr=2"
-        },
-        {
-          id: 3,
-          name: "Jane Smith",
-          email: "jane@example.com",
-          pic: "https://i.pinimg.com/474x/74/e8/20/74e820145614c8565628d08d22822478.jpg"
-        }
-      ];
-
-      setTimeout(() => {
-        setLoading(false);
-        setSearchResult(data.filter(user => user.name.toLowerCase().includes(search.toLowerCase())));
-      }, 1000);
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users/search/${auth.userId}?search=${search}`, {
+              headers: {
+                Authorization: "Bearer " + auth.token,
+              },
+            });
+            const data = await response.json();
+            setLoading(false);
+            setSearchResult(
+              data.users.filter(user => user.firstName && user.firstName.toLowerCase().includes(search.toLowerCase()))
+            );
     } catch (error) {
       toast({
-        title: "Error Occurred!",
+        title: "Error Occured!",
         description: "Failed to Load the Search Results",
         status: "error",
         duration: 5000,
@@ -81,28 +95,26 @@ const Sidebar = () => {
     }
   };
 
-  const accessChat = (userId) => {
-    console.log(userId);
+  const accessChat = async (userId) => {
+    
 
     try {
       setLoadingChat(true);
+           const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/access/chat`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + auth.token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: userId, loggedInUser: auth.userId }),
+      });
+      const data = await response.json();
 
-      // Sample data to simulate API response
-      const data = {
-        _id: userId,
-        users: [
-          { id: 1, name: "Rishabh" },
-          { id: 2, name: "John Doe" },
-          { id: 3, name: "Jane Smith" }
-        ]
-      };
-
-      setTimeout(() => {
-        setLoadingChat(false);
-        if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
-        setSelectedChat(data);
-        onClose();
-      }, 1000);
+      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      setSelectedChat(data);
+      setLoadingChat(false);
+      onClose();
+      
     } catch (error) {
       toast({
         title: "Error fetching the chat",
@@ -149,8 +161,8 @@ const Sidebar = () => {
               <Avatar
                 size="sm"
                 cursor="pointer"
-                name={user.name}
-                src="https://cdn.britannica.com/72/232772-050-4E3D86CC/mind-blown-emoji-head-exploding-emoticon.jpg"
+                name={user.firstName}
+                src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` || "https://via.placeholder.com/150"}
               />
             </MenuButton>
             <MenuList>
@@ -171,7 +183,7 @@ const Sidebar = () => {
               Search Users
             </Typography></DrawerHeader>
           <DrawerBody>
-            <Box d="flex" pb={2}>
+            <Box display="flex" pb={2}>
               <Input
                 placeholder="Search by name or email"
                 mr={2}
@@ -189,7 +201,7 @@ const Sidebar = () => {
                 <UserListItem
                   key={index}
                   user={user}
-                  handleFunction={() => accessChat(user.id)}
+                  handleFunction={() => accessChat(user._id)}
                 />
               ))
             )}
@@ -200,5 +212,4 @@ const Sidebar = () => {
     </>
   );
 };
-
-export default Sidebar;
+export default SideDrawer;
