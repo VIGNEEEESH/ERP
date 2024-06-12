@@ -20,10 +20,16 @@ const cacheMiddleware = (req, res, next) => {
     }
   });
 };
-router.get("/get/all/messages/byid/:chatId", messageControllers.allMessages);
+router.get(
+  "/get/all/messages/byid/:chatId",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
+  messageControllers.allMessages
+);
 
 router.post(
   "/send/message",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   [
     check("sender").isLength({ min: 2 }),
     check("chatId").isLength({ min: 2 }),

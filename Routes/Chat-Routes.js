@@ -22,6 +22,8 @@ const cacheMiddleware = (req, res, next) => {
 
 router.post(
   "/access/chat",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+
   [
     check("userId").isLength({ min: 2 }),
     check("loggedInUser").isLength({ min: 2 }),
@@ -30,16 +32,20 @@ router.post(
 );
 router.post(
   "/create/groupchat",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   [check("chatName").isLength({ min: 2 }), check("users").isLength({ min: 2 })],
   chatControllers.createGroupChat
 );
 router.get(
   "/get/chat/:loggedInUser",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  cacheMiddleware,
   [check("loggedInUser").isLength({ min: 2 })],
   chatControllers.fetchChats
 );
 router.put(
   "/rename/group",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   [
     check("chatId").isLength({ min: 2 }),
     check("chatName").isLength({ min: 2 }),
@@ -48,11 +54,13 @@ router.put(
 );
 router.put(
   "/add/togroup",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   [check("chatId").isLength({ min: 2 }), check("userId").isLength({ min: 2 })],
   chatControllers.addToGroup
 );
 router.put(
   "/remove/fromgroup",
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   [check("chatId").isLength({ min: 2 }), check("userId").isLength({ min: 2 })],
   chatControllers.removeFromGroup
 );

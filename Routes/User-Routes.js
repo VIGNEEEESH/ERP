@@ -28,7 +28,7 @@ router.get(
 );
 router.get(
   "/get/all/users/search/:loggedInUser",
-  // checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   cacheMiddleware,
   userControllers.allUsers
 );
