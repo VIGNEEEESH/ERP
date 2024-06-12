@@ -66,7 +66,6 @@ app.get("/", (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
   res.status(500).send({ error: "Something went wrong!" });
 });
 
@@ -101,7 +100,6 @@ const startServer = async () => {
 
       socket.on("join chat", (room) => {
         socket.join(room);
-        console.log("User Joined Room: " + room);
       });
       socket.on("typing", (room) => socket.in(room).emit("typing"));
       socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
