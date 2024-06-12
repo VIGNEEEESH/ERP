@@ -25,7 +25,7 @@ export function EditEmployee({ employeeData, onClose }) {
         e.preventDefault();
          // Check for empty fields
          const emptyFields = Object.keys(formData).filter((key) => !formData[key]);
-    console.log(formData)
+    
          if (emptyFields.length > 1) {
              // Create an error message for empty fields
              const errorMessage = `Please fill in the following fields: ${emptyFields.join(', ')}`;

@@ -19,7 +19,7 @@ const Profilemodal = ({ user = {}, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Debugging statement to check user object
-  console.log("User object:", user);
+  
 
   return (
     <>

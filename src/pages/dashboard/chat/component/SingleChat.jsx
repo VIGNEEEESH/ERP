@@ -7,12 +7,14 @@ import { useContext, useEffect, useState } from "react";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import ScrollableChat from "./ScrollableChat";
 import Lottie from "react-lottie";
+import { getSender, getSenderFull } from "./ChatLogic";
 import animationData from "../animations/typing.json";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { AuthContext } from "@/pages/auth/Auth-context";
 import { ChatState } from "./miscellaneous/ChatProvider";
 import "./styles.css"
-
+import { io } from "socket.io-client";
+var socket, selectedChatCompare;
 const SingleChat = ({ fetchAgain,setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,6 +22,7 @@ const SingleChat = ({ fetchAgain,setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
   const toast = useToast();
+  const [socketConnected,setSocketConnected]=useState(false)
   const [loggedUser, setLoggedUser] = useState([]);
 const auth=useContext(AuthContext)
   
@@ -61,6 +64,7 @@ const auth=useContext(AuthContext)
       });
     }
   };
+  
   const fetchMessages = async () => {
     if (!selectedChat) return;
 
@@ -76,12 +80,11 @@ const auth=useContext(AuthContext)
       });
       const data = await response.json();
       setMessages(data.messages);
-      console.log(data.messages)
       setLoading(false);
-
+      socket.emit("join chat",selectedChat._id)
       
     } catch (error) {
-      console.log(error)
+      
       toast({
         title: "Error Occured!",
         description: "Failed to Load the Messages",
@@ -92,6 +95,13 @@ const auth=useContext(AuthContext)
       });
     }
   };
+  useEffect(()=>{
+    socket=io(import.meta.env.REACT_APP_BACKEND_URL)
+    socket.emit("setup",user)
+    socket.on("connected",()=>setSocketConnected(true))
+    socket.on("typing",()=>setIsTyping(true))
+    socket.on("stop typing",()=>setIsTyping(false))
+  },[])
   useEffect(() => {
     fetchUserDetails()
     if (selectedChat) {
@@ -100,11 +110,25 @@ const auth=useContext(AuthContext)
       fetchMessages()
       
     }
+    selectedChatCompare=selectedChat
   }, [selectedChat]);
+useEffect(()=>{
+  socket.on("message recieved",(newMessageRecieved)=>{
+    if(!selectedChatCompare || selectedChatCompare._id !==newMessageRecieved.chat._id){
+      if(!notification.includes(newMessageRecieved)){
+        setNotification([newMessageRecieved,...notification])
+        setFetchAgain(!fetchAgain)
+      }
+    }else{
+      setMessages([...messages,newMessageRecieved])
+    }
+  })
+})
+
 
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
-      
+      socket.emit("stop typing",selectedChat._id)
       try {
         
         setNewMessage("");
@@ -117,10 +141,11 @@ const auth=useContext(AuthContext)
           body:JSON.stringify({content:newMessage,chatId:selectedChat._id,sender:auth.userId})
         });
         const data=await response.json()
-        console.log(data.message)
+        
+        socket.emit("new message", data.message)
         setMessages([...messages, data.message]);
       } catch (error) {
-        console.log(error)
+        
         toast({
           title: "Error Occured!",
           description: "Failed to send the Message",
@@ -135,12 +160,21 @@ const auth=useContext(AuthContext)
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
-    if (!typing) {
-      setTyping(true);
-      setTimeout(() => {
-        setTyping(false);
-      }, 3000);
-    }
+   if(!socketConnected) return
+   if(!typing){
+    setTyping(true)
+    socket.emit("typing",selectedChat._id)
+   }
+   let lastTypingTime=new Date().getTime()
+   var timerLength=3000
+   setTimeout(()=>{
+var timeNow=new Date().getTime()
+var timeDiff=timeNow-lastTypingTime
+if(timeDiff >=timerLength && typing){
+socket.emit("stop typing",selectedChat._id)
+setTyping(false)
+}
+   },timerLength)
   };
 
   return (
@@ -162,25 +196,41 @@ const auth=useContext(AuthContext)
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat(null)}
             />
-            {!selectedChat.isGroupChat ? (
-              <>
-                {selectedChat.users[0]._id === loggedUser._id
-                  ? selectedChat.users[1].name
-                  : selectedChat.users[0].name}
-                <ProfileModal
-                  user={
-                    selectedChat.users[0]._id === loggedUser._id
-                      ? selectedChat.users[1]
-                      : selectedChat.users[0]
-                  }
-                />
-              </>
-            ) : (
-              <>
-                {selectedChat.chatName.toUpperCase()}
-                <UpdateGroupChatModal />
-              </>
-            )}
+            {messages &&
+
+(!selectedChat.isGroupChat ? (
+
+  <>
+
+    {getSender(user, selectedChat.users)}
+
+    <ProfileModal
+
+      user={getSenderFull(user, selectedChat.users)}
+
+    />
+
+  </>
+
+) : (
+
+  <>
+
+    {selectedChat.chatName.toUpperCase()}
+
+    <UpdateGroupChatModal
+
+      fetchMessages={fetchMessages}
+
+      fetchAgain={fetchAgain}
+
+      setFetchAgain={setFetchAgain}
+
+    />
+
+  </>
+
+))}
           </Text>
           <Box
             display="flex"
@@ -207,15 +257,23 @@ const auth=useContext(AuthContext)
               </div>
             )}
 
-            <FormControl onKeyDown={sendMessage} id="first-name" isRequired mt={3}>
-              {istyping && (
+<FormControl
+              onKeyDown={sendMessage}
+              id="first-name"
+              isRequired
+              mt={3}
+            >
+              {istyping ? (
                 <div>
                   <Lottie
                     options={defaultOptions}
+                    // height={50}
                     width={70}
                     style={{ marginBottom: 15, marginLeft: 0 }}
                   />
                 </div>
+              ) : (
+                <></>
               )}
               <Input
                 variant="filled"
@@ -228,6 +286,7 @@ const auth=useContext(AuthContext)
           </Box>
         </>
       ) : (
+        // to get socket.io on same page
         <Box display="flex" alignItems="center" justifyContent="center" h="100%">
           <Text fontSize="3xl" pb={3} fontFamily="Work sans">
             Click on a user to start chatting

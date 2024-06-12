@@ -25,7 +25,7 @@ const Profile = lazy(() => import('./pages/deptheaddashboard/profile'));
 const MyOffice = lazy(() => import('./pages/deptheaddashboard/myoffice'));
 const Settings = lazy(() => import('./pages/deptheaddashboard/settings/Settings'));
 const TaskManager = lazy(() => import('./pages/deptheaddashboard/task manager/taskmanager'));
-const Communication = lazy(() => import('./pages/deptheaddashboard/communication/communication'));
+const Communication = lazy(() => import("@/pages/dashboard/communication"));
 const Projects = lazy(() => import('./pages/deptheaddashboard/projects/projects'));
 const WorkStatus = lazy(() => import('./pages/deptheaddashboard/workstatus/WorkStatus'));
 const MyLogRecord = lazy(() => import("./pages/deptheaddashboard/mylogrecord/MylogRecord"));

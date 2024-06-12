@@ -156,7 +156,7 @@ export function MyLogRecord() {
                 workDone: newWorkDone,
                 userId: auth.userId
             };
-            console.log(newLog)
+            
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/work/create/work`, {
                 method: 'POST',
                 headers: {

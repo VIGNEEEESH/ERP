@@ -28,7 +28,7 @@ const CompanyProducts = lazy(() => import("./pages/hrdashboard/companyproducts/C
 const OurClients = lazy(() => import("./pages/hrdashboard/clients/OurClients"));
 const Leave = lazy(() => import("./pages/hrdashboard/leaves/Leave"));
 const Settings = lazy(() => import("./pages/hrdashboard/settings/Settings"));
-const Communication = lazy(() => import("./pages/hrdashboard/communication/communication"));
+const Communication = lazy(() => import("@/pages/dashboard/communication"));
 const Projects = lazy(() => import("./pages/hrdashboard/projects/projects"));
 const Logout = lazy(() => import("./pages/hrdashboard/logout"));
 const Profile = lazy(() => import("./pages/hrdashboard/profile/Profile"));

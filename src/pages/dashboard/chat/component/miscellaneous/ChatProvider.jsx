@@ -37,7 +37,7 @@ const ChatProvider = ({ children }) => {
   };
   useEffect(()=>{
     fetchUserDetails()
-  },[auth.token])
+  },[auth.userId])
 
   return (
     <ChatContext.Provider

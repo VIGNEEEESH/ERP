@@ -20,7 +20,7 @@ const ManageEmployees = lazy(() => import('./pages/ceodashboard/manage-employees
 const AttendenceTracker = lazy(() => import('./pages/ceodashboard/Attendence/AttendenceTracker'));
 const ManageDepartments = lazy(() => import('./pages/ceodashboard/Departments/ManageDepartments'));
 const MyOffice = lazy(() => import('./pages/ceodashboard/myOffice/MyOffice'));
-const Communication = lazy(() => import('./pages/ceodashboard/communication/communication'));
+const Communication = lazy(() => import("@/pages/dashboard/communication"));
 const WorkStatus = lazy(() => import('./pages/ceodashboard/workstatus/WorkStatus'));
 const TaskManager = lazy(() => import('./pages/ceodashboard/task manager/taskmanager'));
 const Projects = lazy(() => import('./pages/ceodashboard/projects/Projects'));
