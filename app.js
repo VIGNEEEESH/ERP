@@ -52,15 +52,33 @@ app.get("/", (req, res) => {
     message: "Hello World",
   });
 });
-mongoose
-  .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.qaath81.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`
-  )
-  .then(() => {
+
+// Connect to MongoDB and start the server
+const startServer = async () => {
+  try {
+    await mongoose.connect(
+      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.qaath81.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`,
+      { useNewUrlParser: true, useUnifiedTopology: true }
+    );
+
     const server = app.listen(3000, () => {
       console.log(`Server is running on port ${server.address().port}`);
     });
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+
+    const io = require("socket.io")(server, {
+      pingTimeout: 60000,
+      cors: {
+        origin: "http://localhost:3000",
+      },
+    });
+
+    io.on("connection", (socket) => {
+      console.log("Connected to socket.io");
+    });
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+};
+
+startServer();

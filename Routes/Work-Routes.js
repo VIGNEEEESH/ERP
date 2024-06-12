@@ -3,23 +3,11 @@ const { check } = require("express-validator");
 const router = express.Router();
 const workControllers = require("../Controllers/Work-Controllers");
 const checkAuth = require("../Middleware/check-auth");
-const redis = require("redis");
-const client = redis.createClient({
-  password: "BqNAC2mcNfO4GnVwVv0jNrRbDYkANFM7",
-  host: "redis-16938.c301.ap-south-1-1.ec2.redns.redis-cloud.com",
-  port: 16938,
-});
-
-client.on("connect", () => {
-  console.log("Client connected to redis");
-});
-client.on("error", (err) => {
-  console.log(err.message);
-});
+const redisClient = require("./redisClient");
 // Middleware function to cache responses for GET requests
 const cacheMiddleware = (req, res, next) => {
   const key = req.originalUrl; // Using the request URL as the cache key
-  client.get(key, (err, data) => {
+  redisClient.get(key, (err, data) => {
     if (err) throw err;
 
     if (data !== null) {
