@@ -13,7 +13,8 @@ import {
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon,
-  WalletIcon
+  WalletIcon,
+  FolderIcon,
 } from "@heroicons/react/24/solid";
 const Home = lazy(() => import('./pages/ceodashboard/home'));
 const ManageEmployees = lazy(() => import('./pages/ceodashboard/manage-employees/manageEmployees'));
@@ -32,6 +33,7 @@ const Settings = lazy(() => import('./pages/ceodashboard/settings/Settings'));
 const Logout = lazy(() => import('./pages/ceodashboard/logout'));
 const LogRecord = lazy(() => import('./pages/ceodashboard/logrecord/LogRecord'));
 const MyLogRecord = lazy(() => import('./pages/ceodashboard/mylogrecord/MylogRecord'));
+const FileSystem = lazy(() => import('./pages/ceodashboard/FileSystem/File'));
 
 // import Home from './pages/ceodashboard/home';
 // import ManageEmployees from './pages/ceodashboard/manage-employees/manageEmployees';
@@ -141,6 +143,12 @@ const CEORoutes = [
         name: "My Log Record",
         path: "/mylogrecord",
         element: <MyLogRecord/>,
+      },
+      {
+        icon: <FolderIcon {...icon} />,
+        name: "My File System",
+        path: "/filesystem",
+        element: <FileSystem/>,
       },
       {
         icon: <UserCircleIcon {...icon} />,

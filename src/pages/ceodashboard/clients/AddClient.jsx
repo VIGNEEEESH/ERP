@@ -34,8 +34,6 @@ function AddClient() {
         e.preventDefault();
         const emptyFields = Object.keys(formData).filter((key) => !formData[key]);
      
-     
-     
     if (emptyFields.length > 0 ) {
         // Create an error message for empty fields and empty userIds
         const errorMessage =
