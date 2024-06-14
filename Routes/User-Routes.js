@@ -4,23 +4,11 @@ const router = express.Router();
 const userControllers = require("../Controllers/User-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
-const redis = require("redis");
-const client = redis.createClient({
-  password: "BqNAC2mcNfO4GnVwVv0jNrRbDYkANFM7",
-  host: "redis-16938.c301.ap-south-1-1.ec2.redns.redis-cloud.com",
-  port: 16938,
-});
-
-client.on("connect", () => {
-  console.log("Client connected to redis");
-});
-client.on("error", (err) => {
-  console.log(err.message);
-});
+const redisClient = require("./redisClient");
 // Middleware function to cache responses for GET requests
 const cacheMiddleware = (req, res, next) => {
   const key = req.originalUrl; // Using the request URL as the cache key
-  client.get(key, (err, data) => {
+  redisClient.get(key, (err, data) => {
     if (err) throw err;
 
     if (data !== null) {
@@ -40,7 +28,7 @@ router.get(
 );
 router.get(
   "/get/all/users/search/:loggedInUser",
-  // checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   cacheMiddleware,
   userControllers.allUsers
 );
