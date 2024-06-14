@@ -1,63 +1,68 @@
-const bcrypt = require('bcryptjs');
-const File = require('../Models/File');
+// File controller (file.controller.js)
+const mongoose = require("mongoose");
+const Grid = require("gridfs-stream");
+const File = require("../Models/File");
 
-// Function to encrypt file data
-const encryptFileData = async (data) => {
-    const salt = await bcrypt.genSalt(10);
-    const encrypted = await bcrypt.hash(data.toString('base64'), salt);
-    return encrypted;
+let gfs;
+
+mongoose.connection.once("open", () => {
+  gfs = Grid(mongoose.connection.db, mongoose.mongo);
+  gfs.collection("uploads");
+});
+
+// Upload a file
+exports.uploadFile = async (req, res) => {
+  try {
+    const file = req.file;
+    const newFile = new File({
+      filename: file.originalname,
+      contentType: file.mimetype,
+      fileId: file.id,
+    });
+    await newFile.save();
+    res.status(200).json({ message: "File uploaded successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-// Function to upload file
-const uploadFile = async (req, res) => {
-    try {
-        const { originalname, mimetype, buffer } = req.file;
+// Get all files
+exports.getAllFiles = async (req, res) => {
+  try {
+    const files = await File.find();
+    res.status(200).json(files);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
-        const encryptedName = await encryptFileData(originalname);
-        const encryptedData = await encryptFileData(buffer);
+// Delete a file
+exports.deleteFile = async (req, res) => {
+  try {
+    const fileId = req.params.id;
+    await gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(fileId) });
+    await File.findOneAndDelete({ fileId });
+    res.status(200).json({ message: "File deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
-        const newFile = new File({
-            originalName: originalname,
-            encryptedName,
-            data: Buffer.from(encryptedData, 'base64'),
-            contentType: mimetype,
-        });
-
-        await newFile.save();
-        res.status(201).json({ message: 'File uploaded successfully' });
-    } catch (error) {
-        console.error('Error uploading file:', error);
-        res.status(500).json({ message: 'Server error' });
+// Open a file
+exports.openFile = async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    const file = await gfs.files.findOne({ filename });
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
     }
-};
-
-// Function to get all files
-const getFiles = async (req, res) => {
-    try {
-        const files = await File.find().select('-data');
-        res.status(200).json(files);
-    } catch (error) {
-        console.error('Error fetching files:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-const getFile = async (req, res) => {
-    try {
-        const file = await File.findById(req.params.id);
-        if (!file) {
-            return res.status(404).json({ message: 'File not found' });
-        }
-        res.set('Content-Type', file.contentType);
-        res.send(file.data);
-    } catch (error) {
-        console.error('Error fetching file:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-module.exports = {
-    uploadFile,
-    getFiles,
-    getFile
+    const readstream = gfs.createReadStream({ filename });
+    readstream.pipe(res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };

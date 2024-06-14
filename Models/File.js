@@ -1,27 +1,9 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const fileSchema = new mongoose.Schema(
-  {
-    originalName: {
-      type: String,
-      required: true,
-    },
-    encryptedName: {
-      type: String,
-      required: true,
-    },
-    data: {
-      type: Buffer,
-      required: true,
-    },
-    contentType: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+const fileSchema = new mongoose.Schema({
+  filename: String,
+  contentType: String,
+  fileId: mongoose.Schema.Types.ObjectId
+});
 
-const File = mongoose.model("File", fileSchema);
-
-module.exports = File;
+module.exports = mongoose.model('File', fileSchema);
