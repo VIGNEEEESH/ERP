@@ -1,4 +1,3 @@
-// File controller (file.controller.js)
 const mongoose = require("mongoose");
 const Grid = require("gridfs-stream");
 const File = require("../Models/File");
