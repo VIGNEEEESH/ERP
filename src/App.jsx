@@ -7,11 +7,11 @@ import ForgotPassword from "./pages/auth/Forgot-Password";
 import UpdatePassword from "./pages/auth/reset-password";
 import "./App.css"
 // Lazy-loaded components
-const Dashboard = lazy(() => import("@/layouts/Dashboard"));
-const Auth = lazy(() => import("@/layouts/Auth"));
-const CEODashboard = lazy(() => import("@/layouts/CEODashboard"));
-const DEPTHEADDashboard = lazy(() => import("@/layouts/DEPTHEADDashboard"));
-const HRDashboard = lazy(() => import("@/layouts/HRDashboard"));
+import Dashboard from "@/layouts/dashboard";
+import Auth from "@/layouts/auth";
+import CEODashboard from "@/layouts/CEOdashboard";
+import DEPTHEADDashboard from "@/layouts/DEPTHEADdashboard";
+import HRDashboard from "@/layouts/HRdashboard";
 const SignIn = lazy(() => import("./pages/auth/sign-in"));
 const SignUp = lazy(() => import("./pages/auth/sign-up"));
 

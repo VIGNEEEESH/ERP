@@ -9,8 +9,8 @@ import {
 } from "@material-tailwind/react";
 import { useTable, usePagination } from 'react-table';
 import { PencilIcon, UserPlusIcon, ArrowLeftIcon, TrashIcon } from "@heroicons/react/24/solid";
-import AddTaskForm from "./AddTaskForm"; // Import AddTaskForm component
-import EditTaskForm from './EditTaskForm'; // Import EditTaskForm component
+import AddTaskForm from "./addtaskform"; // Import AddTaskForm component
+import EditTaskForm from './edittaskform'; // Import EditTaskForm component
 import { Progress } from "@material-tailwind/react";
 import { Modal, message } from 'antd';
 import { AuthContext } from '@/pages/auth/Auth-context';
