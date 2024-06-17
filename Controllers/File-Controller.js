@@ -1,22 +1,27 @@
 const mongoose = require("mongoose");
-const Grid = require("gridfs-stream");
 const File = require("../Models/File");
-
-let gfs;
-
-mongoose.connection.once("open", () => {
-  gfs = Grid(mongoose.connection.db, mongoose.mongo);
-  gfs.collection("uploads");
-});
+const fs = require("fs");
+const path = require("path");
 
 // Upload a file
-exports.uploadFile = async (req, res) => {
+const uploadFile = async (req, res) => {
   try {
     const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const existingFile = await File.findOne({ filename: file.originalname });
+    if (existingFile) {
+      return res
+        .status(409)
+        .json({ error: "File with the same name already exists" });
+    }
+
     const newFile = new File({
       filename: file.originalname,
       contentType: file.mimetype,
-      fileId: file.id,
+      path: file.path,
     });
     await newFile.save();
     res.status(200).json({ message: "File uploaded successfully" });
@@ -27,23 +32,10 @@ exports.uploadFile = async (req, res) => {
 };
 
 // Get all files
-exports.getAllFiles = async (req, res) => {
+const getAllFiles = async (req, res) => {
   try {
-    const files = await File.find();
-    res.status(200).json(files);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-// Delete a file
-exports.deleteFile = async (req, res) => {
-  try {
-    const fileId = req.params.id;
-    await gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(fileId) });
-    await File.findOneAndDelete({ fileId });
-    res.status(200).json({ message: "File deleted successfully" });
+    const files = await File.find({});
+    res.status(200).json({ files });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -51,17 +43,54 @@ exports.deleteFile = async (req, res) => {
 };
 
 // Open a file
-exports.openFile = async (req, res) => {
+const openFile = async (req, res) => {
   try {
     const filename = req.params.filename;
-    const file = await gfs.files.findOne({ filename });
+    const file = await File.findOne({ filename });
     if (!file) {
       return res.status(404).json({ error: "File not found" });
     }
-    const readstream = gfs.createReadStream({ filename });
-    readstream.pipe(res);
+    res.sendFile(path.resolve(file.path));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
+};
+
+// Delete a file
+const deleteFile = async (req, res) => {
+  try {
+    const fileId = req.params.id;
+    const file = await File.findById(fileId);
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    fs.unlink(file.path, async (err) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .json({ error: "Could not delete file from filesystem" });
+      }
+
+      try {
+        await File.findByIdAndDelete(fileId);
+        res.status(200).json({ message: "File deleted successfully" });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = {
+  getAllFiles,
+  uploadFile,
+  deleteFile,
+  openFile,
 };

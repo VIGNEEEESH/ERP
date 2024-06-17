@@ -2,9 +2,8 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 const cors = require("cors");
-const path = require("path");
 
 dotenv.config();
 
@@ -19,6 +18,7 @@ const userRoutes = require("./Routes/User-Routes");
 const workRoutes = require("./Routes/Work-Routes");
 const messageRoutes = require("./Routes/Message-Routes");
 const chatRoutes = require("./Routes/Chat-Routes");
+const fileRoutes = require("./Routes/File-Routes");
 const path = require("path");
 app.use(bodyParser.json());
 app.use(cors());
@@ -49,6 +49,7 @@ app.use("/api/erp/user", userRoutes);
 app.use("/api/erp/work", workRoutes);
 app.use("/api/erp/message", messageRoutes);
 app.use("/api/erp/chat", chatRoutes);
+app.use("/api/erp/files", fileRoutes);
 app.get("/", (req, res) => {
   return res.status(200).json({ message: "Hello World" });
 });

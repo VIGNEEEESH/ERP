@@ -355,16 +355,7 @@ const updateUserById = async (req, res, next) => {
     const error = new HttpError("User not found, please try again", 500);
     return next(error);
   }
-  // let hashedPassword;
-  // try {
-  //   hashedPassword = await bcrypt.hash(password, 12);
-  // } catch (err) {
-  //   const error = new HttpError(
-  //     "Something went wrong while encrypting the password, please try again",
-  //     500
-  //   );
-  //   return next(error);
-  // }
+  
   if (req.file != null) {
     user.image = req.file.path;
   } else {
