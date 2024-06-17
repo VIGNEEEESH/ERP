@@ -24,7 +24,7 @@ const MyOffice = lazy(() => import('./pages/ceodashboard/myOffice/MyOffice'));
 const Communication = lazy(() => import('./pages/ceodashboard/communication/communication'));
 const WorkStatus = lazy(() => import('./pages/ceodashboard/workstatus/WorkStatus'));
 const TaskManager = lazy(() => import('./pages/ceodashboard/task manager/taskmanager'));
-const Projects = lazy(() => import('./pages/ceodashboard/projects/Projects'));
+const Projects = lazy(() => import('./pages/ceodashboard/projects/projects'));
 const CompanyProducts = lazy(() => import('./pages/ceodashboard/companyproducts/CompanyProducts'));
 const OurClients = lazy(() => import('./pages/ceodashboard/clients/OurClients'));
 const Leave = lazy(() => import('./pages/ceodashboard/leaves/Leave'));

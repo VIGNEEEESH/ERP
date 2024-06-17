@@ -147,19 +147,18 @@ import {
 } from "@heroicons/react/24/solid";
 import { lazy } from 'react';
 
-const Home = lazy(() => import("@/pages/dashboard/Home"));
-const Profile = lazy(() => import("@/pages/dashboard/Profile"));
-const Tables = lazy(() => import("@/pages/dashboard/Tables"));
-const Notifications = lazy(() => import("@/pages/dashboard/Notifications"));
-const CommunicationComponent = lazy(() => import("@/pages/dashboard/Communication"));
-const Logout = lazy(() => import("./pages/dashboard/Logout"));
-const Settings = lazy(() => import("./pages/dashboard/settings/Settings"));
+import Home from "@/pages/dashboard/home";
+import Profile from "@/pages/dashboard/profile";
+import Tables from "@/pages/dashboard/tables";
+import Notifications from "@/pages/dashboard/notifications";
+import CommunicationComponent from "@/pages/dashboard/communication";
+import Logout from "./pages/dashboard/logout";const Settings = lazy(() => import("./pages/dashboard/settings/Settings"));
 const LeaveForm = lazy(() => import("./pages/dashboard/leavereq/LeaveForm"));
 const MyOffice = lazy(() => import("./pages/dashboard/myOffice/MyOffice"));
 const EmployeeProjects = lazy(() => import("./pages/dashboard/myProjects/EmployeeProjects"));
 const EmployeeTasks = lazy(() => import("./pages/dashboard/Tasks/EmployeeTasks"));
 const CompanyProducts = lazy(() => import("./pages/dashboard/companyproducts/CompanyProducts"));
-const Employee = lazy(() => import("./pages/dashboard/profile/Employee"));
+const Employee = lazy(() => import("./pages/dashboard/profile/employee"));
 const WorkStatus = lazy(() => import("./pages/dashboard/workstatus/WorkStatus"));
 const MyLogRecord = lazy(() => import("./pages/dashboard/mylogrecord/MylogRecord"));
 // import Home from "@/pages/dashboard/Home";
