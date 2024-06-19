@@ -7,56 +7,25 @@ function EmployeeTasks() {
   const auth = useContext(AuthContext);
   const [tasks, setTasks] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchTasks = async () => {
-  //     try {
-  //       const tasksResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/get/tasks/byemail/${auth.email}`, {
-  //         headers: { Authorization: "Bearer " + auth.token }
-  //       });
-  //       if (!tasksResponse.ok) {
-  //         throw new Error(`Failed to fetch tasks data: ${tasksResponse.status}`);
-  //       }
-  //       const tasksData = await tasksResponse.json();
-  //       setTasks(tasksData.tasks);
-  //     } catch (error) {
-  //       message.error("Error fetching tasks data: " + error.message);
-  //     }
-  //   };
-
-  //   fetchTasks();
-  // }, [auth.email, auth.token]);
-
   useEffect(() => {
-    // Dummy tasks for testing
-    const dummyTasks = [
-      {
-        id: 'CP-1',
-        taskName: 'Dummy Task 1',
-        taskDescription: 'Description for Dummy Task 1',
-        status: 'todo',
-        priority: 'medium',
-        deadline: '2024-06-30',
-      },
-      {
-        id: 'CP-2',
-        taskName: 'Dummy Task 2',
-        taskDescription: 'Description for Dummy Task 2',
-        status: 'in-progress',
-        priority: 'high',
-        deadline: '2024-07-15',
-      },
-      {
-        id: 'CP-3',
-        taskName: 'Dummy Task 3',
-        taskDescription: 'Description for Dummy Task 3',
-        status: 'done',
-        priority: 'low',
-        deadline: '2024-06-25',
-      },
-    ];
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/get/tasks/byemail/${auth.email}`, {
+          headers: { Authorization: "Bearer " + auth.token }
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch tasks data: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched tasks:", data.tasks); // Add log to check fetched tasks
+        setTasks(data.tasks);
+      } catch (error) {
+        message.error("Error fetching tasks data: " + error.message);
+      }
+    };
 
-    setTasks(dummyTasks);
-  }, []); 
+    fetchTasks();
+  }, [auth.email, auth.token]);
 
   return (
     <Kanban tasks={tasks} />

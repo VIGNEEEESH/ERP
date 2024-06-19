@@ -3,9 +3,8 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import './Kanban.css';
 import TaskCard from './TaskCard';
-import { statuses } from './data_task';
-import db from './db.json';
 
+const statuses = ['todo', 'inprogress', 'completed'];
 const BoardIcon = (
   <svg
     className="w-10 h-10 text-blue-300"
@@ -24,45 +23,82 @@ const BoardIcon = (
   </svg>
 );
 
-function Kanban() {
-  const [tasks, setTasks] = useState([]);
+const Kanban = ({ tasks }) => {
+  const [columns, setColumns] = useState({
+    todo: [],
+    inprogress: [],
+    completed: []
+  });
 
   useEffect(() => {
-    // Initialize the tasks state with data from db.json
-    setTasks(db.tasks);
-  }, []);
+    const initializeColumns = () => {
+      const columnsData = {
+        todo: tasks.filter(task => task.progress === 'To Do'),
+        inprogress: tasks.filter(task => task.progress === 'In Progress'),
+        completed: tasks.filter(task => task.progress === 'Completed')
+      };
+      setColumns(columnsData);
+    };
 
-  const updateTask = (updatedTask) => {
-    const updatedTasks = tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task));
-    setTasks(updatedTasks);
-  };
+    initializeColumns();
+  }, [tasks]);
 
-  const handleDrop = (e, status) => {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData('id');
-    const updatedTask = tasks.find((task) => task.id === taskId);
-    if (updatedTask) {
-      updateTask({ ...updatedTask, status });
-    }
+  const handleDragStart = (e, id) => {
+    e.dataTransfer.setData('id', id);
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  const handleDragStart = (e, id) => {
-    e.dataTransfer.setData('id', id);
+  const handleDrop = async (e, newStatus) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData('id');
+    const updatedTask = tasks.find((task) => task._id === taskId);
+    const oldStatus = updatedTask.progress;
+
+    if (updatedTask && updatedTask.progress !== newStatus) {
+      const newStatusFormatted = {
+        todo: 'To Do',
+        inprogress: 'In Progress',
+        completed: 'Completed'
+      }[newStatus];
+
+      updatedTask.progress = newStatusFormatted;
+      setColumns((prevColumns) => ({
+        ...prevColumns,
+        [newStatus]: [...prevColumns[newStatus], updatedTask],
+        [oldStatus.toLowerCase().replace(/\s/g, '')]: prevColumns[oldStatus.toLowerCase().replace(/\s/g, '')].filter(
+          (task) => task._id !== taskId
+        ),
+      }));
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/erp/task/update/taskprogress/byid/${taskId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ progress: newStatusFormatted }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update task status');
+        }
+      } catch (error) {
+        console.error('Error updating task status:', error);
+      }
+    }
   };
 
   const downloadTasksAsPdf = () => {
     const doc = new jsPDF();
     const tableColumn = ['ID', 'Title', 'Description', 'Status', 'Priority'];
     const tableRows = tasks.map((task) => [
-      task.id,
-      task.title,
-      task.description,
-      task.status,
-      task.priority || 'low', // Default priority if not specified
+      task._id,
+      task.taskName,
+      task.taskDescription,
+      task.progress,
     ]);
 
     doc.autoTable({
@@ -94,20 +130,19 @@ function Kanban() {
           >
             <div className="border rounded-lg">
               <div className="flex rounded-lg bg-gray-900 items-center justify-between p-2">
-                <h1 className="text-xl capitalize font-bold text-gray-200"> {status}</h1>
+                <h1 className="text-xl capitalize font-bold text-gray-200">{status}</h1>
+                {BoardIcon}
               </div>
               <div className="h-full">
-                {tasks
-                  .filter((task) => task.status === status)
-                  .map((task) => (
-                    <div
-                      key={task.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, task.id)}
-                    >
-                      <TaskCard task={task} />
-                    </div>
-                  ))}
+                {columns[status]?.map((task) => (
+                  <div
+                    key={task._id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, task._id)}
+                  >
+                    <TaskCard task={task} />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -115,6 +150,6 @@ function Kanban() {
       </div>
     </div>
   );
-}
+};
 
 export default Kanban;
