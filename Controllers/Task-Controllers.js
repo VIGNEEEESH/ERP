@@ -224,28 +224,24 @@ const addTaskFileById = async (req, res, next) => {
 };
 
 const updateTaskProgressById = async (req, res, next) => {
-  const id = req.params.id;
+  const { id } = req.params;
   const { progress } = req.body;
 
+  let task;
   try {
-    // Find the task by ID
-    let task = await Task.findById(id);
-
+    task = await Task.findById(id);
     if (!task) {
       const error = new HttpError("Task not found, please try again", 404);
       return next(error);
     }
 
-    // Update the task's progress
     task.progress = progress;
-
-    // Save the updated task
     await task.save();
 
-    res.status(200).json({ task: task });
+    res.status(200).json({ task });
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong while updating task progress, please try again",
+      "Something went wrong while updating the task progress, please try again",
       500
     );
     return next(error);
