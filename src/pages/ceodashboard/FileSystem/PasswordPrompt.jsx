@@ -1,37 +1,39 @@
 import React, { useState } from 'react';
+import { Input, Button, Card, CardBody, Typography } from '@material-tailwind/react';
 
 const PasswordPrompt = ({ onPasswordSubmit }) => {
-  const [password, setPassword] = useState('');
+    const [password, setPassword] = useState('');
 
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onPasswordSubmit(password);
+    };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    onPasswordSubmit(password);
-  };
-
-  return (
-    <div className="flex justify-center items-center h-screen">
-      <form onSubmit={handleSubmit} className="bg-gray-200 p-8 rounded shadow-lg">
-        <label className="block mb-4">
-          Password:
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={handlePasswordChange}
-            className="border rounded px-3 py-1 ml-2"
-            required
-          />
-        </label>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Submit
-        </button>
-      </form>
-    </div>
-  );
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <Card className="w-96">
+                <CardBody>
+                    <Typography variant="h5" color="blue-gray" className="text-center mb-6">
+                        Enter your password to access the file system
+                    </Typography>
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-4">
+                            <Input
+                                type="password"
+                                label="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="text-center">
+                            <Button type="submit">Submit</Button>
+                        </div>
+                    </form>
+                </CardBody>
+            </Card>
+        </div>
+    );
 };
 
 export default PasswordPrompt;

@@ -21,13 +21,27 @@ export function FileUpload() {
     const [authenticated, setAuthenticated] = useState(false);
     const auth = useContext(AuthContext);
 
-    const handlePasswordSubmit = (password) => {
-        const validPassword = "sajaljain390";
-        if (password === validPassword) {
-            setAuthenticated(true);
-        } else {
-            alert('Incorrect password. Please try again.');
-            setAuthenticated(false);
+    const handlePasswordSubmit = async (password) => {
+        try {
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/verify-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${auth.token}`,
+                },
+                body: JSON.stringify({ email: auth.email, password }),
+            });
+
+            if (response.ok) {
+                setAuthenticated(true);
+            } else {
+                const result = await response.json();
+                alert(result.message || 'Incorrect password. Please try again.');
+                setAuthenticated(false);
+            }
+        } catch (error) {
+            console.error('Error verifying password:', error);
+            message.error('Failed to verify password. Please try again.');
         }
     };
 
@@ -62,7 +76,7 @@ export function FileUpload() {
         selectedFiles.forEach(file => {
             formData.append('file', file);
         });
-    
+
         try {
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/files/upload/file`, {
                 method: 'POST',
@@ -75,7 +89,7 @@ export function FileUpload() {
             if (!response.ok) {
                 throw new Error(responseData.error || 'Failed to upload files');
             }
-    
+
             // Handle success response
             const fetchResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/files/get/all/files`, {
                 headers: {
@@ -85,11 +99,11 @@ export function FileUpload() {
             const data = await fetchResponse.json();
             setFiles(data.files);
             setSelectedFiles([]);
-            setInputKey(Date.now());
-            message.success('Files uploaded successfully.');
+            setInputKey(Date.now()); // Reset file input
+            message.success('Files uploaded successfully!');
         } catch (error) {
             console.error('Error uploading files:', error);
-            message.error(error.message || 'Failed to upload files');
+            message.error(error.message || 'Failed to upload files. Please try again.');
         }
     };
 
@@ -101,198 +115,194 @@ export function FileUpload() {
                     Authorization: `Bearer ${auth.token}`,
                 },
             });
+            const responseData = await response.json();
             if (!response.ok) {
-                const errorDetails = await response.text(); // Get more error details
-                throw new Error(`Network response was not ok: ${errorDetails}`);
+                throw new Error(responseData.error || 'Failed to delete file');
             }
-            setFiles(prevFiles => prevFiles.filter(file => file._id !== fileId));
-            message.success('File deleted successfully.');
+            // Handle success response
+            const updatedFiles = files.filter((file) => file.id !== fileId);
+            setFiles(updatedFiles);
+            message.success('File deleted successfully!');
         } catch (error) {
             console.error('Error deleting file:', error);
-            message.error(`Failed to delete file. Error: ${error.message}`);
+            message.error(error.message || 'Failed to delete file. Please try again.');
         }
     };
-
-    const handleSearch = (event) => {
-        setSearchQuery(event.target.value);
-    };
-
-    const openFile = async (file) => {
-        try {
-            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/files/open/file/${encodeURIComponent(file.filename)}`, {
-                headers: {
-                    Authorization: `Bearer ${auth.token}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch file');
-            }
-
-            // Assuming the response is a file, you can create a blob URL to open it
-            const blob = await response.blob();
-            const url = URL.createObjectURL(blob);
-            window.open(url);
-        } catch (error) {
-            console.error('Error opening file:', error);
-            message.error('Failed to open file. Please try again.');
-        }
-    };
-
-    const data = useMemo(() => files, [files]);
-    const filteredData = useMemo(() => {
-        return data.filter(file =>
-            file.filename.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }, [data, searchQuery]);
 
     const columns = useMemo(
         () => [
+            { Header: 'Name', accessor: 'name' },
+            { Header: 'Size', accessor: 'size' },
+            { Header: 'Type', accessor: 'type' },
+            { Header: 'Date Uploaded', accessor: 'dateUploaded' },
             {
-                Header: 'File Name',
-                accessor: 'filename',
+                Header: 'Actions',
                 Cell: ({ row }) => (
-                    <div className="flex justify-between items-center p-4 border border-gray-200 rounded-md bg-white">
-                        <Typography variant="small" color="blue-gray" className="font-semibold">
-                            {row.original.filename}
-                        </Typography>
-                        <div className="flex gap-2">
-                            <Button onClick={() => openFile(row.original)} size="sm" className="ml-4">
-                                Open
-                            </Button>
-                            <Button onClick={() => handleFileDelete(row.original._id)} size="sm" color="red">
-                                Delete
-                            </Button>
-                        </div>
-                    </div>
+                    <Button color="red" size="sm" onClick={() => handleFileDelete(row.original.id)}>
+                        Delete
+                    </Button>
                 ),
             },
         ],
-        []
+        [files]
     );
 
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
+        prepareRow,
         page,
+        canPreviousPage,
+        canNextPage,
+        pageOptions,
+        pageCount,
+        gotoPage,
         nextPage,
         previousPage,
-        canNextPage,
-        canPreviousPage,
-        gotoPage,
-        pageCount,
+        setPageSize: setTablePageSize,
         state: { pageIndex },
-        prepareRow,
     } = useTable(
         {
             columns,
-            data: filteredData,
+            data: files,
             initialState: { pageIndex: 0, pageSize },
         },
         usePagination
     );
 
-    const handlePageSizeChange = (e) => {
-        const newSize = Number(e.target.value);
-        setPageSize(newSize);
-    };
+    useEffect(() => {
+        setTablePageSize(pageSize);
+    }, [pageSize, setTablePageSize]);
+
+    const filteredFiles = files.filter((file) =>
+        file.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
-        <div>
-            {!authenticated && <PasswordPrompt onPasswordSubmit={handlePasswordSubmit} />}
-            {authenticated && (
-                <div className="mt-12 mb-8 flex flex-col gap-12">
+        <>
+            {!authenticated ? (
+                <PasswordPrompt onPasswordSubmit={handlePasswordSubmit} />
+            ) : (
+                <div className="p-4">
                     <Card>
-                        <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
+                        <CardHeader variant="gradient" color="blue" className="mb-8 p-6">
                             <Typography variant="h6" color="white">
                                 File Upload
                             </Typography>
-                            <Input
-                                type="text"
-                                placeholder="Search files"
-                                value={searchQuery}
-                                onChange={handleSearch}
-                                className="w-full bg-white text-black"
-                            />
                         </CardHeader>
-                        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-                            <div className="flex justify-end items-center gap-4 mb-4" style={{ marginLeft: '20px' }}>
+                        <CardBody>
+                            <div className="mb-4">
                                 <Input
                                     key={inputKey}
                                     type="file"
                                     multiple
                                     onChange={handleFileChange}
-                                    className="w-30 bg-white text-black p-2"
                                 />
-                                <Button onClick={handleFileUpload} size="m" className="p-2" style={{ marginRight: '20px' }}>
+                            </div>
+                            <div className="mb-4">
+                                <Button onClick={handleFileUpload} disabled={selectedFiles.length === 0}>
                                     Upload
                                 </Button>
                             </div>
-                            <table {...getTableProps()} className="w-full min-w-[640px] table-auto">
-                                <thead>
-                                    {headerGroups.map(headerGroup => (
-                                        <tr {...headerGroup.getHeaderGroupProps()}>
-                                            {headerGroup.headers.map(column => (
-                                                <th {...column.getHeaderProps()} className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                                    <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
+                            <div className="mb-4">
+                                <Input
+                                    type="text"
+                                    placeholder="Search files..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table
+                                    {...getTableProps()}
+                                    className="min-w-full bg-white border border-gray-200"
+                                >
+                                    <thead>
+                                        {headerGroups.map((headerGroup) => (
+                                            <tr {...headerGroup.getHeaderGroupProps()}>
+                                                {headerGroup.headers.map((column) => (
+                                                    <th
+                                                        {...column.getHeaderProps()}
+                                                        className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                    >
                                                         {column.render('Header')}
-                                                    </Typography>
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                </thead>
-                                <tbody {...getTableBodyProps()}>
-                                    {page.map(row => {
-                                        prepareRow(row);
-                                        return (
-                                            <tr {...row.getRowProps()}>
-                                                {row.cells.map(cell => (
-                                                    <td {...cell.getCellProps()} className="py-3 px-5">
-                                                        {cell.render('Cell')}
-                                                    </td>
+                                                    </th>
                                                 ))}
                                             </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                            <div className="pagination p-5 flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <span className="mr-2">Page</span>
-                                    <strong>
-                                        {pageIndex + 1} of {pageCount}
-                                    </strong>
-                                </div>
-                                <div className="flex items-center">
-                                    <span onClick={() => gotoPage(0)} disabled={!canPreviousPage} className='cursor-pointer'>
-                                        {" << "}
-                                    </span>
-                                    <span onClick={() => previousPage()} disabled={!canPreviousPage} className='cursor-pointer'>
-                                        {"<"}
-                                    </span>
-                                    <span onClick={() => nextPage()} disabled={!canNextPage} className='cursor-pointer'>
-                                        {">"}
-                                    </span>
-                                    <span onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className='cursor-pointer'>
-                                        {" >>"}
-                                    </span>
-                                    <select value={pageSize} onChange={handlePageSizeChange} className='ml-2'>
-                                        {[5, 10, 20,                                         30, 40, 50].map(size => (
-                                            <option key={size} value={size}>
-                                                Show {size}
-                                            </option>
                                         ))}
-                                    </select>
-                                </div>
+                                    </thead>
+                                    <tbody {...getTableBodyProps()}>
+                                        {page.map((row) => {
+                                            prepareRow(row);
+                                            return (
+                                                <tr {...row.getRowProps()}>
+                                                    {row.cells.map((cell) => (
+                                                        <td
+                                                            {...cell.getCellProps()}
+                                                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                                        >
+                                                            {cell.render('Cell')}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="pagination mt-4">
+                                <Button
+                                    onClick={() => gotoPage(0)}
+                                    disabled={!canPreviousPage}
+                                >
+                                    {'<<'}
+                                </Button>
+                                <Button
+                                    onClick={() => previousPage()}
+                                    disabled={!canPreviousPage}
+                                >
+                                    {'<'}
+                                </Button>
+                                <Button onClick={() => nextPage()} disabled={!canNextPage}>
+                                    {'>'}
+                                </Button>
+                                <Button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+                                    {'>>'}
+                                </Button>
+                                <span>
+                                    Page{' '}
+                                    <strong>
+                                        {pageIndex + 1} of {pageOptions.length}
+                                    </strong>{' '}
+                                </span>
+                                <span>
+                                    | Go to page:{' '}
+                                    <input
+                                        type="number"
+                                        defaultValue={pageIndex + 1}
+                                        onChange={(e) => {
+                                            const pageNumber = e.target.value ? Number(e.target.value) - 1 : 0;
+                                            gotoPage(pageNumber);
+                                        }}
+                                        style={{ width: '100px' }}
+                                    />
+                                </span>{' '}
+                                <select
+                                    value={pageSize}
+                                    onChange={(e) => setPageSize(Number(e.target.value))}
+                                >
+                                    {[5, 10, 20, 30, 40, 50].map((size) => (
+                                        <option key={size} value={size}>
+                                            Show {size}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </CardBody>
                     </Card>
                 </div>
             )}
-        </div>
+        </>
     );
 }
-
-export default FileUpload;

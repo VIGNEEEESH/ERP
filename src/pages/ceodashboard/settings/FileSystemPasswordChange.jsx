@@ -1,5 +1,3 @@
-// FileSystemPasswordChange.jsx
-
 import React, { useContext, useState } from 'react';
 import {
   Card,
@@ -43,14 +41,11 @@ function FileSystemPasswordChange() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    // Update the form data
     setFormData({
       ...formData,
       [name]: value,
     });
 
-    // Check if new password and confirm password match
     if (name === 'confirmPassword' && formData.newPassword !== value) {
       setPasswordsMatch(false);
     } else if (name === 'newPassword' && formData.confirmPassword !== value) {
@@ -64,58 +59,62 @@ function FileSystemPasswordChange() {
 
   const handleProfileUpdate = async () => {
     try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/fileSystem/user/changepassword`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`
+        },
+        body: JSON.stringify(formData)
+      });
 
-      const response = await fetch(import.meta.env.REACT_APP_BACKEND_URL + `/api/fileSystem/user/changepassword`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Authorization: "Bearer " + auth.token, },
-          body: JSON.stringify(formData)
-        })
       if (!response.ok) {
-        return error(`Http error: `, response.message)
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update password');
       }
-      message.success("Password updated successfully")
-      setTimeout(() => {
-        window.location.reload()
-      }, [300]
 
-      )
+      message.success("Password updated successfully");
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
     } catch (err) {
-      message.error("Something went wrong, please try again")
+      message.error(err.message || "Something went wrong, please try again");
     }
-  }
+  };
+
+  const handleSetPassword = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/fileSystem/user/setpassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`
+        },
+        body: JSON.stringify({ newPassword: formData.newPassword })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to set password');
+      }
+
+      message.success("Password set successfully");
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    } catch (err) {
+      message.error(err.message || "Something went wrong, please try again");
+    }
+  };
 
   return (
     <div className="p-4">
       <Card>
         <CardBody>
           <Typography variant="h6" color="blue-gray" className="mb-4">
-            File System Password Change
+            Set Password
           </Typography>
-
           <div className="space-y-4">
-            <Input
-              type={showCurrentPassword ? 'text' : 'password'}
-              label="Current Password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              iconRight={
-                showCurrentPassword ? (
-                  <EyeSlashIcon
-                    className="h-6 w-6 text-blue-gray-400 cursor-pointer"
-                    onClick={() => handleTogglePasswordVisibility('current')}
-                  />
-                ) : (
-                  <EyeIcon
-                    className="h-6 w-6 text-blue-gray-400 cursor-pointer"
-                    onClick={() => handleTogglePasswordVisibility('current')}
-                  />
-                )
-              }
-              inputClassName={passwordsMatch ? 'border border-blue-gray-300' : 'border border-red-500'}
-            />
-
             <Input
               type={showNewPassword ? 'text' : 'password'}
               label="New Password"
@@ -135,9 +134,7 @@ function FileSystemPasswordChange() {
                   />
                 )
               }
-              inputClassName="border border-blue-gray-300"
             />
-
             <Input
               type={showConfirmPassword ? 'text' : 'password'}
               label="Confirm New Password"
@@ -157,19 +154,23 @@ function FileSystemPasswordChange() {
                   />
                 )
               }
-              inputClassName={passwordsMatch ? 'border border-blue-gray-300' : 'border border-red-500'}
             />
-
             {!passwordsMatch && (
-              <Typography variant="small" color="red-500">
+              <Typography variant="small" color="red">
                 Passwords do not match.
               </Typography>
             )}
-
-            <Button disabled={!passwordsMatch} onClick={handleProfileUpdate}>
-              Submit
+            <Button disabled={!passwordsMatch} onClick={handleSetPassword}>
+              Set Password
             </Button>
-
+          </div>
+          <Typography variant="h6" color="blue-gray" className="mt-8 mb-4">
+            Change Password
+          </Typography>
+          <div className="space-y-4">
+            <Button onClick={handleProfileUpdate}>
+              Change Password
+            </Button>
           </div>
         </CardBody>
       </Card>

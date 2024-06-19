@@ -56,7 +56,7 @@ function EmployeeTasks() {
     ];
 
     setTasks(dummyTasks);
-  }, []); // Empty dependency array to run once on mount
+  }, []); 
 
   return (
     <Kanban tasks={tasks} />
