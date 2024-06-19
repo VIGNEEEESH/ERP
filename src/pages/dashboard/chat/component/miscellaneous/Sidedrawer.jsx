@@ -185,7 +185,7 @@ const { setSelectedChat, notification, setNotification, chats, setChats } = Chat
                 size="sm"
                 cursor="pointer"
                 name={user.firstName}
-                src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` || "https://via.placeholder.com/150"}
+                src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` }
               />
             </MenuButton>
             <MenuList>

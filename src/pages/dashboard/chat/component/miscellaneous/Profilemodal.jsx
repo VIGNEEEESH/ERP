@@ -41,7 +41,7 @@ const Profilemodal = ({ user = {}, children }) => {
             <Image
               borderRadius="full"
               boxSize="150px"
-              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` || "https://via.placeholder.com/150"}
+              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}`}
               alt={user.name || "User"}
               mb={4}
               ml={20}

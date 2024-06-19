@@ -11,24 +11,26 @@ import { useState } from "react";
 import { ChatState } from "./miscellaneous/ChatProvider";
 const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
-
+  
   return (
     <ScrollableFeed>
-      {messages &&
+      {messages &&  
         messages.map((m, i) => (
           <div style={{ display: "flex" }} key={m._id}>
             {(isSameSender(messages, m, i, user._id) ||
               isLastMessage(messages, i, user._id)) && (
-              <Tooltip label={m.sender.name} placement="bottom-start" hasArrow>
+              <Tooltip label={`${m.sender.firstName} ${m.sender.lastName}`} placement="bottom-start" hasArrow>
+                {/* <h1>{m.sender.firstName} </h1> */}
                 <Avatar
                   mt="7px"
                   mr={1}
                   size="sm"
                   cursor="pointer"
-                  name={m.sender.name}
-                  src={m.sender.pic}
+                  name={`${m.sender.firstName} ${m.sender.lastName}`}
+                  src={`${import.meta.env.REACT_APP_BACKEND_URL}/${m.sender.image}`}
                 />
               </Tooltip>
+              
             )}
             <span
               style={{

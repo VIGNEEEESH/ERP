@@ -25,7 +25,7 @@ const UserListItem = ({ user, handleFunction }) => {
         size="sm"
         cursor="pointer"
         name={user.firstName}
-        src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` || "https://via.placeholder.com/150"}
+        src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` }
       />
       <Box>
         <Text>{user.firstName} {user.lastName}</Text>

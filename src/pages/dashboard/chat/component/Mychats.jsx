@@ -32,7 +32,7 @@ const MyChats = ({ fetchAgain }) => {
         _id: data.user._id,
         name: `${data.user.firstName} ${data.user.lastName}`,
         email: data.user.email,
-        pic: `${import.meta.env.REACT_APP_BACKEND_URL}/${data.user.image}` || "https://cdn.britannica.com/72/232772-050-4E3D86CC/mind-blown-emoji-head-exploding-emoticon.jpg",
+        pic: `${import.meta.env.REACT_APP_BACKEND_URL}/${data.user.image}` ,
       });
       
     } catch (error) {
