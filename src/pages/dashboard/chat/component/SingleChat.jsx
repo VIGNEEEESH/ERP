@@ -1,7 +1,4 @@
-import { FormControl } from "@chakra-ui/form-control";
-import { Input } from "@chakra-ui/input";
-import { Box, Text } from "@chakra-ui/layout";
-import { IconButton, Spinner, useToast } from "@chakra-ui/react";
+import { FormControl, Input, Box, Text, IconButton, Spinner, useToast, useDisclosure } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useContext, useEffect, useState } from "react";
 import ProfileModal from "./miscellaneous/ProfileModal";
@@ -12,20 +9,25 @@ import animationData from "../animations/typing.json";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { AuthContext } from "@/pages/auth/Auth-context";
 import { ChatState } from "./miscellaneous/ChatProvider";
-import "./styles.css"
 import { io } from "socket.io-client";
+import FileUploadModal from "./miscellaneous/FileUploadModal";
+import { FaPaperclip, FaSmile } from 'react-icons/fa';
+import { InputGroup, InputRightElement } from '@chakra-ui/react';
+import { Picker } from 'emoji-mart';
+import 'emoji-mart/css/emoji-mart.css';
+
 var socket, selectedChatCompare;
-const SingleChat = ({ fetchAgain,setFetchAgain }) => {
+const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const toast = useToast();
-  const [socketConnected,setSocketConnected]=useState(false)
+  const [socketConnected, setSocketConnected] = useState(false);
   const [loggedUser, setLoggedUser] = useState([]);
-const auth=useContext(AuthContext)
-  
+  const auth = useContext(AuthContext);
 
   const defaultOptions = {
     loop: true,
@@ -35,8 +37,7 @@ const auth=useContext(AuthContext)
       preserveAspectRatio: "xMidYMid slice",
     },
   };
-  const { selectedChat, setSelectedChat, user, notification, setNotification } =
-    ChatState();
+  const { selectedChat, setSelectedChat, user, notification, setNotification } = ChatState();
     
   const fetchUserDetails = async () => {
     try {
@@ -69,8 +70,6 @@ const auth=useContext(AuthContext)
     if (!selectedChat) return;
 
     try {
-     
-
       setLoading(true);
 
       const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/message/get/all/messages/byid/${selectedChat._id}`, {
@@ -81,12 +80,11 @@ const auth=useContext(AuthContext)
       const data = await response.json();
       setMessages(data.messages);
       setLoading(false);
-      socket.emit("join chat",selectedChat._id)
+      socket.emit("join chat", selectedChat._id);
       
     } catch (error) {
-      
       toast({
-        title: "Error Occured!",
+        title: "Error Occurred!",
         description: "Failed to Load the Messages",
         status: "error",
         duration: 5000,
@@ -95,59 +93,58 @@ const auth=useContext(AuthContext)
       });
     }
   };
-  useEffect(()=>{
-    socket=io(import.meta.env.REACT_APP_BACKEND_URL)
-    socket.emit("setup",user)
-    socket.on("connected",()=>setSocketConnected(true))
-    socket.on("typing",()=>setIsTyping(true))
-    socket.on("stop typing",()=>setIsTyping(false))
-  },[])
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   useEffect(() => {
-    fetchUserDetails()
+    socket = io(import.meta.env.REACT_APP_BACKEND_URL);
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+    socket.on("typing", () => setIsTyping(true));
+    socket.on("stop typing", () => setIsTyping(false));
+  }, []);
+
+  useEffect(() => {
+    fetchUserDetails();
     if (selectedChat) {
       setLoading(true);
-      
-      fetchMessages()
-      
+      fetchMessages();
     }
-    selectedChatCompare=selectedChat
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
-useEffect(()=>{
-  socket.on("message recieved",(newMessageRecieved)=>{
-    if(!selectedChatCompare || selectedChatCompare._id !==newMessageRecieved.chat._id){
-      if(!notification.includes(newMessageRecieved)){
-        setNotification([newMessageRecieved,...notification])
-        setFetchAgain(!fetchAgain)
-      }
-    }else{
-      setMessages([...messages,newMessageRecieved])
-    }
-  })
-})
 
+  useEffect(() => {
+    socket.on("message received", (newMessageReceived) => {
+      if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
+        if (!notification.includes(newMessageReceived)) {
+          setNotification([newMessageReceived, ...notification]);
+          setFetchAgain(!fetchAgain);
+        }
+      } else {
+        setMessages([...messages, newMessageReceived]);
+      }
+    });
+  });
 
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
-      socket.emit("stop typing",selectedChat._id)
+      socket.emit("stop typing", selectedChat._id);
       try {
-        
         setNewMessage("");
         const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/message/send/message`, {
-          method:"POST",
+          method: "POST",
           headers: {
             Authorization: "Bearer " + auth.token,
-            "Content-Type":"application/json"
+            "Content-Type": "application/json",
           },
-          body:JSON.stringify({content:newMessage,chatId:selectedChat._id,sender:auth.userId})
+          body: JSON.stringify({ content: newMessage, chatId: selectedChat._id, sender: auth.userId }),
         });
-        const data=await response.json()
-        
-        socket.emit("new message", data.message)
+        const data = await response.json();
+        socket.emit("new message", data.message);
         setMessages([...messages, data.message]);
       } catch (error) {
-        
         toast({
-          title: "Error Occured!",
+          title: "Error Occurred!",
           description: "Failed to send the Message",
           status: "error",
           duration: 5000,
@@ -160,21 +157,44 @@ useEffect(()=>{
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
-   if(!socketConnected) return
-   if(!typing){
-    setTyping(true)
-    socket.emit("typing",selectedChat._id)
-   }
-   let lastTypingTime=new Date().getTime()
-   var timerLength=3000
-   setTimeout(()=>{
-var timeNow=new Date().getTime()
-var timeDiff=timeNow-lastTypingTime
-if(timeDiff >=timerLength && typing){
-socket.emit("stop typing",selectedChat._id)
-setTyping(false)
-}
-   },timerLength)
+    if (!socketConnected) return;
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    var timerLength = 3000;
+    setTimeout(() => {
+      var timeNow = new Date().getTime();
+      var timeDiff = timeNow - lastTypingTime;
+
+      if (timeDiff >= timerLength && typing) {
+        socket.emit("stop typing", selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLength);
+  };
+
+  const handleFileUpload = (file, preview) => {
+    if (!file || !preview) return;
+
+    const newMessage = {
+      sender: {
+        name: loggedUser.name,
+        pic: loggedUser.pic,
+        _id: loggedUser._id,
+      },
+      content: `File uploaded: ${file.name}`,
+      preview,
+    };
+
+    setMessages([...messages, newMessage]);
+  };
+
+  const handleEmojiSelect = (emoji) => {
+    setNewMessage(newMessage + emoji.native);
+    setShowEmojiPicker(false); // Hide the emoji picker after selecting an emoji
   };
 
   return (
@@ -194,43 +214,24 @@ setTyping(false)
             <IconButton
               display={{ base: "flex", md: "none" }}
               icon={<ArrowBackIcon />}
-              onClick={() => setSelectedChat(null)}
+              onClick={() => setSelectedChat("")}
             />
             {messages &&
-
-(!selectedChat.isGroupChat ? (
-
-  <>
-
-    {getSender(user, selectedChat.users)}
-
-    <ProfileModal
-
-      user={getSenderFull(user, selectedChat.users)}
-
-    />
-
-  </>
-
-) : (
-
-  <>
-
-    {selectedChat.chatName.toUpperCase()}
-
-    <UpdateGroupChatModal
-
-      fetchMessages={fetchMessages}
-
-      fetchAgain={fetchAgain}
-
-      setFetchAgain={setFetchAgain}
-
-    />
-
-  </>
-
-))}
+              (!selectedChat.isGroupChat ? (
+                <>
+                  {getSender(loggedUser, selectedChat.users)}
+                  <ProfileModal user={getSenderFull(loggedUser, selectedChat.users)} />
+                </>
+              ) : (
+                <>
+                  {selectedChat.chatName.toUpperCase()}
+                  <UpdateGroupChatModal
+                    fetchMessages={fetchMessages}
+                    fetchAgain={fetchAgain}
+                    setFetchAgain={setFetchAgain}
+                  />
+                </>
+              ))}
           </Text>
           <Box
             display="flex"
@@ -244,30 +245,16 @@ setTyping(false)
             overflowY="hidden"
           >
             {loading ? (
-              <Spinner
-                size="xl"
-                w={20}
-                h={20}
-                alignSelf="center"
-                margin="auto"
-              />
+              <Spinner size="xl" w={20} h={20} alignSelf="center" margin="auto" />
             ) : (
-              <div className="messages">
-                <ScrollableChat messages={messages} />
-              </div>
+              <ScrollableChat messages={messages} />
             )}
-
-<FormControl
-              onKeyDown={sendMessage}
-              id="first-name"
-              isRequired
-              mt={3}
-            >
+            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
               {istyping ? (
                 <div>
                   <Lottie
                     options={defaultOptions}
-                    // height={50}
+                    height={50}
                     width={70}
                     style={{ marginBottom: 15, marginLeft: 0 }}
                   />
@@ -275,18 +262,37 @@ setTyping(false)
               ) : (
                 <></>
               )}
-              <Input
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Enter a message.."
-                value={newMessage}
-                onChange={typingHandler}
-              />
+              <InputGroup size="md">
+                <Input
+                  variant="filled"
+                  bg="#E0E0E0"
+                  placeholder="Enter a message.."
+                  value={newMessage}
+                  onChange={typingHandler}
+                />
+                <InputRightElement width="4.5rem">
+                  <IconButton
+                    h="1.75rem"
+                    size="sm"
+                    icon={<FaPaperclip />}
+                    onClick={onOpen}
+                  />
+                  <IconButton
+                    h="1.75rem"
+                    size="sm"
+                    icon={<FaSmile />}
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  />
+                </InputRightElement>
+              </InputGroup>
+              {showEmojiPicker && (
+                <Picker set="apple" onSelect={handleEmojiSelect} />
+              )}
+              <FileUploadModal isOpen={isOpen} onClose={onClose} onFileUpload={handleFileUpload} />
             </FormControl>
           </Box>
         </>
       ) : (
-        // to get socket.io on same page
         <Box display="flex" alignItems="center" justifyContent="center" h="100%">
           <Text fontSize="3xl" pb={3} fontFamily="Work sans">
             Click on a user to start chatting
