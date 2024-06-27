@@ -7,7 +7,7 @@ const taskSchema = new Schema({
   members: [{ type: String }],
   deadline: { type: String },
   assignedDate: { type: String, required: true },
-  progress: { type: String },
+  progress: { type: String, default: "To Do" },
   department: { type: String, required: true },
   files: [{ type: String }],
 });

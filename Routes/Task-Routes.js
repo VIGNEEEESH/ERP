@@ -5,21 +5,19 @@ const taskControllers = require("../Controllers/Task-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 const imageUpload = require("../Middleware/image-upload");
 const redisClient = require("./redisClient");
-// Middleware function to cache responses for GET requests
+
 const cacheMiddleware = (req, res, next) => {
-  const key = req.originalUrl; // Using the request URL as the cache key
+  const key = req.originalUrl;
   redisClient.get(key, (err, data) => {
     if (err) throw err;
-
     if (data !== null) {
-      // If data exists in cache, return it
       res.send(JSON.parse(data));
     } else {
-      // If data doesn't exist in cache, proceed to the route handler
       next();
     }
   });
 };
+
 router.get(
   "/get/all/tasks",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
@@ -60,6 +58,7 @@ router.post(
   ],
   taskControllers.createTask
 );
+
 router.patch(
   "/update/task/byid/:id",
   checkAuth(["CEO", "HR", "DeptHead"]),
@@ -67,7 +66,7 @@ router.patch(
   [
     check("taskName").isLength({ min: 2, max: 255 }).optional(),
     check("taskDescription").isLength({ min: 2 }).optional(),
-    check("members").isLength({ min: 2 }).optional().optional(),
+    check("members").isLength({ min: 2 }).optional(),
     check("deadline").isLength({ min: 2, max: 255 }).optional(),
     check("assignedDate").isLength({ min: 2, max: 255 }).optional(),
     check("progress").isLength({ min: 2 }).optional(),
@@ -75,10 +74,10 @@ router.patch(
   ],
   taskControllers.updateTaskById
 );
+
 router.patch(
   "/update/taskprogress/byid/:id",
-  [check("progress").isLength({ min: 1 })],
-  checkAuth(["CEO", "HR", "DeptHead"]),
+  check("progress").isLength({ min: 1 }),
   taskControllers.updateTaskProgressById
 );
 router.patch(
@@ -87,6 +86,7 @@ router.patch(
   checkAuth(["CEO", "HR", "DeptHead"]),
   taskControllers.addTaskFileById
 );
+
 router.delete(
   "/delete/task/byid/:id",
   checkAuth(["CEO", "HR", "DeptHead"]),
