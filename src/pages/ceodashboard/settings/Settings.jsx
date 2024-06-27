@@ -1,5 +1,6 @@
 import React from 'react';
 import PasswordChange from './PasswordChange';
+import FileSystemPasswordChange from './FileSystemPasswordChange'; 
 import ProfileImageUpdate from './EditProfile';
 
 const Settings = () => {
@@ -10,6 +11,7 @@ const Settings = () => {
       </div>
       <div>
         <PasswordChange />
+        <FileSystemPasswordChange /> 
       </div>
     </div>
   );

@@ -13,7 +13,8 @@ import {
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon,
-  WalletIcon
+  WalletIcon,
+  FolderIcon,
 } from "@heroicons/react/24/solid";
 const Home = lazy(() => import('./pages/ceodashboard/home'));
 const ManageEmployees = lazy(() => import('./pages/ceodashboard/manage-employees/manageEmployees'));
@@ -23,7 +24,7 @@ const MyOffice = lazy(() => import('./pages/ceodashboard/myOffice/MyOffice'));
 const Communication = lazy(() => import("@/pages/dashboard/communication"));
 const WorkStatus = lazy(() => import('./pages/ceodashboard/workstatus/WorkStatus'));
 const TaskManager = lazy(() => import('./pages/ceodashboard/task manager/taskmanager'));
-const Projects = lazy(() => import('./pages/ceodashboard/projects/Projects'));
+const Projects = lazy(() => import('./pages/ceodashboard/projects/projects'));
 const CompanyProducts = lazy(() => import('./pages/ceodashboard/companyproducts/CompanyProducts'));
 const OurClients = lazy(() => import('./pages/ceodashboard/clients/OurClients'));
 const Leave = lazy(() => import('./pages/ceodashboard/leaves/Leave'));
@@ -32,6 +33,7 @@ const Settings = lazy(() => import('./pages/ceodashboard/settings/Settings'));
 const Logout = lazy(() => import('./pages/ceodashboard/logout'));
 const LogRecord = lazy(() => import('./pages/ceodashboard/logrecord/LogRecord'));
 const MyLogRecord = lazy(() => import('./pages/ceodashboard/mylogrecord/MylogRecord'));
+const FileSystem = lazy(() => import('./pages/ceodashboard/FileSystem/file'));
 
 // import Home from './pages/ceodashboard/home';
 // import ManageEmployees from './pages/ceodashboard/manage-employees/manageEmployees';
@@ -141,6 +143,12 @@ const CEORoutes = [
         name: "My Log Record",
         path: "/mylogrecord",
         element: <MyLogRecord/>,
+      },
+      {
+        icon: <FolderIcon {...icon} />,
+        name: "My File System",
+        path: "/filesystem",
+        element: <FileSystem/>,
       },
       {
         icon: <UserCircleIcon {...icon} />,

@@ -118,70 +118,70 @@ export function CEOProfile() {
       </div>
       <Card className="mx-3 mb-6 lg:mx-4 border border-blue-gray-100 mt-[-14rem]">
         <CardBody className="p-4 space-y-6">
-          <div className="flex items-start justify-start gap-2">
-            <Avatar
-              src={`${import.meta.env.REACT_APP_BACKEND_URL}/${formData.image}`}
-              alt="Profile Picture"
-              size="xxl"
-              variant="rounded"
-              className="rounded-lg shadow-lg shadow-blue-gray-500/40"
+         <div className="flex flex-col items-start lg:flex-row lg:items-start gap-2">
+    <Avatar
+      src={`${import.meta.env.REACT_APP_BACKEND_URL}/${formData.image}`}
+      alt="Profile Picture"
+      size="xxl"
+      variant="rounded"
+      className="rounded-lg shadow-lg shadow-blue-gray-500/40"
+    />
+    <div className="flex flex-col space-y-2 ml-8">
+      <Typography variant="h4" color="blue-gray" className="mb-4 mt-2 gap-4">
+        {isEditing ? (
+          <>
+            <Input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              label="First Name"
+              className="border-b border-blue-gray-500 focus:border-blue-600 mr-4"
             />
-            <div className="flex flex-col space-y-2 ml-8">
-              <Typography variant="h4" color="blue-gray" className="mb-4 mt-2 gap-4">
-                {isEditing ? (
-                  <>
-                    <Input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      label="First Name"
-                      className="border-b border-blue-gray-500 focus:border-blue-600 mr-4"
-                    />
-                    <div className='mb-4'></div>
-                    <Input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      label="Last Name"
-                      className="border-b border-blue-gray-500 focus:border-blue-600"
-                    />
-                  </>
-                ) : (
-                  `${formData.firstName} ${formData.lastName}`
-                )}
-              </Typography>
-              <Typography variant="h6" className="font-normal text-blue-gray-600">
-                {isEditing ? (
-                  <Input
-                    type="text"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                    label="Role"
-                    className="border-b border-blue-gray-500 focus:border-blue-600"
-                  />
-                ) : (
-                  formData.role
-                )}
-              </Typography>
-              <Typography variant="h6" className="font-normal text-blue-gray-600">
-                {isEditing ? (
-                  <Input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    disabled
-                    label="Email"
-                    className="border-b border-blue-gray-500 focus:border-blue-600"
-                  />
-                ) : (
-                  formData.email
-                )}
-              </Typography>
-            </div>
-          </div>
+            <div className='mb-4'></div>
+            <Input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              label="Last Name"
+              className="border-b border-blue-gray-500 focus:border-blue-600"
+            />
+          </>
+        ) : (
+          `${formData.firstName} ${formData.lastName}`
+        )}
+      </Typography>
+      <Typography variant="h6" className="font-normal text-blue-gray-600">
+        {isEditing ? (
+          <Input
+            type="text"
+            name="role"
+            value={formData.role}
+            onChange={handleInputChange}
+            label="Role"
+            className="border-b border-blue-gray-500 focus:border-blue-600"
+          />
+        ) : (
+          formData.role
+        )}
+      </Typography>
+      <Typography variant="h6" className="font-normal text-blue-gray-600">
+        {isEditing ? (
+          <Input
+            type="email"
+            name="email"
+            value={formData.email}
+            disabled
+            label="Email"
+            className="border-b border-blue-gray-500 focus:border-blue-600"
+          />
+        ) : (
+          formData.email
+        )}
+      </Typography>
+    </div>
+  </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="flex flex-col space-y-4">
               <Typography variant="h6" className="font-normal text-blue-gray-600">

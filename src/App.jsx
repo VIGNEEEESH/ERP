@@ -7,12 +7,13 @@ import ForgotPassword from "./pages/auth/Forgot-Password";
 import UpdatePassword from "./pages/auth/reset-password";
 import ChatProvider from "./pages/dashboard/chat/component/miscellaneous/ChatProvider";
 
+import "./App.css"
 // Lazy-loaded components
-const Dashboard = lazy(() => import("@/layouts/Dashboard"));
-const Auth = lazy(() => import("@/layouts/Auth"));
-const CEODashboard = lazy(() => import("@/layouts/CEODashboard"));
-const DEPTHEADDashboard = lazy(() => import("@/layouts/DEPTHEADDashboard"));
-const HRDashboard = lazy(() => import("@/layouts/HRDashboard"));
+import Dashboard from "@/layouts/dashboard";
+import Auth from "@/layouts/auth";
+import CEODashboard from "@/layouts/CEOdashboard";
+import DEPTHEADDashboard from "@/layouts/DEPTHEADdashboard";
+import HRDashboard from "@/layouts/HRdashboard";
 const SignIn = lazy(() => import("./pages/auth/sign-in"));
 const SignUp = lazy(() => import("./pages/auth/sign-up"));
 
@@ -29,14 +30,12 @@ function App() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // Check if authentication information is available
     if (role === null) {
       setLoading(false);
     }
   }, [role]);
 
   if (loading) {
-    // Display a loading spinner while authentication is in progress
     return (
       <div
         style={{
@@ -127,4 +126,3 @@ function App() {
 
 export default App;
 
-//Testing
