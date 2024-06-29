@@ -78,7 +78,7 @@ router.patch(
 router.patch(
   "/update/taskprogress/byid/:id",
   [check("progress").isLength({ min: 1 })],
-  checkAuth(["CEO", "HR", "DeptHead"]),
+  checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
   taskControllers.updateTaskProgressById
 );
 router.patch(

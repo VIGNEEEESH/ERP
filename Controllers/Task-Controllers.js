@@ -43,7 +43,7 @@ const createTask = async (req, res, next) => {
     members,
     deadline,
     assignedDate,
-    progress: "0",
+    progress: "To Do",
     department,
     files: filePaths,
   });
@@ -208,6 +208,7 @@ const addTaskFileById = async (req, res, next) => {
 };
 const updateTaskProgressById = async (req, res, next) => {
   const id = req.params.id;
+
   let task;
   const { progress } = req.body;
   try {
