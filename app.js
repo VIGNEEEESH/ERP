@@ -2,9 +2,8 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const cors = require("cors");
 const dotenv = require("dotenv");
-const path = require("path");
+const cors = require("cors");
 
 dotenv.config();
 
@@ -19,19 +18,10 @@ const userRoutes = require("./Routes/User-Routes");
 const workRoutes = require("./Routes/Work-Routes");
 const messageRoutes = require("./Routes/Message-Routes");
 const chatRoutes = require("./Routes/Chat-Routes");
-
+const fileRoutes = require("./Routes/File-Routes");
+const path = require("path");
 app.use(bodyParser.json());
-
-// Allow all origins
-app.use(
-  cors({
-    origin: true,
-    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
+app.use(cors());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 app.use((req, res, next) => {
@@ -59,7 +49,7 @@ app.use("/api/erp/user", userRoutes);
 app.use("/api/erp/work", workRoutes);
 app.use("/api/erp/message", messageRoutes);
 app.use("/api/erp/chat", chatRoutes);
-
+app.use("/api/erp/files", fileRoutes);
 app.get("/", (req, res) => {
   return res.status(200).json({ message: "Hello World" });
 });
