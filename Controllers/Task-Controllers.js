@@ -228,7 +228,6 @@ const updateTaskProgressById = async (req, res, next) => {
   let task;
   const { progress } = req.body;
 
-  let task;
   try {
     task = await Task.findById(id);
     if (!task) {
