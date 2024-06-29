@@ -20,6 +20,7 @@ export function EmployeeLog({ employeeId, onBack }) {
     const [confirmModalVisible, setConfirmModalVisible] = useState(false);
     const [confirmUpdateModalVisible, setConfirmUpdateModalVisible] = useState(false);
     const [selectedLog, setSelectedLog] = useState(null);
+    const [employee, setEmployee] = useState([]);
     const [pageSize, setPageSize] = useState(5);
     const [updateInput, setUpdateInput] = useState("");
     const [filterInterval, setFilterInterval] = useState('weekly'); // Default filter interval
@@ -33,11 +34,21 @@ export function EmployeeLog({ employeeId, onBack }) {
                         Authorization: "Bearer " + auth.token,
                     },
                 });
+                const employeeResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${employeeId}`, {
+                    headers: {
+                        Authorization: "Bearer " + auth.token,
+                    },
+                });
                 if (!logResponse.ok) {
                     throw new Error(`Failed to fetch log data: ${logResponse.status}`);
                 }
+                if (!employeeResponse.ok) {
+                    throw new Error(`Failed to fetch log data: ${employeeResponse.status}`);
+                }
                 const logData = await logResponse.json();
+                const employeeData = await employeeResponse.json();
                 setLogs(logData.work);
+                setEmployee(employeeData.user);
             } catch (error) {
                 message.error("Error fetching logs: " + error.message);
             }
@@ -153,7 +164,7 @@ export function EmployeeLog({ employeeId, onBack }) {
 
     const handlePDFDownload = () => {
         let filteredLogs = [];
-
+        
         switch (filterInterval) {
             case 'weekly':
                 filteredLogs = filterLogsByWeekly();
@@ -172,6 +183,21 @@ export function EmployeeLog({ employeeId, onBack }) {
             const doc = new jsPDF();
             const tableRows = [];
 
+              // Assuming all logs have the same user information
+        const userId = employeeId || 'Unknown';
+        const userEmail = employee.email || 'Unknown';
+        const userFirstName = employee.firstName || 'Unknown';
+        const userLastName = employee.lastName || 'Unknown';
+        const userMobile = employee.mobile || 'Unknown';
+
+        // Add headings
+        doc.setFontSize(12);
+        doc.text(`User Id: ${userId}`, 14, 20);
+        doc.text(`Email: ${userEmail}`, 14, 30);
+        doc.text(`Name: ${userFirstName} ${userLastName}`, 14, 40);
+        doc.text(`Mobile: ${userMobile}`, 14, 50);
+
+
             filteredLogs.forEach((log, index) => {
                 const rowData = [
                     index + 1,
@@ -179,9 +205,11 @@ export function EmployeeLog({ employeeId, onBack }) {
                     log.workDone,
                 ];
                 tableRows.push(rowData);
+                console.log(log)
             });
 
             doc.autoTable({
+                startY: 60,
                 head: [['#', 'Date', 'Work Done']],
                 body: tableRows,
             });

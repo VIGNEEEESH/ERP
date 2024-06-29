@@ -184,7 +184,7 @@ const EditTaskForm = ({ taskData, onClose }) => {
                         </div>
                         <div>
                             <Input
-                                type="number"
+                                type="text"
                                 name="progress"
                                 value={formData.progress}
                                 onChange={handleInputChange}

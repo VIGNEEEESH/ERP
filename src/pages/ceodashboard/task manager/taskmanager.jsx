@@ -98,14 +98,9 @@ const TaskManager = () => {
                             variant="small"
                             className="mb-1 block text-xs font-medium text-blue-gray-600"
                         >
-                            {value}%
+                            {value}
                         </Typography>
-                        <Progress
-                            value={Math.min(100, Math.max(0, value))}
-                            variant="gradient"
-                            color={value === 100 ? "green" : "gray"}
-                            className="h-1"
-                        />
+                       
                     </div>
                 ),
             },

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import './Kanban.css';
 import TaskCard from './TaskCard';
+import { AuthContext } from '@/pages/auth/Auth-context';
 
 const statuses = ['todo', 'inprogress', 'completed'];
 const BoardIcon = (
@@ -29,6 +30,7 @@ const Kanban = ({ tasks }) => {
     inprogress: [],
     completed: []
   });
+  const auth=useContext(AuthContext)
 
   useEffect(() => {
     const initializeColumns = () => {
@@ -74,10 +76,10 @@ const Kanban = ({ tasks }) => {
       }));
 
       try {
-        const response = await fetch(`http://localhost:3000/api/erp/task/update/taskprogress/byid/${taskId}`, {
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/task/update/taskprogress/byid/${taskId}`, {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json', Authorization: "Bearer " + auth.token,
           },
           body: JSON.stringify({ progress: newStatusFormatted }),
         });
