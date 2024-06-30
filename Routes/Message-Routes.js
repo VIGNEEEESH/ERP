@@ -5,6 +5,7 @@ const messageControllers = require("../Controllers/Message-Controllers");
 const checkAuth = require("../Middleware/check-auth");
 
 const redisClient = require("./redisClient");
+const fileUpload = require("../Middleware/image-upload");
 // Middleware function to cache responses for GET requests
 const cacheMiddleware = (req, res, next) => {
   const key = req.originalUrl; // Using the request URL as the cache key
@@ -30,6 +31,7 @@ router.get(
 router.post(
   "/send/message",
   checkAuth(["CEO", "HR", "DeptHead", "Employee"]),
+  fileUpload.single("file"),
   [
     check("sender").isLength({ min: 2 }),
     check("chatId").isLength({ min: 2 }),

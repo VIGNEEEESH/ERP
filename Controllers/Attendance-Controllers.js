@@ -12,7 +12,7 @@ const createAttendance = async (req, res, next) => {
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().split("T")[0];
 
-  const currentTime = currentDate.toLocaleTimeString("en-US", {
+  const currentTime = currentDate.toLocaleTimeString("en-IN", {
     hour12: false,
   });
   const { attendanceStatus, userId, email } = req.body;

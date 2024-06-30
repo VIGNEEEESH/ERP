@@ -5,6 +5,7 @@ const router = express.Router();
 const checkAuth = require("../Middleware/check-auth");
 const redis = require("redis");
 const redisClient = require("./redisClient");
+const User = require("../Models/User");
 
 // Middleware function to cache responses for GET requests
 const cacheMiddleware = (req, res, next) => {
@@ -23,7 +24,7 @@ const cacheMiddleware = (req, res, next) => {
 router.post(
   "/upload/file",
   fileUpload.single("file"),
-  checkAuth(["CEO", "HR"]),
+  checkAuth(["CEO"]),
   fileController.uploadFile
 );
 router.get(

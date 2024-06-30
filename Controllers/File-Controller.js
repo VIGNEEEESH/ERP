@@ -16,11 +16,15 @@ const uploadFile = async (req, res) => {
         .status(409)
         .json({ error: "File with the same name already exists" });
     }
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
 
     const newFile = new File({
       filename: file.originalname,
       contentType: file.mimetype,
       path: file.path,
+      date: formattedDate,
+      size: file.size,
     });
     await newFile.save();
     res.status(200).json({ message: "File uploaded successfully" });

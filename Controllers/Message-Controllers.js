@@ -3,23 +3,27 @@ const { validationResult } = require("express-validator");
 const Message = require("../Models/Message");
 const Chat = require("../Models/Chat");
 const User = require("../Models/User");
-
 const sendMessage = async (req, res) => {
   const { content, chatId, sender } = req.body;
 
-  if (!content || !chatId) {
+  if (!content && !req.file) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
 
-  var newMessage = {
+  let newMessage = {
     sender: sender,
-    content: content,
+    content: content || "",
     chat: chatId,
   };
 
+  if (req.file) {
+    newMessage.fileUrl = req.file.path;
+    newMessage.fileType = req.file.mimetype;
+  }
+
   try {
-    var message = await Message.create(newMessage);
+    let message = await Message.create(newMessage);
 
     message = await message.populate("sender", "firstName lastName image");
     message = await message.populate("chat");
@@ -36,6 +40,7 @@ const sendMessage = async (req, res) => {
     throw new Error(error.message);
   }
 };
+
 const allMessages = async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })
