@@ -1,6 +1,9 @@
-import { FormControl, Input, Box, Text, IconButton, Spinner, useToast, useDisclosure } from "@chakra-ui/react";
+import { 
+  FormControl, Input, Box, Text, IconButton, Spinner, useToast, useDisclosure, 
+  InputGroup, InputRightElement 
+} from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import ScrollableChat from "./ScrollableChat";
 import Lottie from "react-lottie";
@@ -12,11 +15,11 @@ import { ChatState } from "./miscellaneous/ChatProvider";
 import { io } from "socket.io-client";
 import FileUploadModal from "./miscellaneous/FileUploadModal";
 import { FaPaperclip, FaSmile } from 'react-icons/fa';
-import { InputGroup, InputRightElement } from '@chakra-ui/react';
 import { Picker } from 'emoji-mart';
 import 'emoji-mart/css/emoji-mart.css';
 
 var socket, selectedChatCompare;
+
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,6 +30,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const toast = useToast();
   const [socketConnected, setSocketConnected] = useState(false);
   const [loggedUser, setLoggedUser] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null); // Define the ref using useRef
   const auth = useContext(AuthContext);
 
   const defaultOptions = {
@@ -37,8 +42,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
+
   const { selectedChat, setSelectedChat, user, notification, setNotification } = ChatState();
-    
+
   const fetchUserDetails = async () => {
     try {
       const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`, {
@@ -65,7 +71,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       });
     }
   };
-  
+
   const fetchMessages = async () => {
     if (!selectedChat) return;
 
@@ -127,21 +133,34 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   });
 
   const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
+    if ((event.key === "Enter" && newMessage) || selectedFile) {
       socket.emit("stop typing", selectedChat._id);
       try {
+        let formData = new FormData();
+        formData.append("chatId", selectedChat._id);
+        formData.append("sender", auth.userId);
+        if (newMessage) {
+          formData.append("content", newMessage);
+        }
+        if (selectedFile) {
+          formData.append("file", selectedFile);
+        }
+
         setNewMessage("");
+        setSelectedFile(null);
+console.log("send")
         const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/message/send/message`, {
           method: "POST",
           headers: {
             Authorization: "Bearer " + auth.token,
-            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ content: newMessage, chatId: selectedChat._id, sender: auth.userId }),
+          body: formData,
         });
+        
         const data = await response.json();
         socket.emit("new message", data.message);
         setMessages([...messages, data.message]);
+
       } catch (error) {
         toast({
           title: "Error Occurred!",
@@ -174,6 +193,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         setTyping(false);
       }
     }, timerLength);
+  };
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
   };
 
   const handleFileUpload = (file, preview) => {
@@ -226,16 +249,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 <>
                   {selectedChat.chatName.toUpperCase()}
                   <UpdateGroupChatModal
-                    fetchMessages={fetchMessages}
                     fetchAgain={fetchAgain}
                     setFetchAgain={setFetchAgain}
+                    fetchMessages={fetchMessages}
                   />
                 </>
               ))}
           </Text>
           <Box
             display="flex"
-            flexDir="column"
+            flexDirection="column"
             justifyContent="flex-end"
             p={3}
             bg="#E8E8E8"
@@ -245,7 +268,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             overflowY="hidden"
           >
             {loading ? (
-              <Spinner size="xl" w={20} h={20} alignSelf="center" margin="auto" />
+              <Spinner
+                size="xl"
+                w={20}
+                h={20}
+                alignSelf="center"
+                margin="auto"
+              />
             ) : (
               <ScrollableChat messages={messages} />
             )}
@@ -275,7 +304,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     h="1.75rem"
                     size="sm"
                     icon={<FaPaperclip />}
-                    onClick={onOpen}
+                    onClick={() => fileInputRef.current.click()} // Use the ref here
                   />
                   <IconButton
                     h="1.75rem"
@@ -288,7 +317,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               {showEmojiPicker && (
                 <Picker set="apple" onSelect={handleEmojiSelect} />
               )}
-              <FileUploadModal isOpen={isOpen} onClose={onClose} onFileUpload={handleFileUpload} />
+              <input
+                type="file"
+                style={{ display: 'none' }}
+                ref={fileInputRef} // Attach the ref to the input element
+                onChange={handleFileChange}
+              />
+              <FileUploadModal isOpen={isOpen} onClose={onClose} onChange={handleFileChange} />
             </FormControl>
           </Box>
         </>
