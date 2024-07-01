@@ -8,6 +8,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
+const Chat = require("../Models/Chat");
+const Message = require("../Models/Message");
+const Department = require("../Models/Department");
 
 const inviteUser = async (req, res, next) => {
   const errors = validationResult(req);
@@ -355,7 +358,7 @@ const updateUserById = async (req, res, next) => {
     const error = new HttpError("User not found, please try again", 500);
     return next(error);
   }
-  
+
   if (req.file != null) {
     user.image = req.file.path;
   } else {
@@ -434,6 +437,9 @@ const deleteUserById = async (req, res, next) => {
     await Attendance.deleteMany({ userId: user._id });
     await Leave.deleteMany({ email: user.email });
     await Work.deleteMany({ userId: user._id });
+    await Chat.deleteMany({ users: user._id });
+    await Message.deleteMany({ sender: user._id });
+    await Department.deleteMany({ userId: user._id });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong while fetching the data, please try again",
