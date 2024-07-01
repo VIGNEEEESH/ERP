@@ -23,7 +23,7 @@ export function FileUpload() {
 
     const handlePasswordSubmit = async (password) => {
         try {
-            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/verify-password`, {
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,7 +57,8 @@ export function FileUpload() {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                setFiles(data.files);
+                
+                setFiles(data.files || []);
             } catch (error) {
                 console.error('Error fetching files:', error);
                 message.error('Failed to fetch files. Please refresh the page.');
@@ -97,7 +98,7 @@ export function FileUpload() {
                 },
             });
             const data = await fetchResponse.json();
-            setFiles(data.files);
+            setFiles(data.files || []);
             setSelectedFiles([]);
             setInputKey(Date.now()); // Reset file input
             message.success('Files uploaded successfully!');
@@ -109,6 +110,7 @@ export function FileUpload() {
 
     const handleFileDelete = async (fileId) => {
         try {
+           
             const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/files/delete/file/${fileId}`, {
                 method: 'DELETE',
                 headers: {
@@ -121,32 +123,86 @@ export function FileUpload() {
             }
             // Handle success response
             const updatedFiles = files.filter((file) => file.id !== fileId);
-            setFiles(updatedFiles);
+            setFiles(updatedFiles || []);
             message.success('File deleted successfully!');
+            setTimeout(()=>{
+                window.location.reload()
+            },[300])
         } catch (error) {
             console.error('Error deleting file:', error);
             message.error(error.message || 'Failed to delete file. Please try again.');
         }
     };
 
+    const handleFileDownload = async (fileId, filename) => {
+        try {
+            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/files/download/file/${fileId}`, {
+                headers: {
+                    Authorization: `Bearer ${auth.token}`,
+                },
+            });
+            const blob = await response.blob();
+
+            // Create a temporary URL for the blob
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+
+            // Cleanup
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading file:', error);
+            message.error(error.message || 'Failed to download file. Please try again.');
+        }
+    };
+
     const columns = useMemo(
         () => [
-            { Header: 'Name', accessor: 'name' },
-            { Header: 'Size', accessor: 'size' },
-            { Header: 'Type', accessor: 'type' },
-            { Header: 'Date Uploaded', accessor: 'dateUploaded' },
+            { Header: 'Name', accessor: 'filename' },
+            { 
+                Header: 'Size', 
+                accessor: 'size', 
+                Cell: ({ value }) => {
+                    // Convert bytes to human-readable format (MB, KB, GB)
+                    const fileSize = Number(value);
+                    if (fileSize >= 1e9) {
+                        return `${(fileSize / 1e9).toFixed(2)} GB`;
+                    } else if (fileSize >= 1e6) {
+                        return `${(fileSize / 1e6).toFixed(2)} MB`;
+                    } else if (fileSize >= 1e3) {
+                        return `${(fileSize / 1e3).toFixed(2)} KB`;
+                    } else {
+                        return `${fileSize} bytes`;
+                    }
+                },
+            },
+            { Header: 'Type', accessor: 'contentType' },
+            { Header: 'Date Uploaded', accessor: 'date' },
             {
                 Header: 'Actions',
                 Cell: ({ row }) => (
-                    <Button color="red" size="sm" onClick={() => handleFileDelete(row.original.id)}>
-                        Delete
-                    </Button>
+                    <>
+                        <Button color="red" size="sm" onClick={() => handleFileDelete(row.original._id)}>
+                            Delete
+                        </Button>&nbsp;&nbsp;
+                        <Button color="blue" size="sm" onClick={() => handleFileDownload(row.original.id, row.original.filename)}>
+                            Download
+                        </Button>
+                    </>
                 ),
             },
         ],
         [files]
     );
-
+    const filteredFiles = useMemo(() => {
+        return files.filter((file) =>
+            file.filename && file.filename.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [files, searchQuery]);
     const {
         getTableProps,
         getTableBodyProps,
@@ -165,7 +221,7 @@ export function FileUpload() {
     } = useTable(
         {
             columns,
-            data: files,
+            data: filteredFiles,
             initialState: { pageIndex: 0, pageSize },
         },
         usePagination
@@ -175,13 +231,10 @@ export function FileUpload() {
         setTablePageSize(pageSize);
     }, [pageSize, setTablePageSize]);
 
-    const filteredFiles = files.filter((file) =>
-        file.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
+   
     return (
         <>
-            {!authenticated ? (
+            {!authenticated && files.length > 0 ? (
                 <PasswordPrompt onPasswordSubmit={handlePasswordSubmit} />
             ) : (
                 <div className="p-4">
@@ -196,7 +249,6 @@ export function FileUpload() {
                                 <Input
                                     key={inputKey}
                                     type="file"
-                                    multiple
                                     onChange={handleFileChange}
                                 />
                             </div>
@@ -233,18 +285,20 @@ export function FileUpload() {
                                         ))}
                                     </thead>
                                     <tbody {...getTableBodyProps()}>
-                                        {page.map((row) => {
+                                        {page.map(row => {
                                             prepareRow(row);
                                             return (
                                                 <tr {...row.getRowProps()}>
-                                                    {row.cells.map((cell) => (
-                                                        <td
-                                                            {...cell.getCellProps()}
-                                                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                                        >
-                                                            {cell.render('Cell')}
-                                                        </td>
-                                                    ))}
+                                                    {row.cells.map(cell => {
+                                                        return (
+                                                            <td
+                                                                {...cell.getCellProps()}
+                                                                className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                                            >
+                                                                {cell.render('Cell')}
+                                                            </td>
+                                                        );
+                                                    })}
                                                 </tr>
                                             );
                                         })}
@@ -282,19 +336,19 @@ export function FileUpload() {
                                         type="number"
                                         defaultValue={pageIndex + 1}
                                         onChange={(e) => {
-                                            const pageNumber = e.target.value ? Number(e.target.value) - 1 : 0;
-                                            gotoPage(pageNumber);
+                                            const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                                            gotoPage(page);
                                         }}
-                                        style={{ width: '100px' }}
+                                        style={{ width: '50px' }}
                                     />
                                 </span>{' '}
                                 <select
                                     value={pageSize}
                                     onChange={(e) => setPageSize(Number(e.target.value))}
                                 >
-                                    {[5, 10, 20, 30, 40, 50].map((size) => (
-                                        <option key={size} value={size}>
-                                            Show {size}
+                                    {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+                                        <option key={pageSize} value={pageSize}>
+                                            Show {pageSize}
                                         </option>
                                     ))}
                                 </select>
@@ -306,3 +360,5 @@ export function FileUpload() {
         </>
     );
 }
+
+export default FileUpload;

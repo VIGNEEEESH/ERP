@@ -70,25 +70,47 @@ const ScrollableChat = ({ messages }) => {
                 </Tooltip>
               )}
               {m.content && (
+                
                 <span
-                  style={{
-                    backgroundColor: `${
-                      m.sender._id === user._id ? "#BEE3F8" : "#B9F5D0"
-                    }`,
-                    marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                    marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
-                    borderRadius: "20px",
-                    padding: "5px 15px",
-                    maxWidth: "75%",
-                  }}
-                >
-                  {m.content}
-                </span>
+                style={{
+                  backgroundColor: `${
+                    m.sender._id === user._id ? "#BEE3F8" : "#B9F5D0"
+                  }`,
+                  marginLeft: isSameSenderMargin(messages, m, i, user._id),
+                  marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
+                  borderRadius: "20px",
+                  padding: "5px 15px",
+                  maxWidth: "75%",
+                  display: "flex",
+                  flexDirection: "column", // Ensure items stack vertically
+                  alignItems: "flex-start", // Align items to the start of the container
+                }}
+              >
+                {m.content && (
+                  <span style={{ flex: 1 }}>{m.content}</span>
+                )}
+              
+                {m.fileUrl && (
+                  <div style={{ marginTop: 5 }}> {/* Adjust margin as needed */}
+                    <Box display="flex" alignItems="center">
+                      {getFileIcon(m.fileName)}
+                      <Text ml={2}>{m.fileName}</Text>
+                      <Button ml={2} size="sm" colorScheme="blue" onClick={() => downloadFile(m.fileUrl, m.fileName)}>
+                        Download
+                      </Button>
+                    </Box>
+                  </div>
+                )}
+              </span>
+              
+              
               )}
             </div>
-            {m.fileUrl && (
+            {/* {m.fileUrl && (
               <Box mt={2} ml={isSameSenderMargin(messages, m, i, user._id)} maxWidth="75%">
+                
                 {m.fileType.startsWith("image/") && (
+                  
                   <Image src={`${import.meta.env.REACT_APP_BACKEND_URL}/${m.fileUrl}`} alt="Image Preview" maxHeight="200px" maxWidth="200px" />
                 )}
                 {m.fileType.startsWith("video/") && (
@@ -135,7 +157,7 @@ const ScrollableChat = ({ messages }) => {
                     </Button>
                   </Box>
                 )}
-                {m.fileType.startsWith("application/") && !m.fileType.startsWith("image/") && !m.fileType.startsWith("video/") && (
+                {m.fileType.startsWith("application/") && !m.fileType.startsWith("image/") && !m.fileType.startsWith("application/pdf")  && !m.fileType.startsWith("video/") && (
                   <Box display="flex" alignItems="center">
                     <FaFileAlt size={30} />
                     <Text ml={2}>{m.fileName}</Text>
@@ -145,7 +167,7 @@ const ScrollableChat = ({ messages }) => {
                   </Box>
                 )}
               </Box>
-            )}
+            )} */}
           </div>
         ))}
     </ScrollableFeed>

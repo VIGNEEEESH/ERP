@@ -1,6 +1,14 @@
-import { 
-  FormControl, Input, Box, Text, IconButton, Spinner, useToast, useDisclosure, 
-  InputGroup, InputRightElement 
+import {
+  FormControl,
+  Input,
+  Box,
+  Text,
+  IconButton,
+  Spinner,
+  useToast,
+  useDisclosure,
+  InputGroup,
+  InputRightElement
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useContext, useEffect, useState, useRef } from "react";
@@ -19,7 +27,6 @@ import { Picker } from 'emoji-mart';
 import 'emoji-mart/css/emoji-mart.css';
 
 var socket, selectedChatCompare;
-
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,11 +34,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const toast = useToast();
   const [socketConnected, setSocketConnected] = useState(false);
   const [loggedUser, setLoggedUser] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-  const fileInputRef = useRef(null); // Define the ref using useRef
+  const fileInputRef = useRef(null);
   const auth = useContext(AuthContext);
 
   const defaultOptions = {
@@ -57,7 +65,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         _id: data.user._id,
         name: `${data.user.firstName} ${data.user.lastName}`,
         email: data.user.email,
-        pic: `${import.meta.env.REACT_APP_BACKEND_URL}/${data.user.image}` ,
+        pic: `${import.meta.env.REACT_APP_BACKEND_URL}/${data.user.image}`,
       });
       
     } catch (error) {
@@ -109,7 +117,26 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
-  }, []);
+
+    socket.on("message received", (newMessageReceived) => {
+      
+      if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
+        if (!notification.includes(newMessageReceived)) {
+          setNotification((prevNotification) => [newMessageReceived, ...prevNotification]);
+          setFetchAgain((prev) => !prev);
+        }
+      } else {
+        setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+      }
+    });
+
+    return () => {
+      socket.off("message received");
+      socket.off("connected");
+      socket.off("typing");
+      socket.off("stop typing");
+    };
+  }, [notification, selectedChatCompare, setFetchAgain, user]);
 
   useEffect(() => {
     fetchUserDetails();
@@ -120,28 +147,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
-  useEffect(() => {
-    socket.on("message received", (newMessageReceived) => {
-      if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
-        if (!notification.includes(newMessageReceived)) {
-          setNotification([newMessageReceived, ...notification]);
-          setFetchAgain(!fetchAgain);
-        }
-      } else {
-        setMessages([...messages, newMessageReceived]);
-      }
-    });
-  });
-
-  const sendMessage = async (event) => {
-    if ((event.key === "Enter" && newMessage) || selectedFile) {
+  const sendMessage = async () => {
+    if (newMessage || selectedFile) {
       socket.emit("stop typing", selectedChat._id);
       try {
+        setUploadingFile(true);
         let formData = new FormData();
         formData.append("chatId", selectedChat._id);
         formData.append("sender", auth.userId);
         if (newMessage) {
           formData.append("content", newMessage);
+        } else if (selectedFile) {
+          formData.append("content", `File uploaded: ${selectedFile.name}`);
         }
         if (selectedFile) {
           formData.append("file", selectedFile);
@@ -149,7 +166,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
         setNewMessage("");
         setSelectedFile(null);
-console.log("send")
+        
         const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/message/send/message`, {
           method: "POST",
           headers: {
@@ -160,9 +177,11 @@ console.log("send")
         
         const data = await response.json();
         socket.emit("new message", data.message);
-        setMessages([...messages, data.message]);
-
+        setMessages((prevMessages) => [...prevMessages, data.message]);
+        setUploadingFile(false);
+        
       } catch (error) {
+        setUploadingFile(false);
         toast({
           title: "Error Occurred!",
           description: "Failed to send the Message",
@@ -198,27 +217,13 @@ console.log("send")
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
-  };
-
-  const handleFileUpload = (file, preview) => {
-    if (!file || !preview) return;
-
-    const newMessage = {
-      sender: {
-        name: loggedUser.name,
-        pic: loggedUser.pic,
-        _id: loggedUser._id,
-      },
-      content: `File uploaded: ${file.name}`,
-      preview,
-    };
-
-    setMessages([...messages, newMessage]);
+    // Update the input field with the file name
+    setNewMessage(e.target.files[0].name);
   };
 
   const handleEmojiSelect = (emoji) => {
     setNewMessage(newMessage + emoji.native);
-    setShowEmojiPicker(false); // Hide the emoji picker after selecting an emoji
+    setShowEmojiPicker(false);
   };
 
   return (
@@ -279,8 +284,8 @@ console.log("send")
             ) : (
               <ScrollableChat messages={messages} />
             )}
-            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
-              {istyping ? (
+            <FormControl isRequired mt={3}>
+              {istyping && (
                 <div>
                   <Lottie
                     options={defaultOptions}
@@ -289,8 +294,6 @@ console.log("send")
                     style={{ marginBottom: 15, marginLeft: 0 }}
                   />
                 </div>
-              ) : (
-                <></>
               )}
               <InputGroup size="md">
                 <Input
@@ -299,13 +302,14 @@ console.log("send")
                   placeholder="Enter a message.."
                   value={newMessage}
                   onChange={typingHandler}
+                  onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                 />
                 <InputRightElement width="4.5rem">
                   <IconButton
                     h="1.75rem"
                     size="sm"
                     icon={<FaPaperclip />}
-                    onClick={() => fileInputRef.current.click()} // Use the ref here
+                    onClick={() => fileInputRef.current.click()} // Trigger file input click
                   />
                   <IconButton
                     h="1.75rem"
@@ -321,10 +325,14 @@ console.log("send")
               <input
                 type="file"
                 style={{ display: 'none' }}
-                ref={fileInputRef} // Attach the ref to the input element
+                ref={fileInputRef}
                 onChange={handleFileChange}
               />
-              <FileUploadModal isOpen={isOpen} onClose={onClose} onChange={handleFileChange} />
+              {uploadingFile && (
+                <Box mt={3} display="flex" justifyContent="center">
+                  <Spinner size="xl" w={20} h={20} alignSelf="center" margin="auto" />
+                </Box>
+              )}
             </FormControl>
           </Box>
         </>

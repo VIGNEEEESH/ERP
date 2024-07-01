@@ -59,7 +59,7 @@ function FileSystemPasswordChange() {
 
   const handleProfileUpdate = async () => {
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/fileSystem/user/changepassword`, {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/files/fileSystem/user/changepassword`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

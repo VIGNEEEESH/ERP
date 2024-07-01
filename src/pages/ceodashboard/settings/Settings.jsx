@@ -11,7 +11,7 @@ const Settings = () => {
       </div>
       <div>
         <PasswordChange />
-        <FileSystemPasswordChange /> 
+        
       </div>
     </div>
   );

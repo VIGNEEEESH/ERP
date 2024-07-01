@@ -33,7 +33,7 @@ const Settings = lazy(() => import('./pages/ceodashboard/settings/Settings'));
 const Logout = lazy(() => import('./pages/ceodashboard/logout'));
 const LogRecord = lazy(() => import('./pages/ceodashboard/logrecord/LogRecord'));
 const MyLogRecord = lazy(() => import('./pages/ceodashboard/mylogrecord/MylogRecord'));
-const FileSystem = lazy(() => import('./pages/ceodashboard/FileSystem/file'));
+const FileSystem = lazy(() => import('./pages/ceodashboard/FileSystem/FileUpload'));
 
 // import Home from './pages/ceodashboard/home';
 // import ManageEmployees from './pages/ceodashboard/manage-employees/manageEmployees';
