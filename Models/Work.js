@@ -6,6 +6,6 @@ const workSchema = new Schema({
   workDone: { type: String, required: true },
   userId: { type: String, required: true },
 });
-// Compound index on date and userId fields
+
 workSchema.index({ date: 1, userId: 1 }, { unique: true });
 module.exports = mongoose.model("Work", workSchema);
