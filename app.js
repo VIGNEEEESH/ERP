@@ -20,10 +20,7 @@ const messageRoutes = require("./Routes/Message-Routes");
 const chatRoutes = require("./Routes/Chat-Routes");
 const fileRoutes = require("./Routes/File-Routes");
 const path = require("path");
-
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-
+app.use(bodyParser.json());
 app.use(cors());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
