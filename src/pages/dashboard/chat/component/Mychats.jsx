@@ -7,19 +7,24 @@ import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { AuthContext } from "@/pages/auth/Auth-context";
 import { ChatState } from "./miscellaneous/ChatProvider";
 
+
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState([]);
   const auth = useContext(AuthContext);
 
+
   const { selectedChat, setSelectedChat, user, chats = [], setChats } = ChatState(); // Initialize chats to an empty array
 
+
   const toast = useToast();
+
 
   const getSender = (loggedUser, users) => {
     return users[0]._id === loggedUser._id
       ? users[1].firstName + " " + users[1].lastName
       : users[0].firstName + " " + users[0].lastName;
   };
+
 
   const fetchUserDetails = async () => {
     try {
@@ -52,6 +57,7 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
+
   const fetchChats = async () => {
     try {
       const response = await fetch(
@@ -76,13 +82,16 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
+
   useEffect(() => {
     fetchChats();
     fetchUserDetails();
   }, [fetchAgain]);
 
+
   const groupChats = chats.filter((chat) => chat.isGroupChat);
   const singleChats = chats.filter((chat) => !chat.isGroupChat);
+
 
   return (
     <Box
@@ -91,6 +100,7 @@ const MyChats = ({ fetchAgain }) => {
       alignItems="center"
       p={3}
       bg="white"
+      h="70vh"
       w={{ base: "100%", md: "31%" }}
       borderRadius="lg"
       borderWidth="1px"
@@ -193,4 +203,7 @@ const MyChats = ({ fetchAgain }) => {
   );
 };
 
+
 export default MyChats;
+
+

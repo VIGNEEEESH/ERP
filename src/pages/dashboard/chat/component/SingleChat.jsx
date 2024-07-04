@@ -8,7 +8,8 @@ import {
   useToast,
   useDisclosure,
   InputGroup,
-  InputRightElement
+  InputRightElement,
+  InputLeftElement
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useContext, useEffect, useState, useRef } from "react";
@@ -22,7 +23,7 @@ import { AuthContext } from "@/pages/auth/Auth-context";
 import { ChatState } from "./miscellaneous/ChatProvider";
 import { io } from "socket.io-client";
 import FileUploadModal from "./miscellaneous/FileUploadModal";
-import { FaPaperclip, FaSmile } from 'react-icons/fa';
+import { FaPaperclip, FaSmile, FaTelegramPlane  } from 'react-icons/fa';
 import { Picker } from 'emoji-mart';
 import 'emoji-mart/css/emoji-mart.css';
 
@@ -296,6 +297,22 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 </div>
               )}
               <InputGroup size="md">
+              <InputLeftElement>
+
+<IconButton
+
+  h="1.75rem"
+
+  size="sm"
+
+  icon={<FaSmile />}
+
+  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+
+/>
+
+</InputLeftElement>
+
                 <Input
                   variant="filled"
                   bg="#E0E0E0"
@@ -310,13 +327,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     size="sm"
                     icon={<FaPaperclip />}
                     onClick={() => fileInputRef.current.click()} // Trigger file input click
-                  />
-                  <IconButton
-                    h="1.75rem"
-                    size="sm"
-                    icon={<FaSmile />}
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  />
+                  />&nbsp;
+                 <IconButton
+
+h="1.75rem"
+
+size="sm"
+
+icon={<FaTelegramPlane />}
+
+onClick={sendMessage}
+
+/>&nbsp;
                 </InputRightElement>
               </InputGroup>
               {showEmojiPicker && (

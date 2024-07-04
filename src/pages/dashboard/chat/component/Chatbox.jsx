@@ -13,6 +13,7 @@ import { ChatState } from './miscellaneous/ChatProvider';
 const Chatbox = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat } = ChatState();
 
+
   return (
     <Box
       display={{ base: selectedChat ? "flex" : "none", md: "flex" }}
@@ -21,6 +22,7 @@ const Chatbox = ({ fetchAgain, setFetchAgain }) => {
       p={3}
       bg="white"
       w={{ base: "100%", md: "68%" }}
+      h="70vh" // Added height 
       borderRadius="lg"
       borderWidth="1px"
     >
@@ -29,4 +31,7 @@ const Chatbox = ({ fetchAgain, setFetchAgain }) => {
   );
 };
 
+
 export default Chatbox;
+
+
