@@ -134,8 +134,8 @@ import { AuthContext } from "@/pages/auth/Auth-context";
           <ModalOverlay />
           <ModalContent>
             <ModalHeader
-              fontSize="35px"
-              fontFamily="Work sans"
+              fontSize="25px"
+              fontFamily="sans-serif"
               display="flex"
               justifyContent="center"
             >
@@ -145,7 +145,7 @@ import { AuthContext } from "@/pages/auth/Auth-context";
             <ModalBody display="flex" flexDir="column" alignItems="center">
               <FormControl>
                 <Input
-                  placeholder="Chat Name"
+                  placeholder="Group Name"
                   mb={3}
                   onChange={(e) => setGroupChatName(e.target.value)}
                 />
@@ -183,7 +183,7 @@ import { AuthContext } from "@/pages/auth/Auth-context";
             </ModalBody>
             <ModalFooter>
               <Button onClick={handleSubmit} colorScheme="blue">
-                Create Chat
+                Create Group
               </Button>
             </ModalFooter>
           </ModalContent>

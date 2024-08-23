@@ -14,6 +14,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@material-tailwind/react";
+import { NotificationProvider } from './context/NotificationContext';
 import { MaterialTailwindControllerProvider } from "@/context";
 import "../public/css/tailwind.css";
 import { ChakraProvider } from '@chakra-ui/react'
@@ -23,15 +24,26 @@ import { ChakraProvider } from '@chakra-ui/react'
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+      
   <React.StrictMode>
     <BrowserRouter>
+
       <ThemeProvider>
         <MaterialTailwindControllerProvider>
         <ChakraProvider>
+        
+     <NotificationProvider>
+      
+       
           <App />
+          </NotificationProvider>
+        
+          
           </ChakraProvider>
         </MaterialTailwindControllerProvider>
       </ThemeProvider>
+      
     </BrowserRouter>
   </React.StrictMode>
+  
 );

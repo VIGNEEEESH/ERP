@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -24,6 +24,8 @@ export function Sidenav({ brandName, routes }) {
 
   const [profileImg, setProfileImg] = useState(null);
   const [firstName, setFirstName] = useState("");
+  const sidenavRef = useRef(null);
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -50,8 +52,25 @@ export function Sidenav({ brandName, routes }) {
     fetchUserData();
   }, [auth.userId]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidenavRef.current && !sidenavRef.current.contains(event.target)) {
+        setOpenSidenav(dispatch, false);
+      }
+    };
+
+    if (openSidenav) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openSidenav, dispatch]);
+
   return (
     <aside
+      ref={sidenavRef}
       className={`${sidenavTypes[sidenavType]} ${
         openSidenav ? "translate-x-0" : "-translate-x-80"
       } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100 overflow-auto overflow-x-hidden hover:overflow-scroll`}
@@ -81,16 +100,15 @@ export function Sidenav({ brandName, routes }) {
         >
           {`Hello ${firstName}`}
         </Typography>
-        {/* Conditionally render cross icon in mobile view */}
         <IconButton
           variant="text"
           color="white"
           size="sm"
           ripple={false}
-          className="absolute right-0 top-0 grid rounded-br-none rounded-tl-none md:hidden"
+          className="absolute right-0 top-0 grid rounded-br-none rounded-tl-none xl:visible"
           onClick={() => setOpenSidenav(dispatch, false)}
         >
-          <XMarkIcon strokeWidth={2.5} className="h-5 w-5 text-black" />
+          <XMarkIcon strokeWidth={2.5} className="h-5 w-5 dark:text-white" />
         </IconButton>
       </div>
 

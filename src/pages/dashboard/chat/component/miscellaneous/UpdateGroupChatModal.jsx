@@ -1,4 +1,4 @@
-import { ViewIcon } from "@chakra-ui/icons";
+import { EditIcon } from "@chakra-ui/icons";
 import {
   Modal,
   ModalOverlay,
@@ -213,7 +213,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
   return (
     <>
-      <IconButton display={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+      <IconButton display={{ base: "flex" }} icon={<EditIcon />} onClick={onOpen} />
 
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
@@ -223,6 +223,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             fontFamily="Work sans"
             display="flex"
             justifyContent="center"
+            marginLeft={2}
           >
             {selectedChat.chatName}
           </ModalHeader>
@@ -241,14 +242,14 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             </Box>
             <FormControl display="flex">
               <Input
-                placeholder="Chat Name"
+                placeholder="Group Name"
                 mb={3}
                 value={groupChatName}
                 onChange={(e) => setGroupChatName(e.target.value)}
               />
               <Button
                 variant="solid"
-                colorScheme="teal"
+                colorScheme="gray"
                 ml={1}
                 isLoading={renameloading}
                 onClick={handleRename}

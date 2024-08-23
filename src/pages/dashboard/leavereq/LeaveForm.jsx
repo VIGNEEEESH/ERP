@@ -132,7 +132,7 @@ const handlePageSizeChange = (e) => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     try{
-      const response=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/leave/create/leave`,
+      const response=await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}`/api/erp/leave/create/leave,
       {
         method:"POST",
         headers:{

@@ -7,6 +7,7 @@ import ForgotPassword from "./pages/auth/Forgot-Password";
 import UpdatePassword from "./pages/auth/reset-password";
 import ChatProvider from "./pages/dashboard/chat/component/miscellaneous/ChatProvider";
 
+
 import "./App.css"
 // Lazy-loaded components
 import Dashboard from "@/layouts/dashboard";
@@ -103,6 +104,7 @@ function App() {
         role: role,
       }}
     >
+    
       <ChatProvider>
       <Suspense
         fallback={

@@ -24,86 +24,88 @@ import { getSender } from "../ChatLogic";
 import { AuthContext } from "@/pages/auth/Auth-context";
 import { Input } from "antd";
 import { ChatState } from "./ChatProvider";
-// import { ChatState } from "../../Context/ChatProvider";
+
 function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
-const auth=useContext(AuthContext)
-const { setSelectedChat, notification, setNotification, chats, setChats } = ChatState();
+  const auth = useContext(AuthContext);
+  const { setSelectedChat, notification, setNotification, chats, setChats } = ChatState();
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [user, setUser] = useState({});
   
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`, {
+          headers: {
+            Authorization: "Bearer " + auth.token,
+          },
+        });
+        const userData = await userResponse.json();
+        setUser(userData.user);
+      } catch (error) {
+        toast({
+          title: "Error Occurred!",
+          description: "Failed to Load User Data",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      }
+    };
 
-    const [user, setUser] = useState({});
-    useEffect(() => {
-          const fetchUser = async () => {
-            try {
-              const userResponse = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/user/byid/${auth.userId}`, {
-                headers: {
-                  Authorization: "Bearer " + auth.token,
-                },
-              });
-              const userData = await userResponse.json();
-              setUser(userData.user);
-            } catch (error) {
-              toast({
-                title: "Error Occurred!",
-                description: "Failed to Load User Data",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom-left",
-              });
-            }
-          };
-      
-          fetchUser();
-        }, [auth.token, auth.userId, toast]);
-  const handleSearch = async () => {
-    if (!search) {
-      toast({
-        title: "Please Enter something in search",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top-left",
-      });
-      return;
-    }
+    fetchUser();
+  }, [auth.token, auth.userId, toast]);
 
-    try {
-      setLoading(true);
-            const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users/search/${auth.userId}?search=${search}`, {
-              headers: {
-                Authorization: "Bearer " + auth.token,
-              },
-            });
-            const data = await response.json();
-            setLoading(false);
-            setSearchResult(
-              data.users.filter(user => user.firstName && user.firstName.toLowerCase().includes(search.toLowerCase()))
-            );
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
-      });
-    }
-  };
+  // Real-time search functionality
+  useEffect(() => {
+    const handleSearch = async () => {
+      if (!search) {
+        setSearchResult([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/user/get/all/users/search/${auth.userId}?search=${search}`, {
+          headers: {
+            Authorization: "Bearer " + auth.token,
+          },
+        });
+        const data = await response.json();
+        setLoading(false);
+        setSearchResult(
+          data.users.filter(user => user.firstName && user.firstName.toLowerCase().includes(search.toLowerCase()))
+        );
+      } catch (error) {
+        toast({
+          title: "Error Occurred!",
+          description: "Failed to Load the Search Results",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      }
+    };
+
+    const delayDebounceFn = setTimeout(() => {
+      handleSearch();
+    }, 300); // Debounce time set to 300ms
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [search, auth.token, auth.userId, toast]);
 
   const accessChat = async (userId) => {
-    
-
     try {
       setLoadingChat(true);
-           const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/access/chat`, {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/erp/chat/access/chat`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + auth.token,
@@ -140,27 +142,21 @@ const { setSelectedChat, notification, setNotification, chats, setChats } = Chat
         width="100%"
         padding="5px 10px"
         borderWidth="5px"
-        
       >
-        <Tooltip label="Search Users to chat" hasArrow placement="bottom-end" >
+        <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
           <Button variant="ghost" onClick={onOpen}>
             <i className="fas fa-search"></i>
-            <Typography variant="small" color="blue-gray" className="font-semibold">
-              Search User
-            </Typography>
           </Button>
         </Tooltip>
-        <Typography variant="small" color="blue-gray" className="font-semibold">
-              Correct Step Consultancy
-            </Typography>
+       
         <div>
-        <Menu>
+          <Menu>
             <MenuButton p={1}>
-              <NotificationBadge
+              {/* <NotificationBadge
                 count={notification.length}
                 effect={Effect.SCALE}
-              />
-              <BellIcon fontSize="2xl" m={1} />
+              /> */}
+              {/* <BellIcon fontSize="2xl" m={1} /> */}
             </MenuButton>
             <MenuList pl={2}>
               {!notification.length && "No New Messages"}
@@ -180,21 +176,15 @@ const { setSelectedChat, notification, setNotification, chats, setChats } = Chat
             </MenuList>
           </Menu>
           <Menu>
-            <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
+            
               <Avatar
                 size="sm"
                 cursor="pointer"
                 name={user.firstName}
-                src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` }
+                src={`${import.meta.env.REACT_APP_BACKEND_URL}/${user.image}` || "https://via.placeholder.com/150"}
               />
-            </MenuButton>
-            <MenuList>
-              <ProfileModal>
-                <MenuItem> <Typography variant="small" color="blue-gray" className="font-semibold">
-            My Profile
-            </Typography></MenuItem>
-              </ProfileModal>
-            </MenuList>
+           
+           
           </Menu>
         </div>
       </Box>
@@ -203,8 +193,8 @@ const { setSelectedChat, notification, setNotification, chats, setChats } = Chat
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader borderBottomWidth="1px"> <Typography variant="small" color="blue-gray" className="font-semibold">
-              Search Users
-            </Typography></DrawerHeader>
+            Search Users
+          </Typography></DrawerHeader>
           <DrawerBody>
             <Box display="flex" pb={2}>
               <Input
@@ -213,9 +203,6 @@ const { setSelectedChat, notification, setNotification, chats, setChats } = Chat
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              <Button onClick={handleSearch}> <Typography variant="small" color="blue-gray" className="font-semibold">
-             Go
-            </Typography></Button>
             </Box>
             {loading ? (
               <ChatLoading />
@@ -234,5 +221,6 @@ const { setSelectedChat, notification, setNotification, chats, setChats } = Chat
       </Drawer>
     </>
   );
-};
+}
+
 export default SideDrawer;

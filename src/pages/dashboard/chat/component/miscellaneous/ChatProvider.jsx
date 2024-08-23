@@ -11,6 +11,7 @@ const ChatProvider = ({ children }) => {
   const [chats, setChats] = useState();
   const auth=useContext(AuthContext)
   const history = useNavigate();
+  const [isActiveChat, setIsActiveChat] = useState(false);
 
   const fetchUserDetails = async () => {
     
@@ -37,7 +38,7 @@ const ChatProvider = ({ children }) => {
   };
   useEffect(()=>{
     fetchUserDetails()
-  },[auth.userId])
+  },[auth.userId]);
 
   return (
     <ChatContext.Provider
@@ -50,6 +51,7 @@ const ChatProvider = ({ children }) => {
         setNotification,
         chats,
         setChats,
+         setIsActiveChat,
       }}
     >
       {children}

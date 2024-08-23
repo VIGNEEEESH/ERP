@@ -1,6 +1,6 @@
 {
     "env": {
-      "BackendUrl":"http://13.233.212.169:3000/"
+      "BackendUrl":"REACT_APP_BACKEND_URL"
     }
   }
   

@@ -147,6 +147,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { lazy } from 'react';
 
+
 import Home from "@/pages/dashboard/home";
 import Profile from "@/pages/dashboard/profile";
 import Tables from "@/pages/dashboard/tables";
@@ -233,6 +234,7 @@ export const routes = [
         name: "Communication",
         path: "/communication",
         element: <CommunicationComponent />,
+        communication: true,
       },
       {
         icon: <CalendarDaysIcon {...icon} />,
