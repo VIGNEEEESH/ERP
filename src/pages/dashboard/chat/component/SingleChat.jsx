@@ -23,7 +23,7 @@ import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import { useContext, useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-import ProfileModal from "./miscellaneous/ProfileModal";
+import ProfileModal from "./miscellaneous/Profilemodal";
 import ScrollableChat from "./ScrollableChat";
 import { getSender, getSenderFull } from "./ChatLogic";
 import animationData from "../animations/typing.json";

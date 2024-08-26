@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Box, Text, Button, Avatar, Tooltip, useToast } from "@chakra-ui/react";
-import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
+
 import {
   Menu,
   MenuButton,
@@ -13,9 +13,7 @@ import {
   DrawerHeader,
   DrawerOverlay,
 } from "@chakra-ui/react";
-import NotificationBadge from "react-notification-badge";
-import { Effect } from "react-notification-badge";
-import ProfileModal from "./ProfileModal"; // Ensure this component is defined and imported correctly
+
 import ChatLoading from "../ChatLoading";
 import UserListItem from "../userAvatar/UserListItem";
 import { Card, CardHeader, Typography } from "@material-tailwind/react";
